@@ -19,6 +19,17 @@ namespace MetaApi.AppStart
                 client.DefaultRequestHeaders.Add("Authorization", virtualFitConfig.ApiToken);
                 client.DefaultRequestHeaders.Add("Prefer", "wait");
             });
+
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyOrigin()  // Разрешить любой источник
+                          .AllowAnyMethod()  // Разрешить любые HTTP-методы (GET, POST, PUT и т. д.)
+                          .AllowAnyHeader(); // Разрешить любые заголовки
+                });
+            });
         }
     }
 }
