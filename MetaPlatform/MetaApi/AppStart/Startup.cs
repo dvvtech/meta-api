@@ -19,7 +19,7 @@ namespace MetaApi.AppStart
             {
                 client.BaseAddress = new Uri("https://api.replicate.com/v1/");
                 client.Timeout = TimeSpan.FromSeconds(60); // Таймаут запроса
-                client.DefaultRequestHeaders.Add("Authorization", virtualFitConfig.ApiToken);
+                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {virtualFitConfig.ApiToken}");
                 client.DefaultRequestHeaders.Add("Prefer", "wait");
             });
 

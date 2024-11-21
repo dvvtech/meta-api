@@ -83,10 +83,10 @@ namespace MetaApi.Controllers
                     Steps = 30,
                     Category = "upper_body",//lower_body, dresses
                     ForceDc = false,
-                    GarmImg = "https://i.postimg.cc/D0wR6Yxm/7110853102.webp",//requestData.GarmImg,
-                    HumanImg = "https://i.postimg.cc/jd9B6cPd/IMG-6656.jpg",//requestData.HumanImg
+                    GarmImg = "https://ir.ozone.ru/s3/multimedia-1-r/wc1000/6906894111.jpg",//requestData.GarmImg,
+                    HumanImg = "https://i.postimg.cc/vB7x1Vjs/IMG-6718.jpg",//requestData.HumanImg                                
                     MaskOnly = false,
-                    GarmentDes = "cute pink top"
+                    GarmentDes = ""
                 }
             };
 
