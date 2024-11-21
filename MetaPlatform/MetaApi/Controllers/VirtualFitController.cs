@@ -10,15 +10,20 @@ namespace MetaApi.Controllers
     [ApiController]
     public class VirtualFitController : ControllerBase
     {
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IWebHostEnvironment _env;        
 
-       
-        private readonly IWebHostEnvironment _env;
-
-        public VirtualFitController(HttpClient httpClient, IWebHostEnvironment env)
+        public VirtualFitController(IHttpClientFactory httpClientFactory,
+                                    IWebHostEnvironment env)
         {
-            _httpClient = httpClient;
-            _env = env;
+            _httpClientFactory = httpClientFactory;
+            _env = env;            
+        }
+
+        [HttpGet("test")]
+        public string Test()
+        {
+            return "123";
         }
 
         [HttpPost("upload")]
@@ -65,8 +70,7 @@ namespace MetaApi.Controllers
         {
             //модель https://replicate.com/cuuupid/idm-vton
 
-            // Укажите URL другого сервиса, куда будет отправлен запрос
-            var targetUrl = "https://api.replicate.com/v1/predictions";
+            var httpClient = _httpClientFactory.CreateClient("ReplicateAPI");
 
             // Подготовьте данные для отправки            
             var internalRequestData = new PredictionRequest
@@ -95,13 +99,8 @@ namespace MetaApi.Controllers
             var jsonContent = JsonSerializer.Serialize(internalRequestData, options);
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            // Установите заголовки запроса
-            _httpClient.DefaultRequestHeaders.Clear();
-            //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_apiToken}");
-            _httpClient.DefaultRequestHeaders.Add("Prefer", "wait");
-
             // Отправьте POST запрос к другому сервису
-            var response = await _httpClient.PostAsync(targetUrl, content);
+            var response = await httpClient.PostAsync("predictions", content);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -114,8 +113,8 @@ namespace MetaApi.Controllers
             var predictionId = document.RootElement.GetProperty("id").GetString();
             var status = document.RootElement.GetProperty("status").GetString();
 
-            // Повторяем запрос на получение результата, если статус не "succeeded"
-            var checkUrl = $"https://api.replicate.com/v1/predictions/{predictionId}";
+            // Повторяем запрос на получение результата, если статус не "succeeded"            
+            var checkUrl = $"predictions/{predictionId}";
             int maxRetries = 15;
             int retryCount = 0;
             int delay = 2000; // Задержка между запросами в миллисекундах (2 секунды)
@@ -123,12 +122,12 @@ namespace MetaApi.Controllers
             while (status != "succeeded" && status != "failed" && retryCount < maxRetries)
             {
                 await Task.Delay(delay);
-                var checkResponse = await _httpClient.GetAsync(checkUrl);
+                var checkResponse = await httpClient.GetAsync(checkUrl);
 
                 if (!checkResponse.IsSuccessStatusCode)
                 {
-                    var response1 = await checkResponse.Content.ReadAsStringAsync();
-                    return StatusCode((int)checkResponse.StatusCode, response1);
+                    var errorContent = await checkResponse.Content.ReadAsStringAsync();
+                    return StatusCode((int)checkResponse.StatusCode, errorContent);
                 }
 
                 var checkContent = await checkResponse.Content.ReadAsStringAsync();
