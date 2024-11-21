@@ -1,0 +1,1 @@
+﻿1. вручную создал папку wwwroot по пути C:\DVV\GitHub\meta-api2\meta-api\MetaPlatform\MetaApi

@@ -3,10 +3,14 @@ using MetaApi.Constants;
 
 namespace MetaApi.AppStart
 {
-    public class Startup
+    public partial class Startup
     {
+        private WebApplicationBuilder _builder;
+
         public void Initialize(WebApplicationBuilder builder)
         {
+            _builder = builder ?? throw new ArgumentNullException(nameof(builder));
+
             builder.Services.Configure<VirtualFitConfig>(builder.Configuration.GetSection(VirtualFitConfig.SectionName));
 
             var virtualFitConfig = builder.Configuration.GetSection(VirtualFitConfig.SectionName).Get<VirtualFitConfig>();
@@ -21,16 +25,8 @@ namespace MetaApi.AppStart
 
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAll", policy =>
-                {
-                    policy.AllowAnyOrigin()  // Разрешить любой источник
-                          .AllowAnyMethod()  // Разрешить любые HTTP-методы (GET, POST, PUT и т. д.)
-                          .AllowAnyHeader(); // Разрешить любые заголовки
-                });
-            });
-
+            ConfigureCors();
+            
             builder.Services.AddControllers();
         }
     }

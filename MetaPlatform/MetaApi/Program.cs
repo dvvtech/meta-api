@@ -17,7 +17,10 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.UseCors();
+// Добавление поддержки статических файлов
+app.UseStaticFiles();
+
+app.UseCors("AllowAll");
 
 app.MapControllers();
 
