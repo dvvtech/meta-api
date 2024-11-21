@@ -2,14 +2,14 @@ using MetaApi.AppStart;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+var startup = new Startup();
+startup.Initialize(builder);
 
-builder.Services.AddControllers();
 
 var app = builder.Build();
 
-var startup = new Startup();
-startup.Initialize(builder);
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // Configure the HTTP request pipeline.
 

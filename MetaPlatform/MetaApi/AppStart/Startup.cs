@@ -1,6 +1,5 @@
 ﻿using MetaApi.Config;
 using MetaApi.Constants;
-using Microsoft.AspNetCore.Builder.Extensions;
 
 namespace MetaApi.AppStart
 {
@@ -20,6 +19,7 @@ namespace MetaApi.AppStart
                 client.DefaultRequestHeaders.Add("Prefer", "wait");
             });
 
+            builder.Services.AddSwaggerGen();
 
             builder.Services.AddCors(options =>
             {
@@ -30,6 +30,8 @@ namespace MetaApi.AppStart
                           .AllowAnyHeader(); // Разрешить любые заголовки
                 });
             });
+
+            builder.Services.AddControllers();
         }
     }
 }
