@@ -20,7 +20,14 @@ app.UseAuthorization();
 // Добавление поддержки статических файлов
 app.UseStaticFiles();
 
-app.UseCors("AllowAll");
+if (builder.Environment.IsDevelopment())
+{
+    app.UseCors("AllowAll");
+}
+else
+{
+    app.UseCors("AllowAll");
+}
 
 app.MapControllers();
 
