@@ -12,17 +12,21 @@ namespace MetaApi.Controllers
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IWebHostEnvironment _env;        
+        private readonly ILogger<VirtualFitController> _logger;
 
         public VirtualFitController(IHttpClientFactory httpClientFactory,
-                                    IWebHostEnvironment env)
+                                    IWebHostEnvironment env,
+                                    ILogger<VirtualFitController> logger)
         {
             _httpClientFactory = httpClientFactory;
-            _env = env;            
+            _env = env;   
+            _logger = logger;
         }
 
         [HttpGet("test")]
         public string Test()
         {
+            _logger.LogInformation("test");
             return "123";
         }
 
