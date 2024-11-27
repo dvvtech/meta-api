@@ -1,5 +1,4 @@
-﻿
-namespace MetaApi.Core.OperationResults
+﻿namespace MetaApi.Core.OperationResults.Base
 {
     /// <summary>
     /// Класс Result для представления результата операции без возвращаемого значения.

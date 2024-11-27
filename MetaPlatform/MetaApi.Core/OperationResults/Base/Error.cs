@@ -1,5 +1,4 @@
-﻿
-namespace MetaApi.Core.OperationResults
+﻿namespace MetaApi.Core.OperationResults.Base
 {
     /// <summary>
     /// Представляет ошибку, возвращаемую классами Result и Result<T>.
