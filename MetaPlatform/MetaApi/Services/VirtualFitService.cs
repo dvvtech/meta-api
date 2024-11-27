@@ -23,7 +23,7 @@ namespace MetaApi.Services
         /// <summary>
         /// Попытка примерки одежды
         /// </summary>
-        public async Task<Result<string>> TryOnClothesAsync()
+        public async Task<Result<string>> TryOnClothesAsync(Request requestData)
         {
             //модель https://replicate.com/cuuupid/idm-vton
 
@@ -62,8 +62,7 @@ namespace MetaApi.Services
             if (!response.IsSuccessStatusCode)
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
-                return Result<string>.Failure(VirtualFitError.ThirdPartyServiceError(errorContent));
-                //return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
+                return Result<string>.Failure(VirtualFitError.ThirdPartyServiceError(errorContent, response.StatusCode));                
             }
 
             // Получаем ID созданного предсказания из первого ответа
@@ -86,8 +85,7 @@ namespace MetaApi.Services
                 if (!checkResponse.IsSuccessStatusCode)
                 {
                     var errorContent = await checkResponse.Content.ReadAsStringAsync();
-                    return Result<string>.Failure(VirtualFitError.ThirdPartyServiceError(errorContent));
-                    //return StatusCode((int)checkResponse.StatusCode, errorContent);
+                    return Result<string>.Failure(VirtualFitError.ThirdPartyServiceError(errorContent, checkResponse.StatusCode));                    
                 }
 
                 var checkContent = await checkResponse.Content.ReadAsStringAsync();
@@ -99,14 +97,13 @@ namespace MetaApi.Services
                 if (status == "succeeded")
                 {
                     var outputUrl = checkDocument.RootElement.GetProperty("output").GetString();
-                    return Result<string>.Success(outputUrl);
-                    //return Ok(outputUrl);
+                    return Result<string>.Success(outputUrl);                    
                 }
 
                 retryCount++;
             }
 
-            return Result<string>.Failure(VirtualFitError.VirtualFitServiceError(string.Empty));
+            return Result<string>.Failure(VirtualFitError.VirtualFitServiceError("Something went wrong"));
         }
     }
 }

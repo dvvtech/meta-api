@@ -1,4 +1,5 @@
 ﻿using MetaApi.Core.OperationResults.Base;
+using System.Net;
 
 namespace MetaApi.Core.OperationResults
 {
@@ -8,7 +9,7 @@ namespace MetaApi.Core.OperationResults
 
         public const string VirtualFitServiceErrorCode = "CurrentService.Error";
 
-        public static Error ThirdPartyServiceError(string info) => new Error(ThirdPartyServiceErrorCode, $"{info}");
+        public static Error ThirdPartyServiceError(string info, HttpStatusCode httpStatusCode) => new Error(httpStatusCode.ToString(), $"{info}");
 
         public static Error VirtualFitServiceError(string info) => new Error(VirtualFitServiceErrorCode, $"{info}");
     }

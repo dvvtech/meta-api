@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
-using System.Text;
-using MetaApi.Utilities;
 using MetaApi.Models.VirtualFit;
+using MetaApi.Services;
+using MetaApi.Core.OperationResults.Base;
 
 namespace MetaApi.Controllers
 {
@@ -13,14 +12,17 @@ namespace MetaApi.Controllers
     [ApiController]
     public class VirtualFitController : ControllerBase
     {
+        private readonly VirtualFitService _virtualFitService;
         //private readonly IHttpClientFactory _httpClientFactory;
         private readonly IWebHostEnvironment _env;        
         private readonly ILogger<VirtualFitController> _logger;
 
         public VirtualFitController(//IHttpClientFactory httpClientFactory,
+                                    VirtualFitService virtualFitService,
                                     IWebHostEnvironment env,
                                     ILogger<VirtualFitController> logger)
         {
+            _virtualFitService = virtualFitService;
             //_httpClientFactory = httpClientFactory;
             _env = env;   
             _logger = logger;
@@ -80,8 +82,19 @@ namespace MetaApi.Controllers
         /// <returns></returns>
         [HttpPost("send")]
         public async Task<IActionResult> SendPostRequest([FromBody] Request requestData)
-        {            
-            var httpClient = _httpClientFactory.CreateClient("ReplicateAPI");
+        {
+            Result<string> resultFit = await _virtualFitService.TryOnClothesAsync(requestData);
+            if (resultFit.IsFailure)
+            {
+                int httpStatusCode = int.Parse(resultFit.Error.Code);
+                return StatusCode(httpStatusCode, resultFit.Error.Description);
+            }
+
+            return Ok(resultFit.Value);
+
+            #region Comment
+
+            /*var httpClient = _httpClientFactory.CreateClient("ReplicateAPI");
 
             // Подготовьте данные для отправки            
             var internalRequestData = new PredictionRequest
@@ -157,7 +170,9 @@ namespace MetaApi.Controllers
             }
 
             // Если статус "failed" или истек лимит повторных попыток
-            return StatusCode(500, status == "failed" ? "The process failed." : "The process did not complete in time.");
+            return StatusCode(500, status == "failed" ? "The process failed." : "The process did not complete in time.");*/
+
+            #endregion
         }
     }
 }
