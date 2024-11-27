@@ -1,86 +1,30 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MetaApi.Models.VirtualFit;
+using MetaApi.SqlServer.Context;
+using MetaApi.Utilities;
 using System.Text.Json;
 using System.Text;
-using MetaApi.Utilities;
-using MetaApi.Models.VirtualFit;
 
-namespace MetaApi.Controllers
+namespace MetaApi.Services
 {
-    /// <summary>
-    /// Сервис примерки одежды. Используется модель https://replicate.com/cuuupid/idm-vton
-    /// </summary>
-    [Route("api/virtual-fit")]
-    [ApiController]
-    public class VirtualFitController : ControllerBase
+    public class VirtualFitService
     {
-        //private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IWebHostEnvironment _env;        
-        private readonly ILogger<VirtualFitController> _logger;
+        private readonly MetaContext _metaContext;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public VirtualFitController(//IHttpClientFactory httpClientFactory,
-                                    IWebHostEnvironment env,
-                                    ILogger<VirtualFitController> logger)
+        public VirtualFitService(MetaContext metaContext,
+                                 IHttpClientFactory httpClientFactory)
         {
-            //_httpClientFactory = httpClientFactory;
-            _env = env;   
-            _logger = logger;
-        }
-
-        [HttpGet("test")]
-        public string Test()
-        {
-            _logger.LogInformation("test2");
-            return "1234567";
-        }
-
-        [HttpPost("upload")]
-        public async Task<IActionResult> Upload(IFormFile file)
-        {
-            _logger.LogInformation("upload11");
-            if (file == null || file.Length == 0)
-            {
-                return BadRequest("Файл не выбран или пустой.");
-            }
-            _logger.LogInformation("upload22");
-            try
-            {
-                // Путь для сохранения файла
-                var uploadsPath = Path.Combine(_env.WebRootPath, "uploads");                
-                if (!Directory.Exists(uploadsPath))
-                {
-                    Directory.CreateDirectory(uploadsPath);
-                }
-                _logger.LogInformation("upload33");
-                // Уникальное имя файла
-                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-
-                // Полный путь для сохранения
-                var filePath = Path.Combine(uploadsPath, uniqueFileName);
-
-                // Сохранение файла
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-
-                // Генерация публичной ссылки
-                var fileUrl = $"{Request.Scheme}://{Request.Host}/uploads/{uniqueFileName}";
-                return Ok(new { url = fileUrl });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Внутренняя ошибка сервера: {ex.Message}");
-            }
+            _metaContext = metaContext;
+            _httpClientFactory = httpClientFactory;
         }
 
         /// <summary>
-        /// 
+        /// Попытка примерки одежды
         /// </summary>
-        /// <param name="requestData"></param>
-        /// <returns></returns>
-        [HttpPost("send")]
-        public async Task<IActionResult> SendPostRequest([FromBody] Request requestData)
-        {            
+        public async Task TryOnClothesAsync()
+        {
+            //модель https://replicate.com/cuuupid/idm-vton
+
             var httpClient = _httpClientFactory.CreateClient("ReplicateAPI");
 
             // Подготовьте данные для отправки            
@@ -155,9 +99,6 @@ namespace MetaApi.Controllers
 
                 retryCount++;
             }
-
-            // Если статус "failed" или истек лимит повторных попыток
-            return StatusCode(500, status == "failed" ? "The process failed." : "The process did not complete in time.");
         }
     }
 }

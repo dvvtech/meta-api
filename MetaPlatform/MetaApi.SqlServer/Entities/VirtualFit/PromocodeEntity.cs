@@ -10,6 +10,10 @@ namespace MetaApi.SqlServer.Entities.VirtualFit
     {
         public int Id { get; set; }
 
+        public string Promocode { get; set; }
+
+        public int AttemptsLimit { get; set; }
+
         public DateTime CreatedUtcDate { get; set; }
 
         public DateTime UpdateUtcDate { get; set; }

@@ -6,10 +6,13 @@ using System.Threading.Tasks;
 
 namespace MetaApi.SqlServer.Entities.VirtualFit
 {
-    public class FittingResult
+    public class FittingResultEntity
     {
         public int Id { get; set; }
 
+        /// <summary>
+        /// Фото одежды
+        /// </summary>
         public string GarmentImgUrl { get; set; }
 
         public string HumanImgUrl { get; set; }
@@ -18,8 +21,6 @@ namespace MetaApi.SqlServer.Entities.VirtualFit
 
         public int PromocodeId { get; set; }
 
-        public DateTime CreatedUtcDate { get; set; }
-
-        public DateTime UpdateUtcDate { get; set; }
+        public DateTime CreatedUtcDate { get; set; }        
     }
 }
