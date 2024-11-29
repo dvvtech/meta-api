@@ -12,7 +12,15 @@ namespace MetaApi.SqlServer.Entities.VirtualFit
 
         public string Promocode { get; set; }
 
-        public int AttemptsLimit { get; set; }
+        /// <summary>
+        /// Ограничение на кол-во вызовов
+        /// </summary>
+        public int UsageLimit { get; set; }
+
+        /// <summary>
+        /// Кол-во оставшихся вызовов
+        /// </summary>
+        public int RemainingUsage { get; set; }
 
         public DateTime CreatedUtcDate { get; set; }
 
