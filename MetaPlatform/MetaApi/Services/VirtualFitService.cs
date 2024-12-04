@@ -21,7 +21,7 @@ namespace MetaApi.Services
         }
 
         /// <summary>
-        /// Попытка примерки одежды
+        /// Попытка примерки одежды. Возвращает url результирующего изображения
         /// </summary>
         public async Task<Result<string>> TryOnClothesAsync(Request requestData)
         {
@@ -32,7 +32,7 @@ namespace MetaApi.Services
             // Подготовьте данные для отправки            
             var internalRequestData = new PredictionRequest
             {
-                Version = "c871bb9b046607b680449ecbae55fd8c6d945e0a1948644bf2361b3d021d3ff4",
+                Version = "c871bb9b046607b680449ecbae55fd8c6d945e0a1948644bf2361b3d021d3ff4",                           
                 Input = new InputData
                 {
                     Crop = false,
