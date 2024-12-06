@@ -1,14 +1,24 @@
 using MetaApi.AppStart;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Hosting.Server;
+using MetaApi.Configuration;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var startup = new Startup();
 startup.Initialize(builder);
 
-
 var app = builder.Build();
+
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+var virtualFitConfig = builder.Configuration.GetSection(VirtualFitConfig.SectionName).Get<VirtualFitConfig>();
+var dbInfo = builder.Configuration.GetConnectionString(DatabaseConfig.MetaDbMsSqlConnection);
+StringBuilder sb = new StringBuilder();
+sb.AppendLine($"Environment: {environment}");
+sb.AppendLine($"config: {virtualFitConfig.ApiToken}");
+sb.AppendLine($"dbInfo: {dbInfo}");
+app.Logger.LogInformation(sb.ToString());
 
 app.UseSwagger();
 app.UseSwaggerUI();
