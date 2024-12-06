@@ -21,6 +21,11 @@ namespace MetaApi.SqlServer.Entities.VirtualFit
 
         public int PromocodeId { get; set; }
 
-        public DateTime CreatedUtcDate { get; set; }        
+        public DateTime CreatedUtcDate { get; set; }
+
+        /// <summary>
+        /// Навигационное свойство на PromocodeEntity
+        /// </summary>
+        public PromocodeEntity Promocode { get; set; }
     }
 }
