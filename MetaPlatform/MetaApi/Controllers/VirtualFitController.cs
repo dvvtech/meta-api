@@ -35,6 +35,21 @@ namespace MetaApi.Controllers
             return "1234567";
         }
 
+        [HttpPost("generate-promocode")]
+        public async Task<ActionResult<string>> GeneratePromocode(GeneratePromocodeRequest request)
+        {
+            //todo этот метод должен только админом вызываться
+
+            if (request.UsageLimit <= 0)
+            {
+                return BadRequest("UsageLimit должен быть больше 0.");
+            }
+
+            string promocode = await _virtualFitService.GeneratePromocode(request);
+
+            return Ok(promocode);
+        }
+
         [HttpPost("upload")]
         public async Task<IActionResult> Upload(IFormFile file)
         {
