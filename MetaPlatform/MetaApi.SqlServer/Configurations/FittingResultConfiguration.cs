@@ -1,15 +1,10 @@
 ﻿using MetaApi.SqlServer.Entities.VirtualFit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MetaApi.SqlServer.Configurations
 {
-    internal class FittingResultConfiguration : IEntityTypeConfiguration<FittingResultEntity>
+    public class FittingResultConfiguration : IEntityTypeConfiguration<FittingResultEntity>
     {
         public void Configure(EntityTypeBuilder<FittingResultEntity> builder)
         {

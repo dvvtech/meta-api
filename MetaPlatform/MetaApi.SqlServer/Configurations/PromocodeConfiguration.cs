@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MetaApi.SqlServer.Configurations
 {
-    internal class PromocodeConfiguration : IEntityTypeConfiguration<PromocodeEntity>
+    public class PromocodeConfiguration : IEntityTypeConfiguration<PromocodeEntity>
     {
         public void Configure(EntityTypeBuilder<PromocodeEntity> builder)
         {
