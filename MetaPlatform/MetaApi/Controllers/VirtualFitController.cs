@@ -52,13 +52,12 @@ namespace MetaApi.Controllers
 
         [HttpPost("upload")]
         public async Task<IActionResult> Upload(IFormFile file)
-        {
-            _logger.LogInformation("upload11");
+        {            
             if (file == null || file.Length == 0)
             {
                 return BadRequest("Файл не выбран или пустой.");
             }
-            _logger.LogInformation("upload22");
+            
             try
             {
                 // Путь для сохранения файла
@@ -67,7 +66,7 @@ namespace MetaApi.Controllers
                 {
                     Directory.CreateDirectory(uploadsPath);
                 }
-                _logger.LogInformation("upload33");
+                
                 // Уникальное имя файла
                 var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
 
@@ -103,8 +102,14 @@ namespace MetaApi.Controllers
             Result<string> resultFit = await _virtualFitService.TryOnClothesAsync(requestData);
             if (resultFit.IsFailure)
             {
-                int httpStatusCode = int.Parse(resultFit.Error.Code);
-                return StatusCode(httpStatusCode, resultFit.Error.Description);
+                if (int.TryParse(resultFit.Error.Code, out int httpStatusCode))
+                {
+                    return StatusCode(httpStatusCode, resultFit.Error.Description);
+                }
+                else
+                {
+                    return BadRequest(resultFit.Error.Description);
+                }
             }
 
             return Ok(resultFit.Value);

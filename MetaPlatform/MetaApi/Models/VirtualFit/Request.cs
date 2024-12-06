@@ -11,5 +11,7 @@
         /// Фото человека, на которого примерять
         /// </summary>
         public string HumanImg { get; set; }
+
+        public string Promocode {  get; set; }
     }
 }

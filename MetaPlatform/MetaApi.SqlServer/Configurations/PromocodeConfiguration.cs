@@ -41,6 +41,11 @@ namespace MetaApi.SqlServer.Configurations
                 .WithOne(f => f.Promocode)
                 .HasForeignKey(f => f.PromocodeId)
                 .OnDelete(DeleteBehavior.Cascade); // Удаление связанных данных
+
+            // Индекс на поле Promocode
+            builder.HasIndex(p => p.Promocode)
+                   .IsUnique() // Индекс уникальный
+                   .HasDatabaseName("IX_Promocodes_Promocode"); // Опциональное имя индекса
         }
     }
 }

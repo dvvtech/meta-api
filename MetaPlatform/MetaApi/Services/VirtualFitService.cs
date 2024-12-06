@@ -6,6 +6,8 @@ using System.Text;
 using MetaApi.Core.OperationResults.Base;
 using MetaApi.Core.OperationResults;
 using MetaApi.SqlServer.Entities.VirtualFit;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Diagnostics;
 
 namespace MetaApi.Services
 {
@@ -47,9 +49,13 @@ namespace MetaApi.Services
         /// <summary>
         /// Попытка примерки одежды. Возвращает url результирующего изображения
         /// </summary>
-        public async Task<Result<string>> TryOnClothesAsync(Request requestData)
+        public async Task<Result<string>> TryOnClothesAsync(Request request)
         {
-            //модель https://replicate.com/cuuupid/idm-vton
+            PromocodeEntity? promocode = await _metaDbContext.Promocode.FirstOrDefaultAsync(p => p.Promocode == request.Promocode);
+            if(promocode == null) 
+            {
+                return Result<string>.Failure(VirtualFitError.NotValidPromocodeError());
+            }
 
             var httpClient = _httpClientFactory.CreateClient("ReplicateAPI");
 
@@ -64,10 +70,10 @@ namespace MetaApi.Services
                     Steps = 30,
                     Category = "upper_body",//lower_body, dresses
                     ForceDc = false,
-                    GarmImg = "https://ir.ozone.ru/s3/multimedia-1-r/wc1000/6906894111.jpg",//requestData.GarmImg,
-                    HumanImg = "https://i.postimg.cc/vB7x1Vjs/IMG-6718.jpg",//requestData.HumanImg                                
+                    GarmImg = request.GarmImg,
+                    HumanImg = request.HumanImg,                                
                     MaskOnly = false,
-                    GarmentDes = ""
+                    GarmentDes = "кофта"
                 }
             };
 
@@ -121,6 +127,23 @@ namespace MetaApi.Services
                 if (status == "succeeded")
                 {
                     var outputUrl = checkDocument.RootElement.GetProperty("output").GetString();
+
+                    var fitingResult = new FittingResultEntity
+                    {
+                        GarmentImgUrl = request.GarmImg,
+                        HumanImgUrl = request.HumanImg,
+                        ResultImgUrl = outputUrl,
+                        PromocodeId = promocode.Id,
+                        CreatedUtcDate = DateTime.UtcNow,
+                    };
+
+                    // Сохранение в базе данных
+                    _metaDbContext.FittingResult.Add(fitingResult);
+                    promocode.RemainingUsage--;
+                    promocode.UpdateUtcDate = DateTime.UtcNow;
+
+                    await _metaDbContext.SaveChangesAsync();
+
                     return Result<string>.Success(outputUrl);                    
                 }
 
