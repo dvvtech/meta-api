@@ -9,7 +9,7 @@ namespace MetaApi.AppStart
         void ConfigureDatabase(IConfiguration configuration)
         {
             _builder.Services.AddDbContext<MetaDbContext>(options =>
-            {
+            {                
                 options.UseSqlServer(configuration.GetConnectionString(DatabaseConfig.MetaDbMsSqlConnection),
                                      sqlServerOptionsAction: sqlOption =>
                                      {

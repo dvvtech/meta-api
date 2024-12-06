@@ -1,5 +1,6 @@
 ﻿using MetaApi.Configuration;
 using MetaApi.Constants;
+using MetaApi.Services;
 
 namespace MetaApi.AppStart
 {
@@ -24,9 +25,11 @@ namespace MetaApi.AppStart
             });
 
             builder.Services.AddSwaggerGen();
-
+            
             ConfigureCors();
             ConfigureDatabase(builder.Configuration);
+
+            builder.Services.AddScoped<VirtualFitService>();
             
             builder.Services.AddControllers();
         }
