@@ -83,6 +83,8 @@ namespace MetaApi.Controllers
         [HttpPost("send")]
         public async Task<IActionResult> SendPostRequest([FromBody] Request requestData)
         {
+            //todo добавить проверку на промокод
+
             Result<string> resultFit = await _virtualFitService.TryOnClothesAsync(requestData);
             if (resultFit.IsFailure)
             {

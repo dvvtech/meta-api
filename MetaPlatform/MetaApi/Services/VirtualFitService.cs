@@ -10,10 +10,10 @@ namespace MetaApi.Services
 {
     public class VirtualFitService
     {
-        private readonly MetaContext _metaContext;
+        private readonly MetaDbContext _metaContext;
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public VirtualFitService(MetaContext metaContext,
+        public VirtualFitService(MetaDbContext metaContext,
                                  IHttpClientFactory httpClientFactory)
         {
             _metaContext = metaContext;

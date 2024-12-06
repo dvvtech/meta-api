@@ -1,4 +1,4 @@
-﻿using MetaApi.Config;
+﻿using MetaApi.Configuration;
 using MetaApi.Constants;
 
 namespace MetaApi.AppStart
@@ -26,6 +26,7 @@ namespace MetaApi.AppStart
             builder.Services.AddSwaggerGen();
 
             ConfigureCors();
+            ConfigureDatabase(builder.Configuration);
             
             builder.Services.AddControllers();
         }

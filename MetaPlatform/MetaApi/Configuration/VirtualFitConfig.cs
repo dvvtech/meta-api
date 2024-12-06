@@ -1,4 +1,4 @@
-﻿namespace MetaApi.Config
+﻿namespace MetaApi.Configuration
 {
     public class VirtualFitConfig
     {
