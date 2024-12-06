@@ -14,10 +14,12 @@ var app = builder.Build();
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 var virtualFitConfig = builder.Configuration.GetSection(VirtualFitConfig.SectionName).Get<VirtualFitConfig>();
 var dbInfo = builder.Configuration.GetConnectionString(DatabaseConfig.MetaDbMsSqlConnection);
+var rootPath = builder.Environment.ContentRootPath;
 StringBuilder sb = new StringBuilder();
 sb.AppendLine($"Environment: {environment}");
 sb.AppendLine($"config: {virtualFitConfig.ApiToken}");
 sb.AppendLine($"dbInfo: {dbInfo}");
+sb.AppendLine($"rootPath: {rootPath}");
 app.Logger.LogInformation(sb.ToString());
 
 app.UseSwagger();
