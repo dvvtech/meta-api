@@ -70,9 +70,9 @@ namespace MetaApi.Controllers
         /// <returns></returns>
         [HttpPost("try-on")]        
         public async Task<ActionResult<string>> TryOnRequest(FittingRequest request)
-        {            
-            Result<FittingResultResponse> resultFit = await _virtualFitService.TryOnClothesFakeAsync(request);
-            //Result<FittingResultResponse> resultFit = await _virtualFitService.TryOnClothesAsync(request);
+        {
+            Result<FittingResultResponse> resultFit = await _virtualFitService.TryOnClothesAsync(request);
+            //Result<FittingResultResponse> resultFit = await _virtualFitService.TryOnClothesFakeAsync(request);            
             if (resultFit.IsFailure)
             {
                 if (int.TryParse(resultFit.Error.Code, out int httpStatusCode))
@@ -88,9 +88,9 @@ namespace MetaApi.Controllers
             return Ok(resultFit.Value);            
         }
         [HttpPost("history")]
-        public async Task<ActionResult<FittingHistoryResponse[]>> GetHistory(string promocode)
+        public async Task<ActionResult<FittingHistoryResponse[]>> GetHistory(HistoryRequest request)
         {
-            Result<FittingHistoryResponse[]> fittingResults = await _virtualFitService.GetHistory(promocode);
+            Result<FittingHistoryResponse[]> fittingResults = await _virtualFitService.GetHistory(request.Promocode);
             if (fittingResults.IsFailure)
             {
                 return BadRequest(new { description = fittingResults.Error.Description });
