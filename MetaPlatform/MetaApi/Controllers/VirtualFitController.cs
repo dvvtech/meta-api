@@ -12,21 +12,14 @@ namespace MetaApi.Controllers
     [ApiController]
     public class VirtualFitController : ControllerBase
     {
-        private readonly VirtualFitService _virtualFitService;
-        //private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IWebHostEnvironment _env;        
-        private readonly ILogger<VirtualFitController> _logger;
-        private readonly FileCrcHostedService _fileCrcService;
+        private readonly VirtualFitService _virtualFitService;        
+        private readonly ILogger<VirtualFitController> _logger;        
 
-        public VirtualFitController(VirtualFitService virtualFitService,
-                                    IWebHostEnvironment env,
-                                    FileCrcHostedService fileCrcService,
+        public VirtualFitController(VirtualFitService virtualFitService,                                    
                                     ILogger<VirtualFitController> logger)
         {
-            _virtualFitService = virtualFitService;            
-            _env = env;   
-            _logger = logger;
-            _fileCrcService = fileCrcService;
+            _virtualFitService = virtualFitService;                        
+            _logger = logger;            
         }
 
         [HttpGet("test")]
@@ -61,56 +54,13 @@ namespace MetaApi.Controllers
             
             try
             {
-                // Расчёт CRC для загружаемого файла
-                string fileCrc = await CalculateCrcAsync(file);
-
-                // Проверка, существует ли файл с таким же CRC
-                if (_fileCrcService.FileCrcDictionary.TryGetValue(fileCrc, out var existingFileName))
-                {
-                    // Файл уже существует, возвращаем ссылку
-                    var existingFileUrl = $"{Request.Scheme}://{Request.Host}/uploads/{existingFileName}";
-                    return Ok(new { url = existingFileUrl });
-                }
-
-                // Путь для сохранения файла
-                var uploadsPath = Path.Combine(_env.WebRootPath, "uploads");                
-                if (!Directory.Exists(uploadsPath))
-                {
-                    Directory.CreateDirectory(uploadsPath);
-                }
-                
-                // Уникальное имя файла
-                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-
-                // Полный путь для сохранения
-                var filePath = Path.Combine(uploadsPath, uniqueFileName);
-
-                // Сохранение файла
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-
-                // Добавление CRC и имени файла через сервис
-                _fileCrcService.AddFileCrc(fileCrc, uniqueFileName);
-
-                // Генерация публичной ссылки
-                //todo проверить что это https Request.Scheme 
-                var fileUrl = $"{Request.Scheme}://{Request.Host}/uploads/{uniqueFileName}";
-                return Ok(new { url = fileUrl });
+                var fileUrl = await _virtualFitService.UploadFileAsync(file, Request);
+                return Ok(new { url = fileUrl });                
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Внутренняя ошибка сервера: {ex.Message}");
             }
-        }
-
-        private async Task<string> CalculateCrcAsync(IFormFile file)
-        {
-            using var stream = file.OpenReadStream();
-            using var crc32 = new Crc32();
-            var hash = await crc32.ComputeHashAsync(stream);
-            return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
         }
 
         /// <summary>
