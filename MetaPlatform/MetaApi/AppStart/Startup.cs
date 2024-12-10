@@ -30,7 +30,9 @@ namespace MetaApi.AppStart
             ConfigureDatabase(builder.Configuration);
 
             builder.Services.AddScoped<VirtualFitService>();
-            
+            builder.Services.AddSingleton<FileCrcHostedService>();
+            builder.Services.AddHostedService(provider => provider.GetService<FileCrcHostedService>());
+
             builder.Services.AddControllers();
         }
     }
