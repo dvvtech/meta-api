@@ -21,6 +21,10 @@ namespace MetaApi.Services
             {
                 return Result<FittingResultResponse>.Failure(VirtualFitError.NotValidPromocodeError());
             }
+            if (promocode.RemainingUsage <= 0)
+            {
+                return Result<FittingResultResponse>.Failure(VirtualFitError.LimitIsOverError());
+            }
 
             var httpClient = _httpClientFactory.CreateClient("ReplicateAPI");
 
