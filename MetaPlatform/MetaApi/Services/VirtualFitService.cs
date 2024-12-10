@@ -7,7 +7,6 @@ using MetaApi.Core.OperationResults.Base;
 using MetaApi.Core.OperationResults;
 using MetaApi.SqlServer.Entities.VirtualFit;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Diagnostics;
 
 namespace MetaApi.Services
 {
@@ -49,12 +48,12 @@ namespace MetaApi.Services
         /// <summary>
         /// Попытка примерки одежды. Возвращает url результирующего изображения
         /// </summary>
-        public async Task<Result<string>> TryOnClothesAsync(Request request)
+        public async Task<Result<FittingResultResponse>> TryOnClothesAsync(FittingRequest request)
         {
             PromocodeEntity? promocode = await _metaDbContext.Promocode.FirstOrDefaultAsync(p => p.Promocode == request.Promocode);
             if(promocode == null) 
             {
-                return Result<string>.Failure(VirtualFitError.NotValidPromocodeError());
+                return Result<FittingResultResponse>.Failure(VirtualFitError.NotValidPromocodeError());
             }
 
             var httpClient = _httpClientFactory.CreateClient("ReplicateAPI");
@@ -92,7 +91,7 @@ namespace MetaApi.Services
             if (!response.IsSuccessStatusCode)
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
-                return Result<string>.Failure(VirtualFitError.ThirdPartyServiceError(errorContent, response.StatusCode));                
+                return Result<FittingResultResponse>.Failure(VirtualFitError.ThirdPartyServiceError(errorContent, response.StatusCode));                
             }
 
             // Получаем ID созданного предсказания из первого ответа
@@ -115,7 +114,7 @@ namespace MetaApi.Services
                 if (!checkResponse.IsSuccessStatusCode)
                 {
                     var errorContent = await checkResponse.Content.ReadAsStringAsync();
-                    return Result<string>.Failure(VirtualFitError.ThirdPartyServiceError(errorContent, checkResponse.StatusCode));                    
+                    return Result<FittingResultResponse>.Failure(VirtualFitError.ThirdPartyServiceError(errorContent, checkResponse.StatusCode));                    
                 }
 
                 var checkContent = await checkResponse.Content.ReadAsStringAsync();
@@ -132,25 +131,48 @@ namespace MetaApi.Services
                     {
                         GarmentImgUrl = request.GarmImg,
                         HumanImgUrl = request.HumanImg,
-                        ResultImgUrl = outputUrl,
+                        ResultImgUrl = outputUrl ?? string.Empty,
                         PromocodeId = promocode.Id,
                         CreatedUtcDate = DateTime.UtcNow,
                     };
 
-                    // Сохранение в базе данных
                     _metaDbContext.FittingResult.Add(fitingResult);
                     promocode.RemainingUsage--;
                     promocode.UpdateUtcDate = DateTime.UtcNow;
-
+                    // Сохранение в базе данных
                     await _metaDbContext.SaveChangesAsync();
 
-                    return Result<string>.Success(outputUrl);                    
+                    return Result<FittingResultResponse>.Success(new FittingResultResponse
+                    {
+                        Url = outputUrl ?? string.Empty,
+                        RemainingUsage = promocode.RemainingUsage
+                    });                    
                 }
 
                 retryCount++;
             }
 
-            return Result<string>.Failure(VirtualFitError.VirtualFitServiceError("Something went wrong"));
+            return Result<FittingResultResponse>.Failure(VirtualFitError.VirtualFitServiceError("Something went wrong"));
+        }
+
+        public async Task<Result<FittingHistoryResponse[]>> GetHistory(string promocode)
+        {
+            PromocodeEntity? promocodeEntity = await _metaDbContext.Promocode.FirstOrDefaultAsync(p => p.Promocode == promocode);
+            if (promocodeEntity == null)
+            {
+                return Result<FittingHistoryResponse[]>.Failure(VirtualFitError.NotValidPromocodeError());
+            }
+
+            FittingHistoryResponse[] fittingResults = await _metaDbContext.FittingResult
+                                                                  .Where(result => result.PromocodeId == promocodeEntity.Id)
+                                                                  .Select(s => new FittingHistoryResponse
+                                                                               {
+                                                                                    GarmentImgUrl = s.GarmentImgUrl,
+                                                                                    HumanImgUrl = s.HumanImgUrl,
+                                                                                    ResultImgUrl = s.ResultImgUrl,
+                                                                               })
+                                                                  .ToArrayAsync();
+            return Result<FittingHistoryResponse[]>.Success(fittingResults);
         }
 
         private string GenerateUniquePromocode()

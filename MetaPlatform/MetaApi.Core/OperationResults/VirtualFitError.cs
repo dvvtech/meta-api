@@ -15,6 +15,6 @@ namespace MetaApi.Core.OperationResults
 
         public static Error VirtualFitServiceError(string info) => new Error(VirtualFitServiceErrorCode, $"{info}");
 
-        public static Error NotValidPromocodeError() => new Error(NotValidPromocodeErrorCode);
+        public static Error NotValidPromocodeError() => new Error(NotValidPromocodeErrorCode, "Promocode not found");
     }
 }

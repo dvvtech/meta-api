@@ -31,7 +31,7 @@ namespace MetaApi.Controllers
         [HttpGet("test")]
         public string Test()
         {
-            _logger.LogInformation("test2");
+            _logger.LogInformation("test345");
             return "1234567";
         }
 
@@ -51,7 +51,7 @@ namespace MetaApi.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> Upload(IFormFile file)
+        public async Task<ActionResult<string>> Upload(IFormFile file)
         {            
             if (file == null || file.Length == 0)
             {
@@ -90,111 +90,43 @@ namespace MetaApi.Controllers
         }
 
         /// <summary>
-        /// 
+        /// Примерка одежды
         /// </summary>
         /// <param name="requestData"></param>
         /// <returns></returns>
-        [HttpPost("send")]
-        public async Task<IActionResult> SendPostRequest([FromBody] Request requestData)
+        [HttpPost("try-on")]        
+        public async Task<ActionResult<string>> TryOnRequest(FittingRequest request)
         {
             //todo добавить проверку на промокод
 
-            Result<string> resultFit = await _virtualFitService.TryOnClothesAsync(requestData);
+            Result<FittingResultResponse> resultFit = await _virtualFitService.TryOnClothesAsync(request);
             if (resultFit.IsFailure)
             {
                 if (int.TryParse(resultFit.Error.Code, out int httpStatusCode))
                 {
-                    return StatusCode(httpStatusCode, resultFit.Error.Description);
+                    return StatusCode(httpStatusCode, new { description = resultFit.Error.Description });
                 }
                 else
-                {
-                    return BadRequest(resultFit.Error.Description);
+                {                    
+                    return BadRequest(new { description = resultFit.Error.Description });
                 }
             }
 
             return Ok(resultFit.Value);
+            //return Ok(new { url = resultFit.Value, remainingUsage = 7 });
+            //return Ok(new { url = "https://replicate.delivery/yhqm/ieUAqd1K7ekDZkNcPBVUC4D6YIRAO5HLLIbgKHJa6MG24K4TA/output.jpg", remainingUsage = 7 });
 
-            #region Comment
-
-            /*var httpClient = _httpClientFactory.CreateClient("ReplicateAPI");
-
-            // Подготовьте данные для отправки            
-            var internalRequestData = new PredictionRequest
+        }
+        [HttpPost("history")]
+        public async Task<ActionResult<FittingHistoryResponse[]>> GetHistory(string promocode)
+        {
+            Result<FittingHistoryResponse[]> fittingResults = await _virtualFitService.GetHistory(promocode);
+            if (fittingResults.IsFailure)
             {
-                Version = "c871bb9b046607b680449ecbae55fd8c6d945e0a1948644bf2361b3d021d3ff4",
-                Input = new InputData
-                {
-                    Crop = false,
-                    Seed = 42,
-                    Steps = 30,
-                    Category = "upper_body",//lower_body, dresses
-                    ForceDc = false,
-                    GarmImg = "https://ir.ozone.ru/s3/multimedia-1-r/wc1000/6906894111.jpg",//requestData.GarmImg,
-                    HumanImg = "https://i.postimg.cc/vB7x1Vjs/IMG-6718.jpg",//requestData.HumanImg                                
-                    MaskOnly = false,
-                    GarmentDes = ""
-                }
-            };
-
-            // Сериализуйте объект данных в JSON для отправки
-            var options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = new SnakeCaseNamingPolicy(),
-                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-            };
-            var jsonContent = JsonSerializer.Serialize(internalRequestData, options);
-            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-            // Отправьте POST запрос к другому сервису
-            var response = await httpClient.PostAsync("predictions", content);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
+                return BadRequest(new { description = fittingResults.Error.Description });
             }
 
-            // Получаем ID созданного предсказания из первого ответа
-            var responseContent = await response.Content.ReadAsStringAsync();
-            using var document = JsonDocument.Parse(responseContent);
-            var predictionId = document.RootElement.GetProperty("id").GetString();
-            var status = document.RootElement.GetProperty("status").GetString();
-
-            // Повторяем запрос на получение результата, если статус не "succeeded"            
-            var checkUrl = $"predictions/{predictionId}";
-            int maxRetries = 15;
-            int retryCount = 0;
-            int delay = 2000; // Задержка между запросами в миллисекундах (2 секунды)
-
-            while (status != "succeeded" && status != "failed" && retryCount < maxRetries)
-            {
-                await Task.Delay(delay);
-                var checkResponse = await httpClient.GetAsync(checkUrl);
-
-                if (!checkResponse.IsSuccessStatusCode)
-                {
-                    var errorContent = await checkResponse.Content.ReadAsStringAsync();
-                    return StatusCode((int)checkResponse.StatusCode, errorContent);
-                }
-
-                var checkContent = await checkResponse.Content.ReadAsStringAsync();
-                using var checkDocument = JsonDocument.Parse(checkContent);
-
-                // Обновляем статус и проверяем на завершение
-                status = checkDocument.RootElement.GetProperty("status").GetString();
-
-                if (status == "succeeded")
-                {
-                    var outputUrl = checkDocument.RootElement.GetProperty("output").GetString();
-                    return Ok(outputUrl);
-                }
-
-                retryCount++;
-            }
-
-            // Если статус "failed" или истек лимит повторных попыток
-            return StatusCode(500, status == "failed" ? "The process failed." : "The process did not complete in time.");*/
-
-            #endregion
+            return Ok(fittingResults.Value);
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace MetaApi.Models.VirtualFit
 {
-    public class Request
+    public class FittingRequest
     {
         /// <summary>
         /// Фото одежды, которую примерить
@@ -13,5 +13,7 @@
         public string HumanImg { get; set; }
 
         public string Promocode {  get; set; }
+
+        public string Category { get; set; }
     }
 }
