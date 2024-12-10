@@ -37,7 +37,7 @@ namespace MetaApi.Services
                     Crop = false,
                     Seed = 42,
                     Steps = 30,
-                    Category = "upper_body",//lower_body, dresses
+                    Category = request.Category,//"upper_body",//"lower_body", //"dresses"
                     ForceDc = false,
                     GarmImg = request.GarmImg,
                     HumanImg = request.HumanImg,
