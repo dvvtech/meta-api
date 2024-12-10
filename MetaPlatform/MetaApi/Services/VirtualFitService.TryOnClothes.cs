@@ -6,6 +6,7 @@ using MetaApi.Utilities;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Text;
+using MetaApi.Consts;
 
 namespace MetaApi.Services
 {
@@ -13,6 +14,12 @@ namespace MetaApi.Services
     {
         public async Task<Result<FittingResultResponse>> TryOnClothesFakeAsync(FittingRequest request)
         {
+            if (string.IsNullOrWhiteSpace(request.Promocode) ||
+                request.Promocode.Length < FittingConstants.PROMOCODE_MAX_LENGTH)
+            {
+                return Result<FittingResultResponse>.Failure(VirtualFitError.NotValidPromocodeError());
+            }
+
             PromocodeEntity? promocode = await _metaDbContext.Promocode.FirstOrDefaultAsync(p => p.Promocode == request.Promocode);
             if (promocode == null)
             {
@@ -41,6 +48,12 @@ namespace MetaApi.Services
         /// </summary>
         public async Task<Result<FittingResultResponse>> TryOnClothesAsync(FittingRequest request)
         {
+            if (string.IsNullOrWhiteSpace(request.Promocode) ||
+                request.Promocode.Length < FittingConstants.PROMOCODE_MAX_LENGTH)
+            {
+                return Result<FittingResultResponse>.Failure(VirtualFitError.NotValidPromocodeError());
+            }
+
             PromocodeEntity? promocode = await _metaDbContext.Promocode.FirstOrDefaultAsync(p => p.Promocode == request.Promocode);
             if (promocode == null)
             {

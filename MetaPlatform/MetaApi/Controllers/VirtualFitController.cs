@@ -25,8 +25,8 @@ namespace MetaApi.Controllers
         [HttpGet("test")]
         public string Test()
         {
-            _logger.LogInformation("test345");
-            return "1234567";
+            _logger.LogInformation("count images: " + _virtualFitService.GetCount());
+            return "555";
         }
 
         [HttpPost("generate-promocode")]

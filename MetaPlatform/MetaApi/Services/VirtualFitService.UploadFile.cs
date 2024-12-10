@@ -2,6 +2,10 @@
 {
     public partial class VirtualFitService
     {
+        public int GetCount()
+        { 
+            return _fileCrcService.FileCrcDictionary.Count;
+        }
         /// <summary>
         /// Возвращает ссылку на файл
         /// </summary>

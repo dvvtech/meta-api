@@ -1,4 +1,5 @@
-﻿using MetaApi.Models.VirtualFit;
+﻿using MetaApi.Consts;
+using MetaApi.Models.VirtualFit;
 using MetaApi.SqlServer.Entities.VirtualFit;
 
 namespace MetaApi.Services
@@ -36,7 +37,7 @@ namespace MetaApi.Services
             do
             {
                 // Генерация промокода из 6 символов (буквы и цифры)
-                promocode = new string(Enumerable.Repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 6)
+                promocode = new string(Enumerable.Repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", FittingConstants.PROMOCODE_MAX_LENGTH)
                     .Select(s => s[random.Next(s.Length)]).ToArray());
             }
             while (_metaDbContext.Promocode.Any(p => p.Promocode == promocode)); // Проверка уникальности
