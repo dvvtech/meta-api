@@ -17,13 +17,11 @@ namespace MetaApi.Controllers
         private readonly IWebHostEnvironment _env;        
         private readonly ILogger<VirtualFitController> _logger;
 
-        public VirtualFitController(//IHttpClientFactory httpClientFactory,
-                                    VirtualFitService virtualFitService,
+        public VirtualFitController(VirtualFitService virtualFitService,
                                     IWebHostEnvironment env,
                                     ILogger<VirtualFitController> logger)
         {
-            _virtualFitService = virtualFitService;
-            //_httpClientFactory = httpClientFactory;
+            _virtualFitService = virtualFitService;            
             _env = env;   
             _logger = logger;
         }
@@ -96,10 +94,9 @@ namespace MetaApi.Controllers
         /// <returns></returns>
         [HttpPost("try-on")]        
         public async Task<ActionResult<string>> TryOnRequest(FittingRequest request)
-        {
-            //todo добавить проверку на промокод
-
-            Result<FittingResultResponse> resultFit = await _virtualFitService.TryOnClothesAsync(request);
+        {            
+            Result<FittingResultResponse> resultFit = await _virtualFitService.TryOnClothesFakeAsync(request);
+            //Result<FittingResultResponse> resultFit = await _virtualFitService.TryOnClothesAsync(request);
             if (resultFit.IsFailure)
             {
                 if (int.TryParse(resultFit.Error.Code, out int httpStatusCode))
@@ -112,10 +109,7 @@ namespace MetaApi.Controllers
                 }
             }
 
-            return Ok(resultFit.Value);
-            //return Ok(new { url = resultFit.Value, remainingUsage = 7 });
-            //return Ok(new { url = "https://replicate.delivery/yhqm/ieUAqd1K7ekDZkNcPBVUC4D6YIRAO5HLLIbgKHJa6MG24K4TA/output.jpg", remainingUsage = 7 });
-
+            return Ok(resultFit.Value);            
         }
         [HttpPost("history")]
         public async Task<ActionResult<FittingHistoryResponse[]>> GetHistory(string promocode)

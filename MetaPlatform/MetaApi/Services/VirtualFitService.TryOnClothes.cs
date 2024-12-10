@@ -11,6 +11,31 @@ namespace MetaApi.Services
 {
     public partial class VirtualFitService
     {
+        public async Task<Result<FittingResultResponse>> TryOnClothesFakeAsync(FittingRequest request)
+        {
+            PromocodeEntity? promocode = await _metaDbContext.Promocode.FirstOrDefaultAsync(p => p.Promocode == request.Promocode);
+            if (promocode == null)
+            {
+                return Result<FittingResultResponse>.Failure(VirtualFitError.NotValidPromocodeError());
+            }
+            if (promocode.RemainingUsage <= 0)
+            {
+                return Result<FittingResultResponse>.Failure(VirtualFitError.LimitIsOverError());
+            }
+
+            await Task.Delay(5000);
+
+            promocode.RemainingUsage--;
+            promocode.UpdateUtcDate = DateTime.UtcNow;
+            // Сохранение в базе данных
+            await _metaDbContext.SaveChangesAsync();
+
+            return Result<FittingResultResponse>.Success(new FittingResultResponse
+            {
+                Url = "https://replicate.delivery/yhqm/ieUAqd1K7ekDZkNcPBVUC4D6YIRAO5HLLIbgKHJa6MG24K4TA/output.jpg",
+                RemainingUsage = promocode.RemainingUsage
+            });
+        }
         /// <summary>
         /// Попытка примерки одежды.
         /// </summary>
@@ -37,7 +62,7 @@ namespace MetaApi.Services
                     Crop = false,
                     Seed = 42,
                     Steps = 30,
-                    Category = request.Category,//"upper_body",//"lower_body", //"dresses"
+                    Category = request.Category,
                     ForceDc = false,
                     GarmImg = request.GarmImg,
                     HumanImg = request.HumanImg,

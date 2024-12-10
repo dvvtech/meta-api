@@ -14,6 +14,9 @@
 
         public string Promocode {  get; set; }
 
+        /// <summary>
+        /// Возможные значения: upper_body, lower_body, dresses
+        /// </summary>
         public string Category { get; set; }
     }
 }
