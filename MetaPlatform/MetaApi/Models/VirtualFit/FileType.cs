@@ -29,7 +29,7 @@
                 FileType.WomanСlothing => "womanClothing",                         
                 FileType.Man => "man",
                 FileType.Woman => "woman",
-                FileType.Upload => "pploads",
+                FileType.Upload => "uploads",
                 _ => "unknown" // По умолчанию, если FileType не определён
             };
         }

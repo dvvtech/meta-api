@@ -10,6 +10,8 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["MetaApi/MetaApi.csproj", "MetaApi/"]
+COPY ["MetaApi.Core/MetaApi.Core.csproj", "MetaApi.Core/"]
+COPY ["MetaApi.SqlServer/MetaApi.SqlServer.csproj", "MetaApi.SqlServer/"]
 RUN dotnet restore "./MetaApi/MetaApi.csproj"
 COPY . .
 WORKDIR "/src/MetaApi"

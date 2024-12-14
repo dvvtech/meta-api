@@ -15,7 +15,7 @@ namespace MetaApi.Services
         /// <param name="request"></param>
         /// <returns></returns>
         public async Task<string> UploadFileAsync(IFormFile file, FileType fileType, HttpRequest request)
-        {
+        {            
             // Расчёт CRC для загружаемого файла
             string fileCrc = await CalculateCrcAsync(file);
 
@@ -24,10 +24,10 @@ namespace MetaApi.Services
             {
                 return GenerateFileUrl(existingFileName, fileType, request);                
             }
-
+            
             // Сохранение файла на диск
             var uniqueFileName = await SaveFileAsync(file, fileType);
-
+            
             // Добавление CRC в словарь
             _fileCrcService.AddFileCrc(fileCrc, uniqueFileName);
 
@@ -44,19 +44,28 @@ namespace MetaApi.Services
         }
 
         private async Task<string> SaveFileAsync(IFormFile file, FileType fileType)
-        {
-            var uploadsPath = Path.Combine(_env.WebRootPath, fileType.GetFolderName());
+        {            
+            var uploadsPath = Path.Combine(_env.WebRootPath, fileType.GetFolderName());            
             if (!Directory.Exists(uploadsPath))
-            {
-                Directory.CreateDirectory(uploadsPath);
+            {                
+                Directory.CreateDirectory(uploadsPath);                
             }
 
-            var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-            var filePath = Path.Combine(uploadsPath, uniqueFileName);
+            string fileName = Guid.NewGuid().ToString();
+            string uniqueFileName = fileName + Path.GetExtension(file.FileName);
+            string filePath = Path.Combine(uploadsPath, uniqueFileName);
 
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
+            }
+
+            if (fileType != FileType.Upload)
+            {                
+                byte[] resizedBytes = ImageResizer.ResizeImage(file, 135);
+                string newFileName = $"{fileName}_t{Path.GetExtension(file.FileName)}";
+                string newfilePath = Path.Combine(uploadsPath, newFileName);
+                await File.WriteAllBytesAsync(newfilePath, resizedBytes);                
             }
 
             return uniqueFileName;

@@ -1,5 +1,4 @@
 ﻿using MetaApi.Models.VirtualFit;
-using static System.Net.WebRequestMethods;
 
 namespace MetaApi.Services
 {
