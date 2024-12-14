@@ -9,8 +9,6 @@ namespace MetaApi.Services
         private readonly ILogger<FileCrcHostedService> _logger;
         private readonly ConcurrentDictionary<string, string> _fileCrcDictionary = new();
 
-        //private readonly IWebHostEnvironment _env;
-
         public FileCrcHostedService(IWebHostEnvironment env,
                                     ILogger<FileCrcHostedService> logger)
         {

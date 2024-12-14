@@ -1,4 +1,6 @@
-﻿namespace MetaApi.Services
+﻿using MetaApi.Models.VirtualFit;
+
+namespace MetaApi.Services
 {
     public partial class VirtualFitService
     {
@@ -12,7 +14,7 @@
         /// <param name="file"></param>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task<string> UploadFileAsync(IFormFile file, HttpRequest request)
+        public async Task<string> UploadFileAsync(IFormFile file, FileType fileType, HttpRequest request)
         {
             // Расчёт CRC для загружаемого файла
             string fileCrc = await CalculateCrcAsync(file);
@@ -20,17 +22,17 @@
             // Проверка существования файла
             if (_fileCrcService.FileCrcDictionary.TryGetValue(fileCrc, out var existingFileName))
             {
-                return GenerateFileUrl(existingFileName, request);                
+                return GenerateFileUrl(existingFileName, fileType, request);                
             }
 
             // Сохранение файла на диск
-            var uniqueFileName = await SaveFileAsync(file);
+            var uniqueFileName = await SaveFileAsync(file, fileType);
 
             // Добавление CRC в словарь
             _fileCrcService.AddFileCrc(fileCrc, uniqueFileName);
 
             // Генерация публичной ссылки
-            return GenerateFileUrl(uniqueFileName, request);            
+            return GenerateFileUrl(uniqueFileName, fileType, request);            
         }
 
         private async Task<string> CalculateCrcAsync(IFormFile file)
@@ -41,9 +43,9 @@
             return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
         }
 
-        private async Task<string> SaveFileAsync(IFormFile file)
+        private async Task<string> SaveFileAsync(IFormFile file, FileType fileType)
         {
-            var uploadsPath = Path.Combine(_env.WebRootPath, "uploads");
+            var uploadsPath = Path.Combine(_env.WebRootPath, fileType.GetFolderName());
             if (!Directory.Exists(uploadsPath))
             {
                 Directory.CreateDirectory(uploadsPath);
@@ -60,10 +62,10 @@
             return uniqueFileName;
         }
 
-        private string GenerateFileUrl(string fileName, HttpRequest request)
+        private string GenerateFileUrl(string fileName, FileType fileType, HttpRequest request)
         {
-            //todo проверить что это https Request.Scheme 
-            return $"{request.Scheme}://{request.Host}/uploads/{fileName}";
+            //todo проверить что это https Request.Scheme
+            return $"{request.Scheme}://{request.Host}/{fileType.GetFolderName()}/{fileName}";
         }
     }
 }

@@ -2,7 +2,15 @@
 {    
     public class GeneratePromocodeRequest
     {
-        public string Name { get; set; } // Имя человека (опционально)
+        /// <summary>
+        /// // Имя клиента (опционально)
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Админский промокод //todo вынести в конфиг
+        /// </summary>
+        public string AdminPromocode { get; set; }
 
         public int UsageLimit { get; set; } // Лимит использования промокода
     }

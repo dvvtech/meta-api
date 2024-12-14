@@ -26,7 +26,13 @@ namespace MetaApi.Controllers
         public string Test()
         {
             _logger.LogInformation("count images: " + _virtualFitService.GetCount());
-            return "555";
+            return "557";
+        }
+
+        [HttpGet("clothing-collection")]
+        public ActionResult<ClothingCollection> GetClothingCollection()
+        {
+            return Ok(_virtualFitService.GetClothingCollection());
         }
 
         [HttpPost("generate-promocode")]
@@ -44,6 +50,28 @@ namespace MetaApi.Controllers
             return Ok(promocode);
         }
 
+        [HttpPost("upload-to-collection")]
+        public async Task<ActionResult<string>> UploadToCollection(IFormFile file, string promocode, FileType fileType)
+        {
+            //http://localhost:5023/api/virtual-fit/upload-to-collection?promocode=123&fileType=3
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("Файл не выбран или пустой.");
+            }
+            //todo проверка на админский промокод
+            //request.Promcode
+
+            try
+            {
+                var fileUrl = await _virtualFitService.UploadFileAsync(file, fileType, Request);
+                return Ok(new { url = fileUrl });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Внутренняя ошибка сервера: {ex.Message}");
+            }
+        }
+
         [HttpPost("upload")]
         public async Task<ActionResult<string>> Upload(IFormFile file)
         {            
@@ -54,7 +82,7 @@ namespace MetaApi.Controllers
             
             try
             {
-                var fileUrl = await _virtualFitService.UploadFileAsync(file, Request);
+                var fileUrl = await _virtualFitService.UploadFileAsync(file, FileType.Upload, Request);
                 return Ok(new { url = fileUrl });                
             }
             catch (Exception ex)
