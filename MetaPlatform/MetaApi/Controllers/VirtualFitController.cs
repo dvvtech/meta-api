@@ -32,7 +32,7 @@ namespace MetaApi.Controllers
         [HttpGet("clothing-collection")]
         public ActionResult<ClothingCollection> GetClothingCollection()
         {
-            return Ok(_virtualFitService.GetClothingCollection());
+            return Ok(_virtualFitService.GetClothingCollection(Request.Host.Value));
         }
 
         [HttpPost("generate-promocode")]
@@ -52,7 +52,7 @@ namespace MetaApi.Controllers
 
         [HttpPost("upload-to-collection")]
         public async Task<ActionResult<string>> UploadToCollection(IFormFile file, string promocode, FileType fileType)
-        {
+        {            
             //http://localhost:5023/api/virtual-fit/upload-to-collection?promocode=123&fileType=3
             if (file == null || file.Length == 0)
             {
@@ -63,7 +63,7 @@ namespace MetaApi.Controllers
 
             try
             {
-                var fileUrl = await _virtualFitService.UploadFileAsync(file, fileType, Request);
+                var fileUrl = await _virtualFitService.UploadFileAsync(file, fileType, Request.Host.Value);
                 return Ok(new { url = fileUrl });
             }
             catch (Exception ex)
@@ -82,7 +82,7 @@ namespace MetaApi.Controllers
             
             try
             {
-                var fileUrl = await _virtualFitService.UploadFileAsync(file, FileType.Upload, Request);
+                var fileUrl = await _virtualFitService.UploadFileAsync(file, FileType.Upload, Request.Host.Value);
                 return Ok(new { url = fileUrl });                
             }
             catch (Exception ex)

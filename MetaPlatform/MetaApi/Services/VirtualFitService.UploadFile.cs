@@ -14,15 +14,15 @@ namespace MetaApi.Services
         /// <param name="file"></param>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task<string> UploadFileAsync(IFormFile file, FileType fileType, HttpRequest request)
+        public async Task<string> UploadFileAsync(IFormFile file, FileType fileType, string host)
         {            
             // Расчёт CRC для загружаемого файла
             string fileCrc = await CalculateCrcAsync(file);
 
             // Проверка существования файла
-            if (_fileCrcService.FileCrcDictionary.TryGetValue(fileCrc, out var existingFileName))
+            if (fileType == FileType.Upload && _fileCrcService.FileCrcDictionary.TryGetValue(fileCrc, out var existingFileName))
             {
-                return GenerateFileUrl(existingFileName, fileType, request);                
+                return GenerateFileUrl(existingFileName, fileType, host);                
             }
             
             // Сохранение файла на диск
@@ -32,7 +32,7 @@ namespace MetaApi.Services
             _fileCrcService.AddFileCrc(fileCrc, uniqueFileName);
 
             // Генерация публичной ссылки
-            return GenerateFileUrl(uniqueFileName, fileType, request);            
+            return GenerateFileUrl(uniqueFileName, fileType, host);            
         }
 
         private async Task<string> CalculateCrcAsync(IFormFile file)
@@ -71,10 +71,10 @@ namespace MetaApi.Services
             return uniqueFileName;
         }
 
-        private string GenerateFileUrl(string fileName, FileType fileType, HttpRequest request)
+        private string GenerateFileUrl(string fileName, FileType fileType, string host)
         {
             //todo проверить что это https Request.Scheme
-            return $"{request.Scheme}://{request.Host}/{fileType.GetFolderName()}/{fileName}";
+            return $"https://{host}/{fileType.GetFolderName()}/{fileName}";
         }
     }
 }
