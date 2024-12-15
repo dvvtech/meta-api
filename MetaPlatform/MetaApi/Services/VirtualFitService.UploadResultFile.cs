@@ -1,5 +1,4 @@
 ﻿using MetaApi.Models.VirtualFit;
-using Microsoft.VisualBasic.FileIO;
 
 namespace MetaApi.Services
 {

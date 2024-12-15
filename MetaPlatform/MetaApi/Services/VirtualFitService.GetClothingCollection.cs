@@ -26,9 +26,10 @@ namespace MetaApi.Services
             var clothingItem = new ClothingItem[files.Length];
             for (int i = 0; i < files.Length; i++)
             {
+                string fileName = Path.GetFileName(files[i]);
                 clothingItem[i] = new ClothingItem
                 {
-                    Link = GenerateFileUrl(files[i], fileType, host),
+                    Link = GenerateFileUrl(fileName, fileType, host),
                 };
             }
 

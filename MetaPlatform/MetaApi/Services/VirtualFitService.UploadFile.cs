@@ -8,6 +8,9 @@ namespace MetaApi.Services
         { 
             return _fileCrcService.FileCrcDictionary.Count;
         }
+
+
+
         /// <summary>
         /// Возвращает ссылку на файл
         /// </summary>
