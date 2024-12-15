@@ -46,7 +46,7 @@ namespace MetaApi.Services
         /// <summary>
         /// Попытка примерки одежды.
         /// </summary>
-        public async Task<Result<FittingResultResponse>> TryOnClothesAsync(FittingRequest request)
+        public async Task<Result<FittingResultResponse>> TryOnClothesAsync(FittingRequest request, string host)
         {
             if (string.IsNullOrWhiteSpace(request.Promocode) ||
                 request.Promocode.Length < FittingConstants.PROMOCODE_MAX_LENGTH)
@@ -64,6 +64,7 @@ namespace MetaApi.Services
                 return Result<FittingResultResponse>.Failure(VirtualFitError.LimitIsOverError());
             }
 
+            
             var httpClient = _httpClientFactory.CreateClient("ReplicateAPI");
 
             // Подготовьте данные для отправки            
@@ -135,11 +136,13 @@ namespace MetaApi.Services
                 {
                     var outputUrl = checkDocument.RootElement.GetProperty("output").GetString();
 
+                    string urlResult = await UploadResultFileAsync(outputUrl, host);
+
                     var fitingResult = new FittingResultEntity
                     {
                         GarmentImgUrl = request.GarmImg,
                         HumanImgUrl = request.HumanImg,
-                        ResultImgUrl = outputUrl ?? string.Empty,
+                        ResultImgUrl = urlResult ?? string.Empty,
                         PromocodeId = promocode.Id,
                         CreatedUtcDate = DateTime.UtcNow,
                     };
@@ -152,7 +155,7 @@ namespace MetaApi.Services
 
                     return Result<FittingResultResponse>.Success(new FittingResultResponse
                     {
-                        Url = outputUrl ?? string.Empty,
+                        Url = urlResult ?? string.Empty,
                         RemainingUsage = promocode.RemainingUsage
                     });
                 }

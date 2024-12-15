@@ -99,7 +99,7 @@ namespace MetaApi.Controllers
         [HttpPost("try-on")]        
         public async Task<ActionResult<string>> TryOnRequest(FittingRequest request)
         {
-            Result<FittingResultResponse> resultFit = await _virtualFitService.TryOnClothesAsync(request);
+            Result<FittingResultResponse> resultFit = await _virtualFitService.TryOnClothesAsync(request, Request.Host.Value);
             //Result<FittingResultResponse> resultFit = await _virtualFitService.TryOnClothesFakeAsync(request);            
             if (resultFit.IsFailure)
             {

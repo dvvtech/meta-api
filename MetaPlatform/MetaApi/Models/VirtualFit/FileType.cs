@@ -13,7 +13,9 @@
 
         Woman = 4,
 
-        Upload
+        Upload = 5,
+
+        Result = 6
     }
 
     public static class FileTypeExtensions
@@ -30,6 +32,7 @@
                 FileType.Man => "man",
                 FileType.Woman => "woman",
                 FileType.Upload => "uploads",
+                FileType.Result => "result",
                 _ => "unknown" // По умолчанию, если FileType не определён
             };
         }
