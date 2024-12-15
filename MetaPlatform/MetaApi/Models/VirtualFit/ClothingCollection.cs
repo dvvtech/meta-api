@@ -24,9 +24,7 @@
     }
 
     public class ClothingItem
-    {
-        public string Category { get; init; }
-
+    {       
         public string Link { get; init; }
     }
 }
