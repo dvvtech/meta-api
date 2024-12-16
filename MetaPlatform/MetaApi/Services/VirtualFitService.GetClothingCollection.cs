@@ -40,21 +40,6 @@ namespace MetaApi.Services
                 }
 
                 return clothingItem.ToArray();
-
-                /*var clothingItem = new ClothingItem[files.Length/2];
-                for (int i = 0; i < files.Length; i++)
-                {
-                    string fileName = Path.GetFileName(files[i]);
-                    bool endsWith_T = fileName.Contains("_t.") && fileName.Substring(0, fileName.LastIndexOf('.')).EndsWith("_t");
-                    if (endsWith_T)
-                    {
-                        clothingItem[i] = new ClothingItem
-                        {
-                            Link = GenerateFileUrl(fileName, fileType, host),
-                        };
-                    }
-                }
-                return clothingItem;*/
             }
 
             return new ClothingItem[0];
