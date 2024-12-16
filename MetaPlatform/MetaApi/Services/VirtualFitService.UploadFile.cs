@@ -25,10 +25,11 @@ namespace MetaApi.Services
 
             // Расчёт CRC для загружаемого файла
             string fileCrc = await CalculateCrcAsync(file);
-
+            _logger.LogInformation("UploadFileAsync");
             // Проверка существования файла
             if (fileType == FileType.Upload && _fileCrcService.FileCrcDictionary.TryGetValue(fileCrc, out var existingFileName))
             {
+                _logger.LogInformation($"{file.Name} get from cache");
                 return GenerateFileUrl(existingFileName, fileType, host);                
             }
             
