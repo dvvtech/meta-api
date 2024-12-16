@@ -1,6 +1,8 @@
 ﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif;
+using Microsoft.SqlServer.Server;
+using SixLabors.ImageSharp.Formats;
 
 namespace MetaApi.Services
 {
@@ -18,7 +20,11 @@ namespace MetaApi.Services
 
             using var inputStream = file.OpenReadStream();
 
-            // Загружаем изображение из входного потока
+            // Определяем формат изображения
+            IImageFormat format = Image.DetectFormat(inputStream);
+            inputStream.Position = 0; // Сбрасываем позицию потока для повторного чтения
+
+            // Загружаем изображение
             using var image = Image.Load(inputStream);
 
             // Попытка получить значение ориентации из EXIF
@@ -49,7 +55,6 @@ namespace MetaApi.Services
                     break;
             }
 
-            // Если ориентация не была исправлена, вернуть исходный файл
             if (!orientationFixed)
                 return file;
 
@@ -58,14 +63,14 @@ namespace MetaApi.Services
 
             // Сохраняем исправленное изображение в MemoryStream
             var outputStream = new MemoryStream();
-            image.SaveAsJpeg(outputStream); // Сохраняем в формате JPEG
+            image.Save(outputStream, format); // Сохраняем в исходном формате
             outputStream.Position = 0; // Сброс позиции потока для чтения
 
             // Создаём новый IFormFile из исправленного изображения
             var fixedFile = new FormFile(outputStream, 0, outputStream.Length, file.Name, file.FileName)
             {
                 Headers = file.Headers,
-                ContentType = "image/jpeg"
+                ContentType = file.ContentType
             };
 
             return fixedFile;
