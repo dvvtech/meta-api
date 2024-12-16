@@ -9,8 +9,6 @@ namespace MetaApi.Services
             return _fileCrcService.FileCrcDictionary.Count;
         }
 
-
-
         /// <summary>
         /// Возвращает ссылку на файл
         /// </summary>
@@ -18,7 +16,9 @@ namespace MetaApi.Services
         /// <param name="request"></param>
         /// <returns></returns>
         public async Task<string> UploadFileAsync(IFormFile file, FileType fileType, string host)
-        {            
+        {
+            file = FixImageOrientation(file);
+
             // Расчёт CRC для загружаемого файла
             string fileCrc = await CalculateCrcAsync(file);
 
@@ -41,7 +41,7 @@ namespace MetaApi.Services
         private async Task<string> CalculateCrcAsync(IFormFile file)
         {
             using var stream = file.OpenReadStream();
-            using var crc32 = new Crc32();
+            using var crc32 = new Crc32();            
             var hash = await crc32.ComputeHashAsync(stream);
             return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
         }

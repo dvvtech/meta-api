@@ -7,7 +7,7 @@ namespace MetaApi.Services
 {
     public static class ImageResizer
     {
-        public static byte[] ResizeImage(IFormFile file, int targetWidth = 200)
+        public static byte[] ResizeImage(IFormFile file, int targetWidth)
         {
             if (file == null || file.Length == 0)
             {
