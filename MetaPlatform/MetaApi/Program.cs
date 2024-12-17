@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Hosting.Server;
 using MetaApi.Configuration;
 using System.Text;
+using MetaApi.SqlServer.Context;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +26,13 @@ app.Logger.LogInformation(sb.ToString());
 
 app.UseSwagger();
 app.UseSwaggerUI();
+
+// Применение миграций автоматически при старте приложения
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<MetaDbContext>();
+    context.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 

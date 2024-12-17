@@ -11,6 +11,8 @@ namespace MetaApi.Services
             // Генерация уникального промокода
             var promocode = GenerateUniquePromocode();
 
+            DateTime dtUtcNow = DateTime.UtcNow;
+
             // Создание сущности промокода
             var promocodeEntity = new PromocodeEntity
             {
@@ -18,8 +20,8 @@ namespace MetaApi.Services
                 Name = request.Name,
                 UsageLimit = request.UsageLimit,
                 RemainingUsage = request.UsageLimit,
-                CreatedUtcDate = DateTime.UtcNow,
-                UpdateUtcDate = DateTime.UtcNow
+                CreatedUtcDate = dtUtcNow,
+                UpdateUtcDate = dtUtcNow
             };
 
             // Сохранение в базе данных

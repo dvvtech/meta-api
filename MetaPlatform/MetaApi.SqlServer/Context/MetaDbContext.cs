@@ -12,7 +12,7 @@ namespace MetaApi.SqlServer.Context
 
         public MetaDbContext(DbContextOptions<MetaDbContext> options) : base(options)
         {
-            Database.EnsureCreated();
+            //Database.EnsureCreated();
         }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -21,6 +21,24 @@ namespace MetaApi.SqlServer.Context
             modelBuilder.ApplyConfiguration(new PromocodeConfiguration());
 
             base.OnModelCreating(modelBuilder);
+
+            //Seed(modelBuilder);
+        }
+
+        private void Seed(ModelBuilder modelBuilder)
+        {
+            DateTime dtUtcNow = DateTime.UtcNow;
+            modelBuilder.Entity<PromocodeEntity>().HasData(
+                new PromocodeEntity
+                { 
+                    Id = 1,
+                    Promocode = "PRBA34YNI9!QWC7IZS",
+                    Name = "admin",
+                    UsageLimit = 500000,
+                    RemainingUsage = 500000,
+                    CreatedUtcDate = dtUtcNow,
+                    UpdateUtcDate = dtUtcNow,
+                });
         }
     }
 }
