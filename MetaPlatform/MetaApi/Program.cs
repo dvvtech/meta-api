@@ -38,11 +38,6 @@ using (var scope = app.Services.CreateScope())
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
-
-// Добавление поддержки статических файлов
-app.UseStaticFiles();
-
 if (builder.Environment.IsDevelopment())
 {
     //app.UseCors("AllowAll");
@@ -50,9 +45,14 @@ if (builder.Environment.IsDevelopment())
 }
 else
 {
-    //app.UseCors("AllowAll");
-    app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+    app.UseCors("AllowSpecificOrigin"); 
+    //app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 }
+
+app.UseAuthorization();
+
+// Добавление поддержки статических файлов
+app.UseStaticFiles();
 
 app.MapControllers();
 
