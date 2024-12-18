@@ -1,12 +1,11 @@
 ﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing; // для методов обработки (Resize)
-using SixLabors.ImageSharp.Formats;   // для определений форматов
 using SixLabors.ImageSharp.Formats.Jpeg; // для конкретного формата JPEG
 
 namespace MetaApi.Services
 {
     public static class ImageResizer
-    {
+    {        
         public static byte[] ResizeImage(IFormFile file, int targetWidth)
         {
             if (file == null || file.Length == 0)
