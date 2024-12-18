@@ -22,7 +22,7 @@ namespace MetaApi.Services
         /// <returns></returns>
         public async Task<string> UploadFileAsync(IFormFile file, FileType fileType, string host)
         {            
-            file = FixImageOrientationAndSize(file);            
+            file = CorrectOrientationAndResizeImage(file);            
             // Расчёт CRC для загружаемого файла
             string fileCrc = await CalculateCrcAsync(file);
             
@@ -82,14 +82,13 @@ namespace MetaApi.Services
         /// </summary>
         /// <param name="file">Входное изображение в формате IFormFile.</param>
         /// <returns>Исправленное изображение в виде IFormFile или исходный файл, если EXIF Orientation отсутствует.</returns>
-        private IFormFile FixImageOrientationAndSize(IFormFile file)
+        private IFormFile CorrectOrientationAndResizeImage(IFormFile file)
         {
             if (file == null || file.Length == 0)
                 throw new ArgumentException("Файл не должен быть пустым", nameof(file));
 
             try
             {
-                // Открываем поток для чтения файла
                 using var inputStream = file.OpenReadStream();
 
                 // Определяем формат изображения
@@ -97,140 +96,84 @@ namespace MetaApi.Services
                 if (format == null)
                     return file; // Неподдерживаемый формат изображения
 
-                inputStream.Position = 0; // Сбрасываем позицию потока
+                inputStream.Position = 0; // Сброс позиции потока
                 using var image = Image.Load(inputStream);
 
-                // Проверяем наличие и значение EXIF ориентации
-                if (image.Metadata?.ExifProfile == null ||
-                    !image.Metadata.ExifProfile.TryGetValue(ExifTag.Orientation, out var orientationValue))
-                {
-                    return ResizeIfNeed(file, image, format);
-                }
+                // Сначала меняем размер изображения
+                bool resized = ResizeIfNeeded(image);
 
-                ushort orientation = orientationValue.Value;
-                bool orientationFixed = false;
+                // Затем фиксируем ориентацию над уже уменьшенным изображением
+                bool orientationFixed = FixOrientation(image);
 
-                const int maxWidth = 1024;
-                // Вычисляем пропорциональную высоту
-                float ratio = (float)maxWidth / (float)image.Width;
-                int targetHeight = (int)(image.Height * ratio);
+                if (!resized && !orientationFixed)
+                    return file; // Если ничего не изменилось, возвращаем исходный файл
 
-                // Применяем поворот изображения в зависимости от ориентации
-                switch (orientation)
-                {
-                    case 3:
-                        {
-                            if (image.Width > maxWidth)
-                            {                                
-                                // Меняем размер с помощью ImageSharp
-                                image.Mutate(x => x.Resize(new ResizeOptions
-                                {
-                                    Mode = ResizeMode.Max,
-                                    Size = new Size(maxWidth, targetHeight)
-                                }));
-                            }
-
-                            image.Mutate(x => x.Rotate(RotateMode.Rotate180));
-                            orientationFixed = true;
-                            break;
-                        }
-                    case 6:
-                        {
-                            if (image.Width > maxWidth)
-                            {
-                                // Меняем размер с помощью ImageSharp
-                                image.Mutate(x => x.Resize(new ResizeOptions
-                                {
-                                    Mode = ResizeMode.Max,
-                                    Size = new Size(maxWidth, targetHeight)
-                                }));
-                            }
-
-                            image.Mutate(x => x.Rotate(RotateMode.Rotate90));
-                            orientationFixed = true;
-                            break;
-                        }
-                    case 8:
-                        {
-                            if (image.Width > maxWidth)
-                            {
-                                // Меняем размер с помощью ImageSharp
-                                image.Mutate(x => x.Resize(new ResizeOptions
-                                {
-                                    Mode = ResizeMode.Max,
-                                    Size = new Size(maxWidth, targetHeight)
-                                }));
-                            }
-
-                            image.Mutate(x => x.Rotate(RotateMode.Rotate270));
-                            orientationFixed = true;
-                            break;
-                        }
-                }
-
-                if (!orientationFixed)
-                {
-                    return ResizeIfNeed(file, image, format); // Если изменений нет, возвращаем исходный файл
-                }
-
-                // Удаляем EXIF Orientation
-                image.Metadata.ExifProfile.RemoveValue(ExifTag.Orientation);
-
-                // Сохраняем исправленное изображение в MemoryStream
-                var outputStream = new MemoryStream();
-                image.Save(outputStream, format); // Используем исходный формат
-                outputStream.Position = 0;
-
-                // Создаём новый IFormFile из MemoryStream
-                var fixedFile = new FormFile(outputStream, 0, outputStream.Length, file.Name, file.FileName)
-                {
-                    Headers = file.Headers,
-                    ContentType = file.ContentType
-                };
-
-                return fixedFile;
+                return SaveImageToIFormFile(image, format, file);
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Ошибка при обработке изображения: {ex.Message}");
-                //Console.WriteLine($"Ошибка при обработке изображения: {ex.Message}");
-                return file; // Возвращаем оригинальный файл в случае ошибки
+                return file;
             }
         }
 
-        private IFormFile ResizeIfNeed(IFormFile file, Image image, IImageFormat format)
+        private bool FixOrientation(Image image)
         {
-            const int maxWidth = 1024;
-            if (image.Width > maxWidth)
+            if (image.Metadata?.ExifProfile == null ||
+                !image.Metadata.ExifProfile.TryGetValue(ExifTag.Orientation, out var orientationValue))
             {
-                // Вычисляем пропорциональную высоту
-                float ratio = (float)maxWidth / (float)image.Width;
-                int targetHeight = (int)(image.Height * ratio);
-
-                // Меняем размер с помощью ImageSharp
-                image.Mutate(x => x.Resize(new ResizeOptions
-                {
-                    Mode = ResizeMode.Max,
-                    Size = new Size(maxWidth, targetHeight)
-                }));
-                // Сохраняем исправленное изображение в MemoryStream
-                var outputStream1 = new MemoryStream();
-                image.Save(outputStream1, format); // Используем исходный формат
-                outputStream1.Position = 0;
-
-                // Создаём новый IFormFile из MemoryStream
-                var fixedFile1 = new FormFile(outputStream1, 0, outputStream1.Length, file.Name, file.FileName)
-                {
-                    Headers = file.Headers,
-                    ContentType = file.ContentType
-                };
-
-                return fixedFile1;
+                return false; // Нет EXIF ориентации
             }
-            else
+
+            switch (orientationValue.Value)
             {
-                return file; // Ориентация отсутствует, возвращаем исходный файл
+                case 3:
+                    image.Mutate(x => x.Rotate(RotateMode.Rotate180));
+                    break;
+                case 6:
+                    image.Mutate(x => x.Rotate(RotateMode.Rotate90));
+                    break;
+                case 8:
+                    image.Mutate(x => x.Rotate(RotateMode.Rotate270));
+                    break;
+                default:
+                    return false; // Ориентация не требует изменений
             }
+
+            image.Metadata.ExifProfile.RemoveValue(ExifTag.Orientation); // Удаляем EXIF Orientation
+            return true;
+        }
+
+        private bool ResizeIfNeeded(Image image)
+        {
+            const int MaxWidth = 1024;
+
+            if (image.Width <= MaxWidth)
+                return false;
+
+            // Вычисляем пропорциональную высоту
+            float ratio = (float)MaxWidth / image.Width;
+            int targetHeight = (int)(image.Height * ratio);
+
+            image.Mutate(x => x.Resize(new ResizeOptions
+            {
+                Mode = ResizeMode.Max,
+                Size = new Size(MaxWidth, targetHeight)
+            }));
+            return true;
+        }
+
+        private IFormFile SaveImageToIFormFile(Image image, IImageFormat format, IFormFile originalFile)
+        {
+            var outputStream = new MemoryStream();
+            image.Save(outputStream, format);
+            outputStream.Position = 0;
+
+            return new FormFile(outputStream, 0, outputStream.Length, originalFile.Name, originalFile.FileName)
+            {
+                Headers = originalFile.Headers,
+                ContentType = originalFile.ContentType
+            };
         }
 
 
