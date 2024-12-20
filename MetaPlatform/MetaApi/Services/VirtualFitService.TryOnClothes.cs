@@ -15,7 +15,7 @@ namespace MetaApi.Services
         public async Task<Result<FittingResultResponse>> TryOnClothesFakeAsync(FittingRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.Promocode) ||
-                request.Promocode.Length < FittingConstants.PROMOCODE_MAX_LENGTH)
+                request.Promocode.Length > FittingConstants.PROMOCODE_MAX_LENGTH)
             {
                 return Result<FittingResultResponse>.Failure(VirtualFitError.NotValidPromocodeError());
             }
@@ -49,7 +49,7 @@ namespace MetaApi.Services
         public async Task<Result<FittingResultResponse>> TryOnClothesAsync(FittingRequest request, string host)
         {
             if (string.IsNullOrWhiteSpace(request.Promocode) ||
-                request.Promocode.Length < FittingConstants.PROMOCODE_MAX_LENGTH)
+                request.Promocode.Length > FittingConstants.PROMOCODE_MAX_LENGTH)
             {
                 return Result<FittingResultResponse>.Failure(VirtualFitError.NotValidPromocodeError());
             }
@@ -63,7 +63,6 @@ namespace MetaApi.Services
             {
                 return Result<FittingResultResponse>.Failure(VirtualFitError.LimitIsOverError());
             }
-
             
             var httpClient = _httpClientFactory.CreateClient("ReplicateAPI");
 

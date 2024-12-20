@@ -39,7 +39,7 @@ namespace MetaApi.Services
             do
             {
                 // Генерация промокода из 6 символов (буквы и цифры)
-                promocode = new string(Enumerable.Repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", FittingConstants.PROMOCODE_MAX_LENGTH)
+                promocode = new string(Enumerable.Repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", FittingConstants.PROMOCODE_CURRENT_LENGTH)
                     .Select(s => s[random.Next(s.Length)]).ToArray());
             }
             while (_metaDbContext.Promocode.Any(p => p.Promocode == promocode)); // Проверка уникальности

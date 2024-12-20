@@ -115,6 +115,14 @@ namespace MetaApi.Controllers
 
             return Ok(resultFit.Value);            
         }
+
+        [HttpDelete]
+        public async Task<ActionResult> Delete(FittingDeleteRequest request)
+        { 
+            await _virtualFitService.Delete(request);
+            return Ok();
+        }
+
         [HttpPost("history")]
         public async Task<ActionResult<FittingHistoryResponse[]>> GetHistory(HistoryRequest request)
         {

@@ -2,6 +2,8 @@
 {
     public class FittingHistoryResponse
     {
+        public int Id { get; set; }
+
         public string GarmentImgUrl { get; set; }
 
         public string HumanImgUrl { get; set; }

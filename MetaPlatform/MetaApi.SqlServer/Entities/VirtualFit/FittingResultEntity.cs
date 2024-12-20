@@ -24,6 +24,11 @@ namespace MetaApi.SqlServer.Entities.VirtualFit
         public DateTime CreatedUtcDate { get; set; }
 
         /// <summary>
+        /// Флаг, указывающий на то, удалена ли запись
+        /// </summary>
+        public bool IsDeleted { get; set; }
+
+        /// <summary>
         /// Навигационное свойство на PromocodeEntity
         /// </summary>
         public PromocodeEntity Promocode { get; set; }

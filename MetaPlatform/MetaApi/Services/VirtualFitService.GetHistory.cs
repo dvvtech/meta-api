@@ -17,9 +17,10 @@ namespace MetaApi.Services
             }
 
             FittingHistoryResponse[] fittingResults = await _metaDbContext.FittingResult
-                                                                  .Where(result => result.PromocodeId == promocodeEntity.Id)
+                                                                  .Where(result => result.PromocodeId == promocodeEntity.Id && !result.IsDeleted)
                                                                   .Select(s => new FittingHistoryResponse
                                                                   {
+                                                                      Id = s.Id,
                                                                       GarmentImgUrl = s.GarmentImgUrl,
                                                                       HumanImgUrl = s.HumanImgUrl,
                                                                       ResultImgUrl = s.ResultImgUrl,
