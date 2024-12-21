@@ -39,7 +39,7 @@ namespace MetaApi.Services
 
             return Result<FittingResultResponse>.Success(new FittingResultResponse
             {
-                Url = "https://replicate.delivery/yhqm/ieUAqd1K7ekDZkNcPBVUC4D6YIRAO5HLLIbgKHJa6MG24K4TA/output.jpg",
+                Url = "https://a30944-8332.x.d-f.pw/result/d211d593-59b4-497b-8368-8d13b14f8dc1.jpg",
                 RemainingUsage = promocode.RemainingUsage
             });
         }
