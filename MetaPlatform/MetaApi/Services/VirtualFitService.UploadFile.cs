@@ -4,6 +4,7 @@ using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using Image = SixLabors.ImageSharp.Image;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace MetaApi.Services
 {
@@ -34,7 +35,7 @@ namespace MetaApi.Services
             }
             
             // Сохранение файла на диск
-            var uniqueFileName = await SaveFileAsync(file, fileType);            
+            var uniqueFileName = await SaveFileAsync(file, fileType);               
             // Добавление CRC в словарь
             _fileCrcService.AddFileCrc(fileCrc, uniqueFileName);            
             // Генерация публичной ссылки
@@ -87,6 +88,7 @@ namespace MetaApi.Services
             if (file == null || file.Length == 0)
                 throw new ArgumentException("Файл не должен быть пустым", nameof(file));
 
+            Image image = null;
             try
             {
                 using var inputStream = file.OpenReadStream();
@@ -97,31 +99,34 @@ namespace MetaApi.Services
                     return file; // Неподдерживаемый формат изображения
 
                 inputStream.Position = 0; // Сброс позиции потока
-                using var image = Image.Load(inputStream);
+                image = Image.Load(inputStream);                
 
                 bool isChangeImage = false;
                 //если фото неайфоновское
                 if (image.Metadata?.ExifProfile == null ||
                     !image.Metadata.ExifProfile.TryGetValue(ExifTag.Orientation, out var orientationValue))
                 {
-                    // Сначала меняем размер изображения
+                    //меняем размер изображения
                     isChangeImage = ResizeIfNeeded(image, 768);
                 }
                 else
                 {
-                    // Сначала меняем размер изображения
+                    //меняем размер изображения
                     isChangeImage = ResizeIfNeeded(image, 1024);
                 }
 
                 // Затем фиксируем ориентацию над уже уменьшенным изображением
                 bool orientationFixed = FixOrientation(image);
 
+                //todo для горизонтальных фото нижняя строка не валидна
                 float imageRatio = (float)image.Height / image.Width;
-                if (imageRatio < 1.2 || imageRatio > 1.4)
+                if (imageRatio < 1.22 || imageRatio > 1.4)
                 {
                     //info: обычно для айфоновских фото сюда уже не заходим
-                    PerformCropping(image, 1.33);
-                    isChangeImage = true;
+                    using (Image newImage = PerformPadding(image, 1.333))
+                    {
+                        return SaveImageToIFormFile(newImage, format, file);
+                    }
                 }
 
                 if (!isChangeImage && !orientationFixed)
@@ -134,6 +139,46 @@ namespace MetaApi.Services
                 _logger.LogError($"Ошибка при обработке изображения: {ex.Message}");
                 return file;
             }
+            finally 
+            {
+                image?.Dispose();                
+            }
+        }
+
+        private Image PerformPadding(Image image, double targetAspectRatio)
+        {
+            int originalWidth = image.Width;
+            int originalHeight = image.Height;
+
+            // Вычисляем целевые размеры
+            int targetWidth;
+            int targetHeight;
+
+            //фото горизонтальное
+            if (originalHeight < originalWidth)
+            {
+                // Если текущее соотношение меньше целевого, увеличиваем ширину
+                targetWidth = (int)(originalHeight * targetAspectRatio);
+                targetHeight = originalHeight;
+            }
+            //фото вертикальное
+            else
+            {
+                targetHeight = originalHeight;
+                targetWidth = (int)(originalHeight / targetAspectRatio);
+            }
+
+            // Создаём новое изображение с нужными размерами и чёрным фоном
+            var paddedImage = new Image<Rgba32>(targetWidth, targetHeight, Color.Black);
+
+            // Рассчитываем координаты, чтобы центрировать оригинальное изображение
+            int offsetX = (targetWidth - originalWidth) / 2;
+            int offsetY = (targetHeight - originalHeight) / 2;
+
+            // Вставляем оригинальное изображение в центр нового
+            paddedImage.Mutate(ctx => ctx.DrawImage(image, new Point(offsetX, offsetY), 1.0f));
+
+            return paddedImage;
         }
 
         private void PerformCropping(Image image, double targetAspectRatio)
