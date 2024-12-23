@@ -11,38 +11,7 @@ using MetaApi.Consts;
 namespace MetaApi.Services
 {
     public partial class VirtualFitService
-    {
-        public async Task<Result<FittingResultResponse>> TryOnClothesFakeAsync(FittingRequest request)
-        {
-            if (string.IsNullOrWhiteSpace(request.Promocode) ||
-                request.Promocode.Length > FittingConstants.PROMOCODE_MAX_LENGTH)
-            {
-                return Result<FittingResultResponse>.Failure(VirtualFitError.NotValidPromocodeError());
-            }
-
-            PromocodeEntity? promocode = await _metaDbContext.Promocode.FirstOrDefaultAsync(p => p.Promocode == request.Promocode);
-            if (promocode == null)
-            {
-                return Result<FittingResultResponse>.Failure(VirtualFitError.NotValidPromocodeError());
-            }
-            if (promocode.RemainingUsage <= 0)
-            {
-                return Result<FittingResultResponse>.Failure(VirtualFitError.LimitIsOverError());
-            }
-
-            await Task.Delay(5000);
-
-            promocode.RemainingUsage--;
-            promocode.UpdateUtcDate = DateTime.UtcNow;
-            // Сохранение в базе данных
-            await _metaDbContext.SaveChangesAsync();
-
-            return Result<FittingResultResponse>.Success(new FittingResultResponse
-            {
-                Url = "https://a30944-8332.x.d-f.pw/result/d211d593-59b4-497b-8368-8d13b14f8dc1.jpg",
-                RemainingUsage = promocode.RemainingUsage
-            });
-        }
+    {        
         /// <summary>
         /// Попытка примерки одежды.
         /// </summary>
@@ -207,6 +176,38 @@ namespace MetaApi.Services
             await File.WriteAllBytesAsync(filePath, imageBytes);
 
             return uniqueFileName;
+        }
+
+        public async Task<Result<FittingResultResponse>> TryOnClothesFakeAsync(FittingRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Promocode) ||
+                request.Promocode.Length > FittingConstants.PROMOCODE_MAX_LENGTH)
+            {
+                return Result<FittingResultResponse>.Failure(VirtualFitError.NotValidPromocodeError());
+            }
+
+            PromocodeEntity? promocode = await _metaDbContext.Promocode.FirstOrDefaultAsync(p => p.Promocode == request.Promocode);
+            if (promocode == null)
+            {
+                return Result<FittingResultResponse>.Failure(VirtualFitError.NotValidPromocodeError());
+            }
+            if (promocode.RemainingUsage <= 0)
+            {
+                return Result<FittingResultResponse>.Failure(VirtualFitError.LimitIsOverError());
+            }
+
+            await Task.Delay(5000);
+
+            promocode.RemainingUsage--;
+            promocode.UpdateUtcDate = DateTime.UtcNow;
+            // Сохранение в базе данных
+            await _metaDbContext.SaveChangesAsync();
+
+            return Result<FittingResultResponse>.Success(new FittingResultResponse
+            {
+                Url = "https://a30944-8332.x.d-f.pw/result/d211d593-59b4-497b-8368-8d13b14f8dc1.jpg",
+                RemainingUsage = promocode.RemainingUsage
+            });
         }
     }
 }

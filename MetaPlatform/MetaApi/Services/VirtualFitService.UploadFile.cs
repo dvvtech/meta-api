@@ -99,13 +99,32 @@ namespace MetaApi.Services
                 inputStream.Position = 0; // Сброс позиции потока
                 using var image = Image.Load(inputStream);
 
-                // Сначала меняем размер изображения
-                bool resized = ResizeIfNeeded(image);
+                bool isChangeImage = false;
+                //если фото неайфоновское
+                if (image.Metadata?.ExifProfile == null ||
+                    !image.Metadata.ExifProfile.TryGetValue(ExifTag.Orientation, out var orientationValue))
+                {
+                    // Сначала меняем размер изображения
+                    isChangeImage = ResizeIfNeeded(image, 768);
+                }
+                else
+                {
+                    // Сначала меняем размер изображения
+                    isChangeImage = ResizeIfNeeded(image, 1024);
+                }
 
                 // Затем фиксируем ориентацию над уже уменьшенным изображением
                 bool orientationFixed = FixOrientation(image);
 
-                if (!resized && !orientationFixed)
+                float imageRatio = (float)image.Height / image.Width;
+                if (imageRatio < 1.2 || imageRatio > 1.4)
+                {
+                    //info: обычно для айфоновских фото сюда уже не заходим
+                    PerformCropping(image, 1.3);
+                    isChangeImage = true;
+                }
+
+                if (!isChangeImage && !orientationFixed)
                     return file; // Если ничего не изменилось, возвращаем исходный файл
 
                 return SaveImageToIFormFile(image, format, file);
@@ -115,6 +134,26 @@ namespace MetaApi.Services
                 _logger.LogError($"Ошибка при обработке изображения: {ex.Message}");
                 return file;
             }
+        }
+
+        private void PerformCropping(Image image, double targetAspectRatio)
+        {
+            int originalWidth = image.Width;
+            int originalHeight = image.Height;
+
+            int targetWidth = originalWidth;
+            int targetHeight = (int)(originalWidth * targetAspectRatio);
+
+            if (targetHeight > originalHeight)
+            {
+                targetHeight = originalHeight;
+                targetWidth = (int)(originalHeight / targetAspectRatio);
+            }
+
+            int cropX = (originalWidth - targetWidth) / 2;
+            int cropY = (originalHeight - targetHeight) / 2;
+
+            image.Mutate(x => x.Crop(new Rectangle(cropX, cropY, targetWidth, targetHeight)));            
         }
 
         private bool FixOrientation(Image image)
@@ -144,21 +183,21 @@ namespace MetaApi.Services
             return true;
         }
 
-        private bool ResizeIfNeeded(Image image)
+        private bool ResizeIfNeeded(Image image, int maxWidth)
         {
-            const int MaxWidth = 1024;
+            //const int MaxWidth = 1024;
 
-            if (image.Width <= MaxWidth)
+            if (image.Width <= maxWidth)
                 return false;
 
             // Вычисляем пропорциональную высоту
-            float ratio = (float)MaxWidth / image.Width;
+            float ratio = (float)maxWidth / image.Width;
             int targetHeight = (int)(image.Height * ratio);
 
             image.Mutate(x => x.Resize(new ResizeOptions
             {
                 Mode = ResizeMode.Max,
-                Size = new Size(MaxWidth, targetHeight)
+                Size = new Size(maxWidth, targetHeight)
             }));
             return true;
         }
