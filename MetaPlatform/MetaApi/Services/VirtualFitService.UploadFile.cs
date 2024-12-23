@@ -120,7 +120,7 @@ namespace MetaApi.Services
                 if (imageRatio < 1.2 || imageRatio > 1.4)
                 {
                     //info: обычно для айфоновских фото сюда уже не заходим
-                    PerformCropping(image, 1.3);
+                    PerformCropping(image, 1.33);
                     isChangeImage = true;
                 }
 
