@@ -24,7 +24,7 @@ namespace MetaApi.Controllers
 
         [HttpGet("test")]
         public string Test()
-        {
+        {            
             _logger.LogInformation("count images: " + _virtualFitService.GetCount());
             return "557";
         }

@@ -5,6 +5,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using Image = SixLabors.ImageSharp.Image;
 using SixLabors.ImageSharp.PixelFormats;
+using MetaApi.Consts;
 
 namespace MetaApi.Services
 {
@@ -51,11 +52,11 @@ namespace MetaApi.Services
         }
 
         private async Task<string> SaveFileAsync(IFormFile file, FileType fileType)
-        {            
-            var uploadsPath = Path.Combine(_env.WebRootPath, fileType.GetFolderName());            
+        {
+            var uploadsPath = Path.Combine(_env.WebRootPath, fileType.GetFolderName());
             if (!Directory.Exists(uploadsPath))
-            {                
-                Directory.CreateDirectory(uploadsPath);                
+            {
+                Directory.CreateDirectory(uploadsPath);
             }
 
             string fileName = Guid.NewGuid().ToString();
@@ -67,13 +68,11 @@ namespace MetaApi.Services
                 await file.CopyToAsync(stream);
             }
 
-            if (fileType != FileType.Upload)
-            {                
-                byte[] resizedBytes = ImageResizer.ResizeImage(file, 135);
-                string newFileName = $"{fileName}_t{Path.GetExtension(file.FileName)}";
-                string newfilePath = Path.Combine(uploadsPath, newFileName);
-                await File.WriteAllBytesAsync(newfilePath, resizedBytes);                
-            }
+            //Сохраняем уменьшенную копию для раздела история
+            byte[] resizedBytes = ImageResizer.ResizeImage(file, FittingConstants.THUMBNAIL_WIDTH);
+            string newFileName = $"{fileName}_t{Path.GetExtension(file.FileName)}";
+            string newfilePath = Path.Combine(uploadsPath, newFileName);
+            await File.WriteAllBytesAsync(newfilePath, resizedBytes);
 
             return uniqueFileName;
         }

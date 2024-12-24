@@ -103,14 +103,18 @@ namespace MetaApi.Services
                 if (status == "succeeded")
                 {
                     var outputUrl = checkDocument.RootElement.GetProperty("output").GetString();
+                    if (string.IsNullOrEmpty(outputUrl))
+                    {
+                        throw new InvalidOperationException("Output URL is missing or empty.");
+                    }
 
                     string urlResult = await UploadResultFileAsync(outputUrl, host);
 
                     var fitingResult = new FittingResultEntity
                     {
-                        GarmentImgUrl = request.GarmImg,
-                        HumanImgUrl = request.HumanImg,
-                        ResultImgUrl = urlResult ?? string.Empty,
+                        GarmentImgUrl = AppendSuffixToUrl(request.GarmImg, FittingConstants.THUMBNAIL_SUFFIX_URL),
+                        HumanImgUrl = AppendSuffixToUrl(request.HumanImg, FittingConstants.THUMBNAIL_SUFFIX_URL),
+                        ResultImgUrl = AppendSuffixToUrl(urlResult, FittingConstants.THUMBNAIL_SUFFIX_URL),
                         PromocodeId = promocode.Id,
                         CreatedUtcDate = DateTime.UtcNow,
                     };
@@ -132,6 +136,29 @@ namespace MetaApi.Services
             }
 
             return Result<FittingResultResponse>.Failure(VirtualFitError.VirtualFitServiceError("Something went wrong"));
+        }
+
+        private string AppendSuffixToUrl(string url, string suffix)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                throw new ArgumentException("URL не может быть пустым или null", nameof(url));
+            }
+
+            ReadOnlySpan<char> urlSpan = url.AsSpan();
+            int lastDotIndex = urlSpan.LastIndexOf('.');
+
+            if (lastDotIndex == -1 || lastDotIndex <= urlSpan.LastIndexOf('/'))
+            {
+                throw new ArgumentException("Некорректный формат URL: отсутствует расширение файла", nameof(url));
+            }
+
+            Span<char> result = stackalloc char[url.Length + suffix.Length];
+            urlSpan.Slice(0, lastDotIndex).CopyTo(result);
+            suffix.AsSpan().CopyTo(result.Slice(lastDotIndex));
+            urlSpan.Slice(lastDotIndex).CopyTo(result.Slice(lastDotIndex + suffix.Length));
+
+            return new string(result);
         }
 
         private async Task<string> UploadResultFileAsync(string imageUrl, string host)
@@ -174,6 +201,12 @@ namespace MetaApi.Services
 
             // Сохраняем оригинальный файл
             await File.WriteAllBytesAsync(filePath, imageBytes);
+
+            //Сохраняем уменьшенную копию для раздела история
+            byte[] resizedBytes = ImageResizer.ResizeImage(imageBytes, FittingConstants.THUMBNAIL_WIDTH);
+            string newFileName = $"{fileName}_t{extension}";
+            string newfilePath = Path.Combine(uploadsPath, newFileName);
+            await File.WriteAllBytesAsync(newfilePath, resizedBytes);
 
             return uniqueFileName;
         }

@@ -26,6 +26,7 @@ namespace MetaApi.Services
                                                                       ResultImgUrl = s.ResultImgUrl,
                                                                   })
                                                                   .ToArrayAsync();
+            
             return Result<FittingHistoryResponse[]>.Success(fittingResults);
         }
     }

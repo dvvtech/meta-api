@@ -5,16 +5,15 @@ namespace MetaApi.Services
 {
     public class FileCrcHostedService : IHostedService
     {
-        private readonly string _folderPath = "C:\\Files"; // Путь к вашей папке
+        private readonly string _uploadsFolderPath;
         private readonly ILogger<FileCrcHostedService> _logger;
         private readonly ConcurrentDictionary<string, string> _fileCrcDictionary = new();
 
         public FileCrcHostedService(IWebHostEnvironment env,
                                     ILogger<FileCrcHostedService> logger)
         {
-            _logger = logger;
-            //_env = env;
-            _folderPath = Path.Combine(env.WebRootPath, "uploads");
+            _logger = logger;            
+            _uploadsFolderPath = Path.Combine(env.WebRootPath, "uploads");
         }
 
         // Публичное свойство для доступа к словарю
@@ -51,13 +50,13 @@ namespace MetaApi.Services
 
         private void ProcessFiles()
         {
-            if (!Directory.Exists(_folderPath))
+            if (!Directory.Exists(_uploadsFolderPath))
             {
-                _logger.LogWarning($"Папка {_folderPath} не найдена.");
+                _logger.LogWarning($"Папка {_uploadsFolderPath} не найдена.");
                 return;
             }
 
-            var files = Directory.GetFiles(_folderPath);
+            var files = Directory.GetFiles(_uploadsFolderPath);
             foreach (var filePath in files)
             {
                 try
