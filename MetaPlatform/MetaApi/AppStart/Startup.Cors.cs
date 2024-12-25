@@ -14,12 +14,12 @@
                               .AllowAnyMethod();
                     });
 
-                //options.AddPolicy("AllowAll", policy =>
-                //{
-                //    policy.AllowAnyOrigin()  // Разрешить любой источник
-                //       .AllowAnyMethod()  // Разрешить любые HTTP-методы (GET, POST, PUT и т. д.)
-                //       .AllowAnyHeader(); // Разрешить любые заголовки
-                //});
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyOrigin()  // Разрешить любой источник
+                       .AllowAnyMethod()  // Разрешить любые HTTP-методы (GET, POST, PUT и т. д.)
+                       .AllowAnyHeader(); // Разрешить любые заголовки
+                });
 
 
                 //builder.WithOrigins("https://apidocs3.scout-gps.ru")

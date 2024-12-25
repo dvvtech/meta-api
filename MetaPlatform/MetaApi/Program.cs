@@ -40,8 +40,8 @@ app.UseHttpsRedirection();
 
 if (builder.Environment.IsDevelopment())
 {
-    //app.UseCors("AllowAll");
-    app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+    app.UseCors("AllowAll");
+    //app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 }
 else
 {

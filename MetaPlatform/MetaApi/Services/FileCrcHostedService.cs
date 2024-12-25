@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using MetaApi.Consts;
+using System.Collections.Concurrent;
 using System.Security.Cryptography;
 
 namespace MetaApi.Services
@@ -6,6 +7,7 @@ namespace MetaApi.Services
     public class FileCrcHostedService : IHostedService
     {
         private readonly string _uploadsFolderPath;
+        //private readonly string _resultFolderPath;
         private readonly ILogger<FileCrcHostedService> _logger;
         private readonly ConcurrentDictionary<string, string> _fileCrcDictionary = new();
 
@@ -14,6 +16,7 @@ namespace MetaApi.Services
         {
             _logger = logger;            
             _uploadsFolderPath = Path.Combine(env.WebRootPath, "uploads");
+            //_resultFolderPath = Path.Combine(env.WebRootPath, "result");
         }
 
         // Публичное свойство для доступа к словарю
@@ -30,7 +33,9 @@ namespace MetaApi.Services
             _logger.LogInformation("FileCrcHostedService запущен. Начинается обработка файлов...");
 
             try
-            {
+            {                
+                //ProcessFiles2(_uploadsFolderPath);
+                //ProcessFiles2(_resultFolderPath);
                 ProcessFiles();
             }
             catch (Exception ex)
@@ -46,7 +51,7 @@ namespace MetaApi.Services
         {
             _logger.LogInformation("FileCrcHostedService остановлен.");
             return Task.CompletedTask;
-        }
+        }        
 
         private void ProcessFiles()
         {
@@ -60,12 +65,14 @@ namespace MetaApi.Services
             foreach (var filePath in files)
             {
                 try
-                {
-                    var crc = CalculateCrc(filePath);
+                {                    
                     var fileName = Path.GetFileName(filePath);
-
-                    // Добавляем CRC и имя файла в словарь
-                    _fileCrcDictionary[crc] = fileName;
+                    if (!EndsWithSuffix(fileName))
+                    {
+                        var crc = CalculateCrc(filePath);
+                        // Добавляем CRC и имя файла в словарь
+                        _fileCrcDictionary[crc] = fileName;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -76,6 +83,28 @@ namespace MetaApi.Services
             _logger.LogInformation($"Обработано файлов: {_fileCrcDictionary.Count}");
         }
 
+        /// <summary>
+        /// Завершается ли название файла _t
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="suffix"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        private bool EndsWithSuffix(string fileName, string suffix = "_t")
+        {
+            if (string.IsNullOrEmpty(fileName))
+                throw new ArgumentException("Строка не должна быть пустой или null", nameof(fileName));
+
+            var lastDotIndex = fileName.LastIndexOf('.');
+            if (lastDotIndex == -1)
+                return false; // Нет расширения файла
+
+            // Проверяем, находится ли суффикс перед расширением
+            var baseName = fileName.Substring(0, lastDotIndex);
+            return baseName.EndsWith(suffix);
+        }
+
+
         private string CalculateCrc(string filePath)
         {
             using var stream = File.OpenRead(filePath);
@@ -83,6 +112,38 @@ namespace MetaApi.Services
             var hash = crc32.ComputeHash(stream);
             return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
         }
+
+        //public static string AddSuffixToFilePath(string filePath, string suffix = "_t")
+        //{
+        //    if (string.IsNullOrEmpty(filePath))
+        //    {
+        //        throw new ArgumentException("Путь к файлу не может быть пустым или null", nameof(filePath));
+        //    }
+
+        //    // Найти позицию последней точки для определения расширения файла
+        //    var lastDotIndex = filePath.LastIndexOf('.');
+        //    if (lastDotIndex == -1 || lastDotIndex <= filePath.LastIndexOf(Path.DirectorySeparatorChar))
+        //    {
+        //        throw new ArgumentException("Путь не содержит корректного расширения файла", nameof(filePath));
+        //    }
+
+        //    // Вставить суффикс перед расширением
+        //    return filePath.Insert(lastDotIndex, suffix);
+        //}
+
+        //private void ProcessFiles2(string path)
+        //{
+        //    var files = Directory.GetFiles(path);
+        //    foreach (var filePath in files)
+        //    {
+        //        byte[] imgBytes = File.ReadAllBytes(filePath);
+        //        byte[] resizedBytes = ImageResizer.ResizeImage(imgBytes, FittingConstants.THUMBNAIL_WIDTH);
+
+        //        string newfilePath = AddSuffixToFilePath(filePath);
+
+        //        File.WriteAllBytes(newfilePath, resizedBytes);
+        //    }
+        //}
     }
 
     // Простая реализация CRC32

@@ -46,5 +46,34 @@ namespace MetaApi.Services
 
             return promocode;
         }
+
+        //public void Test()
+        //{
+        //    foreach (var row in _metaDbContext.FittingResult)
+        //    {
+        //        row.GarmentImgUrl = AddSuffixToFilePath(row.GarmentImgUrl);
+        //        row.HumanImgUrl = AddSuffixToFilePath(row.HumanImgUrl);
+        //        row.ResultImgUrl = AddSuffixToFilePath(row.ResultImgUrl);
+        //    }
+        //    _metaDbContext.SaveChanges();
+        //}
+
+        //public static string AddSuffixToFilePath(string filePath, string suffix = "_t")
+        //{
+        //    if (string.IsNullOrEmpty(filePath))
+        //    {
+        //        throw new ArgumentException("Путь к файлу не может быть пустым или null", nameof(filePath));
+        //    }
+
+        //    // Найти позицию последней точки для определения расширения файла
+        //    var lastDotIndex = filePath.LastIndexOf('.');
+        //    if (lastDotIndex == -1 || lastDotIndex <= filePath.LastIndexOf(Path.DirectorySeparatorChar))
+        //    {
+        //        throw new ArgumentException("Путь не содержит корректного расширения файла", nameof(filePath));
+        //    }
+
+        //    // Вставить суффикс перед расширением
+        //    return filePath.Insert(lastDotIndex, suffix);
+        //}
     }
 }
