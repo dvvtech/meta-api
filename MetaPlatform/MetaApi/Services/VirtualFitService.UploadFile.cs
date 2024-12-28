@@ -23,17 +23,18 @@ namespace MetaApi.Services
         /// <param name="request"></param>
         /// <returns></returns>
         public async Task<string> UploadFileAsync(IFormFile file, FileType fileType, string host)
-        {            
-            file = CorrectOrientationAndResizeImage(file);            
+        {
             // Расчёт CRC для загружаемого файла
             string fileCrc = await CalculateCrcAsync(file);
-            
+
             // Проверка существования файла
             if (fileType == FileType.Upload && _fileCrcService.FileCrcDictionary.TryGetValue(fileCrc, out var existingFileName))
             {
                 _logger.LogInformation($"{existingFileName} get from cache");
-                return GenerateFileUrl(existingFileName, fileType, host);                
+                return GenerateFileUrl(existingFileName, fileType, host);
             }
+
+            file = CorrectOrientationAndResizeImage(file);                        
             
             // Сохранение файла на диск
             var uniqueFileName = await SaveFileAsync(file, fileType);               
@@ -122,7 +123,7 @@ namespace MetaApi.Services
                 if (imageRatio < 1.22 || imageRatio > 1.4)
                 {
                     //info: обычно для айфоновских фото сюда уже не заходим
-                    using (Image newImage = PerformPadding(image, 1.333))
+                    using (Image newImage = PerformPadding(image, FittingConstants.ASPECT_RATIO))
                     {
                         return SaveImageToIFormFile(newImage, format, file);
                     }

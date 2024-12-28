@@ -16,5 +16,10 @@ namespace MetaApi.Consts
         /// Окончание url для уменьшенных изображений
         /// </summary>
         public const string THUMBNAIL_SUFFIX_URL = "_t";
+
+        /// <summary>
+        /// Отношение высоты к ширине
+        /// </summary>
+        public const float ASPECT_RATIO = 1.333f;
     }
 }
