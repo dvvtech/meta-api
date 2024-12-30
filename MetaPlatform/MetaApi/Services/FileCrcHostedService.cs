@@ -16,6 +16,10 @@ namespace MetaApi.Services
         {
             _logger = logger;            
             _uploadsFolderPath = Path.Combine(env.WebRootPath, "uploads");
+            if (!Directory.Exists(_uploadsFolderPath))
+            {
+                Directory.CreateDirectory(_uploadsFolderPath);
+            }
             //_resultFolderPath = Path.Combine(env.WebRootPath, "result");
         }
 
@@ -60,8 +64,11 @@ namespace MetaApi.Services
                 _logger.LogWarning($"Папка {_uploadsFolderPath} не найдена.");
                 return;
             }
+            
+            var files = Directory.GetFiles(_uploadsFolderPath)
+                                 .Where(file => Path.GetFileNameWithoutExtension(file).EndsWith("_v"))
+                                 .ToList();
 
-            var files = Directory.GetFiles(_uploadsFolderPath);
             foreach (var filePath in files)
             {
                 try

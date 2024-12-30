@@ -30,29 +30,34 @@ namespace MetaApi.Services
 
         private static byte[] ResizeImageFromStream(Stream inputStream, int targetWidth)
         {
-            using var image = Image.Load(inputStream);
-
-            // Вычисляем пропорциональные размеры
-            int targetHeight = CalculateProportionalHeight(image.Width, image.Height, targetWidth);
-
-            // Меняем размер изображения
-            image.Mutate(x => x.Resize(new ResizeOptions
+            try
             {
-                Mode = ResizeMode.Max,
-                Size = new Size(targetWidth, targetHeight)
-            }));
+                using var image = Image.Load(inputStream);
 
-            // Сохраняем результат в JPEG
-            using var outputStream = new MemoryStream();
-            image.Save(outputStream, JpegFormat.Instance);
+                // Меняем размер изображения
+                image.Mutate(x => x.Resize(new ResizeOptions
+                {
+                    Mode = ResizeMode.Max,
+                    Size = new Size(targetWidth, 0) // Автоматически сохраняет пропорции
+                }));
 
-            return outputStream.ToArray();
-        }
+                // Сохраняем результат в JPEG
+                using var outputStream = new MemoryStream();
+                image.Save(outputStream, new JpegEncoder
+                {
+                    Quality = 85 // Настройка качества JPEG
+                });
 
-        private static int CalculateProportionalHeight(int originalWidth, int originalHeight, int targetWidth)
-        {
-            float ratio = (float)targetWidth / originalWidth;
-            return (int)(originalHeight * ratio);
+                return outputStream.ToArray();
+            }
+            catch (UnknownImageFormatException)
+            {
+                throw new ArgumentException("Формат изображения не поддерживается.");
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Произошла ошибка при обработке изображения.", ex);
+            }
         }
     }
 }

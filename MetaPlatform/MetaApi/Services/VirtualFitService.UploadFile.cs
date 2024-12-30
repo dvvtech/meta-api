@@ -6,6 +6,7 @@ using SixLabors.ImageSharp.Processing;
 using Image = SixLabors.ImageSharp.Image;
 using SixLabors.ImageSharp.PixelFormats;
 using MetaApi.Consts;
+using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace MetaApi.Services
 {
@@ -23,7 +24,9 @@ namespace MetaApi.Services
         /// <param name="request"></param>
         /// <returns></returns>
         public async Task<string> UploadFileAsync(IFormFile file, FileType fileType, string host)
-        {
+        {            
+            file = ResizeImageAndCorrectOrientation(file);
+
             // Расчёт CRC для загружаемого файла
             string fileCrc = await CalculateCrcAsync(file);
 
@@ -34,14 +37,66 @@ namespace MetaApi.Services
                 return GenerateFileUrl(existingFileName, fileType, host);
             }
 
-            file = CorrectOrientationAndResizeImage(file);                        
+            // Сохранение файла на диск c окончанием _v
+            var uniqueFileName = await SaveFileAsync(file, fileType);
             
-            // Сохранение файла на диск
-            var uniqueFileName = await SaveFileAsync(file, fileType);               
+            //сохраняем уменьшенную копию
+            await ResizeAndSaveFile(file, fileType, uniqueFileName);
+
+            await PaddingAndSave(file, fileType, uniqueFileName);
+
             // Добавление CRC в словарь
-            _fileCrcService.AddFileCrc(fileCrc, uniqueFileName);            
+            _fileCrcService.AddFileCrc(fileCrc, uniqueFileName);   
+            
             // Генерация публичной ссылки
-            return GenerateFileUrl(uniqueFileName, fileType, host);            
+            return GenerateFileUrl(uniqueFileName, Path.GetExtension(file.FileName), fileType, host);            
+        }
+
+        private async Task PaddingAndSave(IFormFile file, FileType fileType, string fileName)
+        {
+            Image image = null;
+            try
+            {
+                using var inputStream = file.OpenReadStream();
+
+                // Определяем формат изображения
+                IImageFormat format = Image.DetectFormat(inputStream);
+                if (format == null)
+                    return; // Неподдерживаемый формат изображения
+
+                inputStream.Position = 0; // Сброс позиции потока
+                image = Image.Load(inputStream);
+                //todo для горизонтальных фото нижняя строка не валидна
+                //вычисляем отношение высоты к ширине
+                float imageRatio = (float)image.Height / image.Width;
+                if (imageRatio < 1.22 || imageRatio > 1.4)
+                {
+                    //info: обычно для айфоновских фото сюда уже не заходим
+                    using (Image newImage = PerformPadding(image, FittingConstants.ASPECT_RATIO))
+                    {                        
+                        // Определяем формат на основе расширения или указываем его явно
+                        var jpegEncoder = new JpegEncoder
+                        {
+                            Quality = 85 // Настройка качества изображения (можно изменить)
+                        };
+
+                        string uploadsPath = Path.Combine(_env.WebRootPath, fileType.GetFolderName());                        
+                        string newFileName = $"{fileName}_r{Path.GetExtension(file.FileName)}";
+                        string newfilePath = Path.Combine(uploadsPath, newFileName);
+
+                        // Сохраняем изображение в файл
+                        newImage.Save(newfilePath, jpegEncoder);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            finally 
+            {
+                image?.Dispose();
+            }
         }
 
         private async Task<string> CalculateCrcAsync(IFormFile file)
@@ -52,38 +107,45 @@ namespace MetaApi.Services
             return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
         }
 
+        private async Task ResizeAndSaveFile(IFormFile file, FileType fileType, string fileName)
+        {            
+            //Сохраняем уменьшенную копию для раздела история
+            byte[] resizedBytes = ImageResizer.ResizeImage(file, FittingConstants.THUMBNAIL_WIDTH);
+
+            var uploadsPath = Path.Combine(_env.WebRootPath, fileType.GetFolderName());
+            string newFileName = $"{fileName}_t{Path.GetExtension(file.FileName)}";
+            string newfilePath = Path.Combine(uploadsPath, newFileName);
+
+            await File.WriteAllBytesAsync(newfilePath, resizedBytes);
+        }
+
         private async Task<string> SaveFileAsync(IFormFile file, FileType fileType)
         {
             var uploadsPath = Path.Combine(_env.WebRootPath, fileType.GetFolderName());
+
             if (!Directory.Exists(uploadsPath))
             {
                 Directory.CreateDirectory(uploadsPath);
             }
 
             string fileName = Guid.NewGuid().ToString();
-            string uniqueFileName = fileName + Path.GetExtension(file.FileName);
+            string uniqueFileName = $"{fileName}_v{Path.GetExtension(file.FileName)}";
             string filePath = Path.Combine(uploadsPath, uniqueFileName);
 
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
-            }
+            }            
 
-            //Сохраняем уменьшенную копию для раздела история
-            byte[] resizedBytes = ImageResizer.ResizeImage(file, FittingConstants.THUMBNAIL_WIDTH);
-            string newFileName = $"{fileName}_t{Path.GetExtension(file.FileName)}";
-            string newfilePath = Path.Combine(uploadsPath, newFileName);
-            await File.WriteAllBytesAsync(newfilePath, resizedBytes);
-
-            return uniqueFileName;
+            return fileName;
         }
 
         /// <summary>
-        /// Исправляет ориентацию изображения на основе EXIF-метаданных.
+        /// Ресазим изображение до ширины 768 и исправление ориентации изображения на основе EXIF-метаданных.
         /// </summary>
         /// <param name="file">Входное изображение в формате IFormFile.</param>
         /// <returns>Исправленное изображение в виде IFormFile или исходный файл, если EXIF Orientation отсутствует.</returns>
-        private IFormFile CorrectOrientationAndResizeImage(IFormFile file)
+        private IFormFile ResizeImageAndCorrectOrientation(IFormFile file)
         {
             if (file == null || file.Length == 0)
                 throw new ArgumentException("Файл не должен быть пустым", nameof(file));
@@ -100,37 +162,20 @@ namespace MetaApi.Services
 
                 inputStream.Position = 0; // Сброс позиции потока
                 image = Image.Load(inputStream);                
-
-                bool isChangeImage = false;
+                
                 //если фото неайфоновское
                 if (image.Metadata?.ExifProfile == null ||
                     !image.Metadata.ExifProfile.TryGetValue(ExifTag.Orientation, out var orientationValue))
-                {
-                    //меняем размер изображения
-                    isChangeImage = ResizeIfNeeded(image, 768);
+                {                    
+                    ResizeIfNeeded(image, 768);
                 }
                 else
-                {
-                    //меняем размер изображения
-                    isChangeImage = ResizeIfNeeded(image, 1024);
+                {                    
+                    ResizeIfNeeded(image, 1024);
                 }
 
                 // Затем фиксируем ориентацию над уже уменьшенным изображением
-                bool orientationFixed = FixOrientation(image);
-
-                //todo для горизонтальных фото нижняя строка не валидна
-                float imageRatio = (float)image.Height / image.Width;
-                if (imageRatio < 1.22 || imageRatio > 1.4)
-                {
-                    //info: обычно для айфоновских фото сюда уже не заходим
-                    using (Image newImage = PerformPadding(image, FittingConstants.ASPECT_RATIO))
-                    {
-                        return SaveImageToIFormFile(newImage, format, file);
-                    }
-                }
-
-                if (!isChangeImage && !orientationFixed)
-                    return file; // Если ничего не изменилось, возвращаем исходный файл
+                FixOrientation(image);
 
                 return SaveImageToIFormFile(image, format, file);
             }
@@ -145,6 +190,12 @@ namespace MetaApi.Services
             }
         }
 
+        /// <summary>
+        /// Дорисовываем к фото полоски справа и слева 
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="targetAspectRatio"></param>
+        /// <returns></returns>
         private Image PerformPadding(Image image, double targetAspectRatio)
         {
             int originalWidth = image.Width;
@@ -201,12 +252,12 @@ namespace MetaApi.Services
             image.Mutate(x => x.Crop(new Rectangle(cropX, cropY, targetWidth, targetHeight)));            
         }
 
-        private bool FixOrientation(Image image)
+        private void FixOrientation(Image image)
         {
             if (image.Metadata?.ExifProfile == null ||
                 !image.Metadata.ExifProfile.TryGetValue(ExifTag.Orientation, out var orientationValue))
             {
-                return false; // Нет EXIF ориентации
+                return; // Нет EXIF ориентации
             }
 
             switch (orientationValue.Value)
@@ -221,19 +272,16 @@ namespace MetaApi.Services
                     image.Mutate(x => x.Rotate(RotateMode.Rotate270));
                     break;
                 default:
-                    return false; // Ориентация не требует изменений
+                    return; // Ориентация не требует изменений
             }
 
-            image.Metadata.ExifProfile.RemoveValue(ExifTag.Orientation); // Удаляем EXIF Orientation
-            return true;
+            image.Metadata.ExifProfile.RemoveValue(ExifTag.Orientation); // Удаляем EXIF Orientation            
         }
 
-        private bool ResizeIfNeeded(Image image, int maxWidth)
-        {
-            //const int MaxWidth = 1024;
-
+        private void ResizeIfNeeded(Image image, int maxWidth)
+        {            
             if (image.Width <= maxWidth)
-                return false;
+                return;
 
             // Вычисляем пропорциональную высоту
             float ratio = (float)maxWidth / image.Width;
@@ -243,8 +291,7 @@ namespace MetaApi.Services
             {
                 Mode = ResizeMode.Max,
                 Size = new Size(maxWidth, targetHeight)
-            }));
-            return true;
+            }));            
         }
 
         private IFormFile SaveImageToIFormFile(Image image, IImageFormat format, IFormFile originalFile)
@@ -260,6 +307,13 @@ namespace MetaApi.Services
             };
         }
 
+        
+
+        private string GenerateFileUrl(string fileName, string extension, FileType fileType, string host)
+        {
+            //todo проверить что это https Request.Scheme
+            return $"https://{host}/{fileType.GetFolderName()}/{fileName}_v{extension}";
+        }
 
         private string GenerateFileUrl(string fileName, FileType fileType, string host)
         {
