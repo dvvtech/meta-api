@@ -37,13 +37,14 @@ namespace MetaApi.Services
                 return GenerateFileUrl(existingFileName, fileType, host);
             }
 
-            // Сохранение файла на диск c окончанием _v
-            var uniqueFileName = await SaveFileAsync(file, fileType);
+            string uniqueFileName = Guid.NewGuid().ToString();
+            var uploadsPath = Path.Combine(_env.WebRootPath, fileType.GetFolderName());
             
-            //сохраняем уменьшенную копию
-            await ResizeAndSaveFile(file, fileType, uniqueFileName);
+            //info эти 3 вызова не нужно запускть парааллельно
 
-            await PaddingAndSave(file, fileType, uniqueFileName);
+            await SaveFileAsync(file, uploadsPath, uniqueFileName);
+            await ResizeAndSaveFile(file, uploadsPath, uniqueFileName);
+            await PaddingAndSave(file, uploadsPath, uniqueFileName);
 
             // Добавление CRC в словарь
             _fileCrcService.AddFileCrc(fileCrc, uniqueFileName);   
@@ -52,7 +53,7 @@ namespace MetaApi.Services
             return GenerateFileUrl(uniqueFileName, Path.GetExtension(file.FileName), fileType, host);            
         }
 
-        private async Task PaddingAndSave(IFormFile file, FileType fileType, string fileName)
+        private async Task PaddingAndSave(IFormFile file, string uploadsPath, string fileName)
         {
             Image image = null;
             try
@@ -79,8 +80,7 @@ namespace MetaApi.Services
                         {
                             Quality = 85 // Настройка качества изображения (можно изменить)
                         };
-
-                        string uploadsPath = Path.Combine(_env.WebRootPath, fileType.GetFolderName());                        
+                                            
                         string newFileName = $"{fileName}_r{Path.GetExtension(file.FileName)}";
                         string newfilePath = Path.Combine(uploadsPath, newFileName);
 
@@ -107,37 +107,44 @@ namespace MetaApi.Services
             return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
         }
 
-        private async Task ResizeAndSaveFile(IFormFile file, FileType fileType, string fileName)
-        {            
-            //Сохраняем уменьшенную копию для раздела история
+        /// <summary>
+        /// Сохраняем уменьшенную копию для раздела история
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="uploadsPath"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        private async Task ResizeAndSaveFile(IFormFile file, string uploadsPath, string fileName)
+        {                        
             byte[] resizedBytes = ImageResizer.ResizeImage(file, FittingConstants.THUMBNAIL_WIDTH);
-
-            var uploadsPath = Path.Combine(_env.WebRootPath, fileType.GetFolderName());
+            
             string newFileName = $"{fileName}_t{Path.GetExtension(file.FileName)}";
             string newfilePath = Path.Combine(uploadsPath, newFileName);
 
             await File.WriteAllBytesAsync(newfilePath, resizedBytes);
         }
 
-        private async Task<string> SaveFileAsync(IFormFile file, FileType fileType)
-        {
-            var uploadsPath = Path.Combine(_env.WebRootPath, fileType.GetFolderName());
-
+        /// <summary>
+        /// Сохранение файла на диск c окончанием _v
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="uploadsPath"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        private async Task SaveFileAsync(IFormFile file, string uploadsPath, string fileName)
+        {            
             if (!Directory.Exists(uploadsPath))
             {
                 Directory.CreateDirectory(uploadsPath);
             }
-
-            string fileName = Guid.NewGuid().ToString();
+            
             string uniqueFileName = $"{fileName}_v{Path.GetExtension(file.FileName)}";
             string filePath = Path.Combine(uploadsPath, uniqueFileName);
 
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
-            }            
-
-            return fileName;
+            }                        
         }
 
         /// <summary>
