@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Text;
 using MetaApi.Consts;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace MetaApi.Services
 {
@@ -107,8 +109,8 @@ namespace MetaApi.Services
                     {
                         throw new InvalidOperationException("Output URL is missing or empty.");
                     }
-
-                    string urlResult = await UploadResultFileAsync(outputUrl, host);
+                                        
+                    string urlResult = await UploadResultFileAsync(outputUrl, host, request.HumanImg);
 
                     var fitingResult = new FittingResultEntity
                     {
@@ -138,6 +140,12 @@ namespace MetaApi.Services
             return Result<FittingResultResponse>.Failure(VirtualFitError.VirtualFitServiceError("Something went wrong"));
         }
 
+        private double? GetImageRatio(string fileName)
+        {
+            //парсим имя
+            return 1.5;
+        }
+
         private string AppendSuffixToUrl(string url, string suffix)
         {
             if (string.IsNullOrEmpty(url))
@@ -161,28 +169,42 @@ namespace MetaApi.Services
             return new string(result);
         }
 
-        private async Task<string> UploadResultFileAsync(string imageUrl, string host)
+        private async Task<string> UploadResultFileAsync(string imageUrl, string host, string humanImg)
         {
+            byte[] imageBytes = await GetImageResult(imageUrl);
+
+            var image = Image.Load(imageBytes);
+
+            double? imageRatio = GetImageRatio(humanImg);
+            if (imageRatio != null)
+            {
+                PerformCropping(image, imageRatio.Value);
+            }
+
             // Сохранение файла на диск
-            var uniqueFileName = await SaveFileAsync(imageUrl, FileType.Result);
+            var uniqueFileName = await SaveFileAsync(imageUrl, image, FileType.Result);
 
             // Генерация публичной ссылки
             return GenerateFileUrl(uniqueFileName, FileType.Result, host);
         }
 
-        private async Task<string> SaveFileAsync(string imageUrl, FileType fileType)
+        public async Task<byte[]> GetImageResult(string imageUrl)
+        {            
+            byte[] imageBytes;
+            using (var httpClient = _httpClientFactory.CreateClient())
+            {
+                imageBytes = await httpClient.GetByteArrayAsync(imageUrl);
+            }
+
+            return imageBytes;
+        }
+
+        private async Task<string> SaveFileAsync(string imageUrl, Image image, FileType fileType)
         {
             var uploadsPath = Path.Combine(_env.WebRootPath, fileType.GetFolderName());
             if (!Directory.Exists(uploadsPath))
             {
                 Directory.CreateDirectory(uploadsPath);
-            }
-
-            // Загрузка изображения по URL
-            byte[] imageBytes;
-            using (var httpClient = _httpClientFactory.CreateClient())
-            {
-                imageBytes = await httpClient.GetByteArrayAsync(imageUrl);
             }
 
             // Определение расширения файла из URL 
@@ -199,11 +221,14 @@ namespace MetaApi.Services
             string uniqueFileName = fileName + extension;
             string filePath = Path.Combine(uploadsPath, uniqueFileName);
 
-            // Сохраняем оригинальный файл
-            await File.WriteAllBytesAsync(filePath, imageBytes);
+            // Сохраняем оригинальный файл            
+            image.Save(filePath, new JpegEncoder
+            {
+                Quality = FittingConstants.QUALITY_JPEG
+            });
 
-            //Сохраняем уменьшенную копию для раздела история
-            byte[] resizedBytes = ImageResizer.ResizeImage(imageBytes, FittingConstants.THUMBNAIL_WIDTH);
+            //Сохраняем уменьшенную копию для раздела история            
+            byte[] resizedBytes = ImageResizer.ResizeImage(image, FittingConstants.THUMBNAIL_WIDTH);
             string newFileName = $"{fileName}_t{extension}";
             string newfilePath = Path.Combine(uploadsPath, newFileName);
             await File.WriteAllBytesAsync(newfilePath, resizedBytes);

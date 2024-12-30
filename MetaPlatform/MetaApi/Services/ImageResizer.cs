@@ -1,6 +1,7 @@
 ﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing; // для методов обработки (Resize)
-using SixLabors.ImageSharp.Formats.Jpeg; // для конкретного формата JPEG
+using SixLabors.ImageSharp.Formats.Jpeg;
+using MetaApi.Consts; // для конкретного формата JPEG
 
 namespace MetaApi.Services
 {
@@ -14,7 +15,8 @@ namespace MetaApi.Services
             }
 
             using var inputStream = file.OpenReadStream();
-            return ResizeImageFromStream(inputStream, targetWidth);
+            using var image = Image.Load(inputStream);
+            return ResizeImage(image, targetWidth);
         }
 
         public static byte[] ResizeImage(byte[] imageBytes, int targetWidth)
@@ -25,15 +27,14 @@ namespace MetaApi.Services
             }
 
             using var inputStream = new MemoryStream(imageBytes);
-            return ResizeImageFromStream(inputStream, targetWidth);
+            using var image = Image.Load(inputStream);
+            return ResizeImage(image, targetWidth);
         }
 
-        private static byte[] ResizeImageFromStream(Stream inputStream, int targetWidth)
+        public static byte[] ResizeImage(Image image, int targetWidth)
         {
             try
-            {
-                using var image = Image.Load(inputStream);
-
+            {                
                 // Меняем размер изображения
                 image.Mutate(x => x.Resize(new ResizeOptions
                 {
@@ -45,7 +46,7 @@ namespace MetaApi.Services
                 using var outputStream = new MemoryStream();
                 image.Save(outputStream, new JpegEncoder
                 {
-                    Quality = 85 // Настройка качества JPEG
+                    Quality = FittingConstants.QUALITY_JPEG
                 });
 
                 return outputStream.ToArray();

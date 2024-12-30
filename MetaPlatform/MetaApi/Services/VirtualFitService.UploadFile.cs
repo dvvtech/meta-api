@@ -44,7 +44,7 @@ namespace MetaApi.Services
 
             await SaveFileAsync(file, uploadsPath, uniqueFileName);
             await ResizeAndSaveFile(file, uploadsPath, uniqueFileName);
-            await PaddingAndSave(file, uploadsPath, uniqueFileName);
+            PaddingAndSave(file, uploadsPath, uniqueFileName);
 
             // Добавление CRC в словарь
             _fileCrcService.AddFileCrc(fileCrc, uniqueFileName);   
@@ -53,7 +53,7 @@ namespace MetaApi.Services
             return GenerateFileUrl(uniqueFileName, Path.GetExtension(file.FileName), fileType, host);            
         }
 
-        private async Task PaddingAndSave(IFormFile file, string uploadsPath, string fileName)
+        private void PaddingAndSave(IFormFile file, string uploadsPath, string fileName)
         {
             Image image = null;
             try
@@ -78,14 +78,20 @@ namespace MetaApi.Services
                         // Определяем формат на основе расширения или указываем его явно
                         var jpegEncoder = new JpegEncoder
                         {
-                            Quality = 85 // Настройка качества изображения (можно изменить)
+                            Quality = FittingConstants.QUALITY_JPEG
                         };
                                             
-                        string newFileName = $"{fileName}_r{Path.GetExtension(file.FileName)}";
+                        string newFileName = $"{fileName}_{imageRatio}_r{Path.GetExtension(file.FileName)}";
                         string newfilePath = Path.Combine(uploadsPath, newFileName);
 
                         // Сохраняем изображение в файл
                         newImage.Save(newfilePath, jpegEncoder);
+
+
+                        //newFileName = $"{fileName}_res{Path.GetExtension(file.FileName)}";
+                        //newfilePath = Path.Combine(uploadsPath, newFileName);
+                        //PerformCropping(newImage, imageRatio);
+                        //newImage.Save(newfilePath, jpegEncoder);
                     }
                 }
             }

@@ -21,5 +21,10 @@ namespace MetaApi.Consts
         /// Отношение высоты к ширине
         /// </summary>
         public const float ASPECT_RATIO = 1.333f;
+
+        /// <summary>
+        /// Настройка качества JPEG
+        /// </summary>
+        public const int QUALITY_JPEG = 85;
     }
 }
