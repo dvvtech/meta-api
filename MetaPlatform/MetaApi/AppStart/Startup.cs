@@ -19,7 +19,7 @@ namespace MetaApi.AppStart
             builder.Services.AddHttpClient(ApiNames.REPLICATE_API, client =>
             {
                 client.BaseAddress = new Uri("https://api.replicate.com/v1/");
-                client.Timeout = TimeSpan.FromSeconds(60); // Таймаут запроса
+                client.Timeout = TimeSpan.FromSeconds(45); // Таймаут запроса
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {virtualFitConfig.ApiToken}");
                 client.DefaultRequestHeaders.Add("Prefer", "wait");
             });

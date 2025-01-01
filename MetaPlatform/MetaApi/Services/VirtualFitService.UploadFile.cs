@@ -39,21 +39,22 @@ namespace MetaApi.Services
 
             string uniqueFileName = Guid.NewGuid().ToString();
             var uploadsPath = Path.Combine(_env.WebRootPath, fileType.GetFolderName());
-            
+
             //info эти 3 вызова не нужно запускть парааллельно
 
-            await SaveFileAsync(file, uploadsPath, uniqueFileName);
+            string lastFileName = await SaveFileAsync(file, uploadsPath, uniqueFileName);
             await ResizeAndSaveFile(file, uploadsPath, uniqueFileName);
-            PaddingAndSave(file, uploadsPath, uniqueFileName);
-
+            string padingFileName = PaddingAndSave(file, uploadsPath, uniqueFileName);
+            lastFileName = (string.IsNullOrEmpty(padingFileName)) ? lastFileName : padingFileName;  
+            
             // Добавление CRC в словарь
-            _fileCrcService.AddFileCrc(fileCrc, uniqueFileName);   
+            _fileCrcService.AddFileCrc(fileCrc, lastFileName);   
             
             // Генерация публичной ссылки
-            return GenerateFileUrl(uniqueFileName, Path.GetExtension(file.FileName), fileType, host);            
+            return GenerateFileUrl(lastFileName, fileType, host);            
         }
 
-        private void PaddingAndSave(IFormFile file, string uploadsPath, string fileName)
+        private string PaddingAndSave(IFormFile file, string uploadsPath, string fileName)
         {
             Image image = null;
             try
@@ -63,36 +64,40 @@ namespace MetaApi.Services
                 // Определяем формат изображения
                 IImageFormat format = Image.DetectFormat(inputStream);
                 if (format == null)
-                    return; // Неподдерживаемый формат изображения
+                    return string.Empty; // Неподдерживаемый формат изображения
 
                 inputStream.Position = 0; // Сброс позиции потока
                 image = Image.Load(inputStream);
                 //todo для горизонтальных фото нижняя строка не валидна
                 //вычисляем отношение высоты к ширине
                 float imageRatio = (float)image.Height / image.Width;
-                if (imageRatio < 1.22 || imageRatio > 1.4)
+                if (imageRatio < 1.25 || imageRatio > 1.38)
                 {
                     //info: обычно для айфоновских фото сюда уже не заходим
                     using (Image newImage = PerformPadding(image, FittingConstants.ASPECT_RATIO))
-                    {                        
+                    {
                         // Определяем формат на основе расширения или указываем его явно
                         var jpegEncoder = new JpegEncoder
                         {
                             Quality = FittingConstants.QUALITY_JPEG
                         };
-                                            
+
                         string newFileName = $"{fileName}_{imageRatio}_r{Path.GetExtension(file.FileName)}";
                         string newfilePath = Path.Combine(uploadsPath, newFileName);
 
                         // Сохраняем изображение в файл
                         newImage.Save(newfilePath, jpegEncoder);
 
-
+                        return newFileName;
                         //newFileName = $"{fileName}_res{Path.GetExtension(file.FileName)}";
                         //newfilePath = Path.Combine(uploadsPath, newFileName);
                         //PerformCropping(newImage, imageRatio);
                         //newImage.Save(newfilePath, jpegEncoder);
                     }
+                }
+                else
+                { 
+                    return string.Empty;
                 }
             }
             catch (Exception ex)
@@ -103,6 +108,7 @@ namespace MetaApi.Services
             {
                 image?.Dispose();
             }
+            return string.Empty;
         }
 
         private async Task<string> CalculateCrcAsync(IFormFile file)
@@ -137,7 +143,7 @@ namespace MetaApi.Services
         /// <param name="uploadsPath"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        private async Task SaveFileAsync(IFormFile file, string uploadsPath, string fileName)
+        private async Task<string> SaveFileAsync(IFormFile file, string uploadsPath, string fileName)
         {            
             if (!Directory.Exists(uploadsPath))
             {
@@ -150,7 +156,9 @@ namespace MetaApi.Services
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
-            }                        
+            }
+
+            return uniqueFileName;
         }
 
         /// <summary>
@@ -318,14 +326,6 @@ namespace MetaApi.Services
                 Headers = originalFile.Headers,
                 ContentType = originalFile.ContentType
             };
-        }
-
-        
-
-        private string GenerateFileUrl(string fileName, string extension, FileType fileType, string host)
-        {
-            //todo проверить что это https Request.Scheme
-            return $"https://{host}/{fileType.GetFolderName()}/{fileName}_v{extension}";
         }
 
         private string GenerateFileUrl(string fileName, FileType fileType, string host)

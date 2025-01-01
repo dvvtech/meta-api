@@ -142,8 +142,12 @@ namespace MetaApi.Services
 
         private double? GetImageRatio(string fileName)
         {
-            //парсим имя
-            return 1.5;
+            if (string.IsNullOrEmpty(fileName)) return null;
+
+            var parts = fileName.Split('_');
+            if (parts.Length <= 1) return null;
+
+            return double.TryParse(parts[1], out var ratio) ? ratio : null;
         }
 
         private string AppendSuffixToUrl(string url, string suffix)
