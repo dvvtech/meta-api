@@ -1,4 +1,5 @@
 ﻿using MetaApi.Consts;
+using MetaApi.Models.VirtualFit;
 using System.Collections.Concurrent;
 using System.Security.Cryptography;
 
@@ -15,12 +16,17 @@ namespace MetaApi.Services
                                     ILogger<FileCrcHostedService> logger)
         {
             _logger = logger;            
-            _uploadsFolderPath = Path.Combine(env.WebRootPath, "uploads");
-            if (!Directory.Exists(_uploadsFolderPath))
-            {
-                Directory.CreateDirectory(_uploadsFolderPath);
-            }
+            _uploadsFolderPath = Path.Combine(env.WebRootPath, "uploads");            
             //_resultFolderPath = Path.Combine(env.WebRootPath, "result");
+
+            foreach (FileType fileType in Enum.GetValues(typeof(FileType)))
+            {                
+                var path = Path.Combine(env.WebRootPath, fileType.GetFolderName());
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+            }
         }
 
         // Публичное свойство для доступа к словарю
