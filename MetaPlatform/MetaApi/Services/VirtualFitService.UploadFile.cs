@@ -38,15 +38,15 @@ namespace MetaApi.Services
             }
 
             string uniqueFileName = Guid.NewGuid().ToString();
-            var uploadsPath = Path.Combine(_env.WebRootPath, fileType.GetFolderName());
+            var uploadsPath = Path.Combine(_env.WebRootPath, fileType.GetFolderName());            
 
-            //info эти 3 вызова не нужно запускть парааллельно
-
-            string lastFileName = await SaveFileAsync(file, uploadsPath, uniqueFileName);
-            await ResizeAndSaveFile(file, uploadsPath, uniqueFileName);
-            string padingFileName = PaddingAndSave(file, uploadsPath, uniqueFileName);
-            lastFileName = (string.IsNullOrEmpty(padingFileName)) ? lastFileName : padingFileName;  
+            string padingFileName = PaddingAndSave(file, uploadsPath, uniqueFileName, out float imageRatio);
             
+            string lastFileName = await SaveFileAsync(file, uploadsPath, uniqueFileName, imageRatio);
+            lastFileName = (string.IsNullOrEmpty(padingFileName)) ? lastFileName : padingFileName;
+
+            await ResizeAndSaveFile(file, uploadsPath, uniqueFileName, imageRatio);
+
             // Добавление CRC в словарь
             _fileCrcService.AddFileCrc(fileCrc, lastFileName);   
             
@@ -54,7 +54,7 @@ namespace MetaApi.Services
             return GenerateFileUrl(lastFileName, fileType, host);            
         }
 
-        private string PaddingAndSave(IFormFile file, string uploadsPath, string fileName)
+        private string PaddingAndSave(IFormFile file, string uploadsPath, string fileName, out float imageRatio)
         {
             Image image = null;
             try
@@ -64,13 +64,17 @@ namespace MetaApi.Services
                 // Определяем формат изображения
                 IImageFormat format = Image.DetectFormat(inputStream);
                 if (format == null)
+                {
+                    imageRatio = 0.0f;
                     return string.Empty; // Неподдерживаемый формат изображения
+                }
 
                 inputStream.Position = 0; // Сброс позиции потока
                 image = Image.Load(inputStream);
                 //todo для горизонтальных фото нижняя строка не валидна
                 //вычисляем отношение высоты к ширине
-                float imageRatio = (float)image.Height / image.Width;
+                imageRatio = (float)image.Height / image.Width;
+                imageRatio = (float)Math.Round(imageRatio, 3);
                 if (imageRatio < 1.25 || imageRatio > 1.38)
                 {
                     //info: обычно для айфоновских фото сюда уже не заходим
@@ -82,7 +86,7 @@ namespace MetaApi.Services
                             Quality = FittingConstants.QUALITY_JPEG
                         };
 
-                        string newFileName = $"{fileName}_{imageRatio}_r{Path.GetExtension(file.FileName)}";
+                        string newFileName = $"{fileName}_{imageRatio}_p{Path.GetExtension(file.FileName)}";
                         string newfilePath = Path.Combine(uploadsPath, newFileName);
 
                         // Сохраняем изображение в файл
@@ -96,7 +100,8 @@ namespace MetaApi.Services
                     }
                 }
                 else
-                { 
+                {
+                    imageRatio = 0;
                     return string.Empty;
                 }
             }
@@ -108,6 +113,8 @@ namespace MetaApi.Services
             {
                 image?.Dispose();
             }
+
+            imageRatio = 0.0f;
             return string.Empty;
         }
 
@@ -126,11 +133,19 @@ namespace MetaApi.Services
         /// <param name="uploadsPath"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        private async Task ResizeAndSaveFile(IFormFile file, string uploadsPath, string fileName)
+        private async Task ResizeAndSaveFile(IFormFile file, string uploadsPath, string fileName, float imageRatio)
         {                        
             byte[] resizedBytes = ImageResizer.ResizeImage(file, FittingConstants.THUMBNAIL_WIDTH);
             
-            string newFileName = $"{fileName}_t{Path.GetExtension(file.FileName)}";
+            string newFileName;
+            if (imageRatio > 0.1)
+            {
+                newFileName = $"{fileName}_{imageRatio}_t{Path.GetExtension(file.FileName)}";
+            }
+            else
+            {
+                newFileName = $"{fileName}_t{Path.GetExtension(file.FileName)}";
+            }
             string newfilePath = Path.Combine(uploadsPath, newFileName);
 
             await File.WriteAllBytesAsync(newfilePath, resizedBytes);
@@ -143,14 +158,17 @@ namespace MetaApi.Services
         /// <param name="uploadsPath"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        private async Task<string> SaveFileAsync(IFormFile file, string uploadsPath, string fileName)
+        private async Task<string> SaveFileAsync(IFormFile file, string uploadsPath, string fileName, float imageRatio)
         {            
-            if (!Directory.Exists(uploadsPath))
+            string uniqueFileName;
+            if (imageRatio > 0.1)
             {
-                Directory.CreateDirectory(uploadsPath);
+                uniqueFileName = $"{fileName}_{imageRatio}_v{Path.GetExtension(file.FileName)}";
             }
-            
-            string uniqueFileName = $"{fileName}_v{Path.GetExtension(file.FileName)}";
+            else
+            {
+                uniqueFileName = $"{fileName}_v{Path.GetExtension(file.FileName)}";
+            }
             string filePath = Path.Combine(uploadsPath, uniqueFileName);
 
             using (var stream = new FileStream(filePath, FileMode.Create))

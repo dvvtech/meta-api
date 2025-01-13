@@ -13,7 +13,29 @@ using SixLabors.ImageSharp.Formats.Jpeg;
 namespace MetaApi.Services
 {
     public partial class VirtualFitService
-    {        
+    {
+        private string GetUrl(string url)
+        {            
+            string imgFileName = System.IO.Path.GetFileNameWithoutExtension(url);
+            var count = imgFileName.Count(s => s == '_');
+            if (count == 1)
+            {
+                return url;
+            }
+            if (imgFileName.EndsWith("_p", StringComparison.OrdinalIgnoreCase))
+            {
+                return url;
+            }
+
+            //если фото из внутренней коллекции и для него есть паддинг то нужно заменить название файла чтоб оканчивался на _p
+            if (imgFileName.EndsWith("_v", StringComparison.OrdinalIgnoreCase))
+            {
+                return url.Replace("_v", FittingConstants.PADDING_SUFFIX_URL);                
+            }
+
+            throw new Exception("internal error");
+        }
+
         /// <summary>
         /// Попытка примерки одежды.
         /// </summary>
@@ -34,7 +56,7 @@ namespace MetaApi.Services
             {
                 return Result<FittingResultResponse>.Failure(VirtualFitError.LimitIsOverError());
             }
-            
+
             var httpClient = _httpClientFactory.CreateClient("ReplicateAPI");
 
             // Подготовьте данные для отправки            
@@ -48,8 +70,8 @@ namespace MetaApi.Services
                     Steps = 30,
                     Category = request.Category,
                     ForceDc = false,
-                    GarmImg = request.GarmImg,
-                    HumanImg = request.HumanImg,
+                    GarmImg = GetUrl(request.GarmImg),
+                    HumanImg = GetUrl(request.HumanImg),
                     MaskOnly = false,
                     GarmentDes = ""
                 }
@@ -114,9 +136,9 @@ namespace MetaApi.Services
 
                     var fitingResult = new FittingResultEntity
                     {
-                        GarmentImgUrl = AppendSuffixToUrl(request.GarmImg, FittingConstants.THUMBNAIL_SUFFIX_URL),
-                        HumanImgUrl = AppendSuffixToUrl(request.HumanImg, FittingConstants.THUMBNAIL_SUFFIX_URL),
-                        ResultImgUrl = AppendSuffixToUrl(urlResult, FittingConstants.THUMBNAIL_SUFFIX_URL),
+                        GarmentImgUrl = request.GarmImg.Replace("_p", FittingConstants.THUMBNAIL_SUFFIX_URL).Replace("_v", FittingConstants.THUMBNAIL_SUFFIX_URL),
+                        HumanImgUrl = request.HumanImg.Replace("_p", FittingConstants.THUMBNAIL_SUFFIX_URL).Replace("_v", FittingConstants.THUMBNAIL_SUFFIX_URL),
+                        ResultImgUrl = urlResult.Replace("_v", FittingConstants.THUMBNAIL_SUFFIX_URL),
                         PromocodeId = promocode.Id,
                         CreatedUtcDate = DateTime.UtcNow,
                     };
@@ -138,6 +160,11 @@ namespace MetaApi.Services
             }
 
             return Result<FittingResultResponse>.Failure(VirtualFitError.VirtualFitServiceError("Something went wrong"));
+        }
+
+        public static string ReplaceEndingToT(string input)
+        {            
+            return input.Substring(0, input.Length - 2) + "_t";            
         }
 
         private double? GetImageRatio(string fileName)
@@ -222,7 +249,7 @@ namespace MetaApi.Services
             }
 
             string fileName = Guid.NewGuid().ToString();
-            string uniqueFileName = fileName + extension;
+            string uniqueFileName = $"{fileName}_v{extension}";
             string filePath = Path.Combine(uploadsPath, uniqueFileName);
 
             // Сохраняем оригинальный файл            

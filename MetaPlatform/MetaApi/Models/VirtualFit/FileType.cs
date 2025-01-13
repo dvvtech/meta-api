@@ -27,6 +27,7 @@
         {
             return fileType switch
             {
+                FileType.None => "none",
                 FileType.ManСlothing => "manClothing",
                 FileType.WomanСlothing => "womanClothing",                         
                 FileType.Man => "man",

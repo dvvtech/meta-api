@@ -16,7 +16,8 @@ namespace MetaApi.Services
                                     ILogger<FileCrcHostedService> logger)
         {
             _logger = logger;            
-            _uploadsFolderPath = Path.Combine(env.WebRootPath, "uploads");            
+            _uploadsFolderPath = Path.Combine(env.WebRootPath, FileType.Upload.GetFolderName());
+            
             //_resultFolderPath = Path.Combine(env.WebRootPath, "result");
 
             foreach (FileType fileType in Enum.GetValues(typeof(FileType)))
@@ -61,16 +62,10 @@ namespace MetaApi.Services
         {
             _logger.LogInformation("FileCrcHostedService остановлен.");
             return Task.CompletedTask;
-        }        
+        }
 
         private void ProcessFiles()
         {
-            if (!Directory.Exists(_uploadsFolderPath))
-            {
-                _logger.LogWarning($"Папка {_uploadsFolderPath} не найдена.");
-                return;
-            }
-            
             var files = Directory.GetFiles(_uploadsFolderPath)
                                  .Where(file => Path.GetFileNameWithoutExtension(file).EndsWith("_v"))
                                  .ToList();
@@ -78,14 +73,14 @@ namespace MetaApi.Services
             foreach (var filePath in files)
             {
                 try
-                {                    
+                {
                     var fileName = Path.GetFileName(filePath);
-                    if (!EndsWithSuffix(fileName))
-                    {
-                        var crc = CalculateCrc(filePath);
-                        // Добавляем CRC и имя файла в словарь
-                        _fileCrcDictionary[crc] = fileName;
-                    }
+
+
+                    var crc = CalculateCrc(filePath);
+                    // Добавляем CRC и имя файла в словарь
+                    _fileCrcDictionary[crc] = fileName;
+
                 }
                 catch (Exception ex)
                 {
