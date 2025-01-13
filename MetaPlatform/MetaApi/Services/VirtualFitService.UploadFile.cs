@@ -43,7 +43,7 @@ namespace MetaApi.Services
             string padingFileName = PaddingAndSave(file, uploadsPath, uniqueFileName, out float imageRatio);
             
             string lastFileName = await SaveFileAsync(file, uploadsPath, uniqueFileName, imageRatio);
-            lastFileName = (string.IsNullOrEmpty(padingFileName)) ? lastFileName : padingFileName;
+            //lastFileName = (string.IsNullOrEmpty(padingFileName)) ? lastFileName : padingFileName;
 
             await ResizeAndSaveFile(file, uploadsPath, uniqueFileName, imageRatio);
 

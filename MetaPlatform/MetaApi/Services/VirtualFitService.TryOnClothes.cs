@@ -20,17 +20,30 @@ namespace MetaApi.Services
             var count = imgFileName.Count(s => s == '_');
             if (count == 1)
             {
+                //todo если оканчивается на _t то заменить на _v
+                if (imgFileName.EndsWith("_t", StringComparison.OrdinalIgnoreCase))
+                {
+                    return url.Replace("_t", FittingConstants.FULLSIZE_SUFFIX_URL);
+                }
+
                 return url;
             }
-            if (imgFileName.EndsWith("_p", StringComparison.OrdinalIgnoreCase))
+
+            /*if (imgFileName.EndsWith("_p", StringComparison.OrdinalIgnoreCase))
             {
                 return url;
-            }
+            }*/
 
             //если фото из внутренней коллекции и для него есть паддинг то нужно заменить название файла чтоб оканчивался на _p
             if (imgFileName.EndsWith("_v", StringComparison.OrdinalIgnoreCase))
             {
                 return url.Replace("_v", FittingConstants.PADDING_SUFFIX_URL);                
+            }
+
+            //если фото из внутренней коллекции 
+            if (imgFileName.EndsWith("_t", StringComparison.OrdinalIgnoreCase))
+            {
+                return url.Replace("_t", FittingConstants.PADDING_SUFFIX_URL);
             }
 
             throw new Exception("internal error");

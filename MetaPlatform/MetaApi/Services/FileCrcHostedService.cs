@@ -76,7 +76,6 @@ namespace MetaApi.Services
                 {
                     var fileName = Path.GetFileName(filePath);
 
-
                     var crc = CalculateCrc(filePath);
                     // Добавляем CRC и имя файла в словарь
                     _fileCrcDictionary[crc] = fileName;
