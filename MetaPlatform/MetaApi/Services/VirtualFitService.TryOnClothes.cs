@@ -72,6 +72,13 @@ namespace MetaApi.Services
 
             var httpClient = _httpClientFactory.CreateClient("ReplicateAPI");
 
+            string logRequestBefore = $"{request.GarmImg} {Environment.NewLine} {request.HumanImg}";
+            _logger.LogInformation(logRequestBefore);
+            string garmImg = GetUrl(request.GarmImg);
+            string humanImg = GetUrl(request.HumanImg);
+            string logRequestAfter = $"{garmImg} {Environment.NewLine} {humanImg} {Environment.NewLine}";
+            _logger.LogInformation(logRequestAfter);            
+
             // Подготовьте данные для отправки            
             var internalRequestData = new PredictionRequest
             {
