@@ -156,8 +156,8 @@ namespace MetaApi.Services
 
                     var fitingResult = new FittingResultEntity
                     {
-                        GarmentImgUrl = request.GarmImg.Replace("_p", FittingConstants.THUMBNAIL_SUFFIX_URL).Replace("_v", FittingConstants.THUMBNAIL_SUFFIX_URL),
-                        HumanImgUrl = request.HumanImg.Replace("_p", FittingConstants.THUMBNAIL_SUFFIX_URL).Replace("_v", FittingConstants.THUMBNAIL_SUFFIX_URL),
+                        GarmentImgUrl = garmImg.Replace("_p", FittingConstants.THUMBNAIL_SUFFIX_URL).Replace("_v", FittingConstants.THUMBNAIL_SUFFIX_URL),
+                        HumanImgUrl = humanImg.Replace("_p", FittingConstants.THUMBNAIL_SUFFIX_URL).Replace("_v", FittingConstants.THUMBNAIL_SUFFIX_URL),
                         ResultImgUrl = urlResult.Replace("_v", FittingConstants.THUMBNAIL_SUFFIX_URL),
                         PromocodeId = promocode.Id,
                         CreatedUtcDate = DateTime.UtcNow,
