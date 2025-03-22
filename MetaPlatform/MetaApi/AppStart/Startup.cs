@@ -29,6 +29,10 @@ namespace MetaApi.AppStart
             ConfigureCors();
             ConfigureDatabase(builder.Configuration);
 
+            //храним временные данные для авторизации vk в кеше памяти
+            builder.Services.AddMemoryCache();
+
+            builder.Services.AddScoped<VkAuthService>();
             builder.Services.AddScoped<VirtualFitService>();
             builder.Services.AddSingleton<FileCrcHostedService>();
             builder.Services.AddHostedService(provider => provider.GetService<FileCrcHostedService>());

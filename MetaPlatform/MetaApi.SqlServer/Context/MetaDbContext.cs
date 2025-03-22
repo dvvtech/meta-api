@@ -1,4 +1,5 @@
 ﻿using MetaApi.SqlServer.Configurations;
+using MetaApi.SqlServer.Entities;
 using MetaApi.SqlServer.Entities.VirtualFit;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,8 @@ namespace MetaApi.SqlServer.Context
         public DbSet<PromocodeEntity> Promocode { get; set; }
 
         public DbSet<FittingResultEntity> FittingResult { get; set; }
+
+        public DbSet<UserEntity> Users { get; set; }
 
         public MetaDbContext(DbContextOptions<MetaDbContext> options) : base(options)
         {
