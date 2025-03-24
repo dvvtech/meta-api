@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MetaApi.SqlServer.Migrations
 {
     [DbContext(typeof(MetaDbContext))]
-    [Migration("20250319193948_UserCreate")]
-    partial class UserCreate
+    [Migration("20250324182610_addUserTable5")]
+    partial class addUserTable5
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,17 +25,13 @@ namespace MetaApi.SqlServer.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("MetaApi.SqlServer.Entities.UserEntity", b =>
+            modelBuilder.Entity("MetaApi.SqlServer.Entities.AccountEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AuthJson")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("AuthType")
                         .HasColumnType("int");
@@ -45,14 +41,16 @@ namespace MetaApi.SqlServer.Migrations
 
                     b.Property<string>("ExternalId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("IsBlocked")
                         .HasColumnType("bit");
 
                     b.Property<string>("JwtRefreshToken")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<int>("Role")
                         .HasColumnType("int");
@@ -62,11 +60,18 @@ namespace MetaApi.SqlServer.Migrations
 
                     b.Property<string>("UserName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.HasIndex("ExternalId")
+                        .IsUnique();
+
+                    b.HasIndex("JwtRefreshToken")
+                        .IsUnique();
+
+                    b.ToTable("Accounts", (string)null);
                 });
 
             modelBuilder.Entity("MetaApi.SqlServer.Entities.VirtualFit.FittingResultEntity", b =>

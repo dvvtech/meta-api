@@ -108,13 +108,13 @@ namespace MetaApi.Services
 
             // Отправьте POST запрос к другому сервису
             var response = await httpClient.PostAsync("predictions", content);
-
+            _logger.LogInformation("get response");
             if (!response.IsSuccessStatusCode)
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
                 return Result<FittingResultResponse>.Failure(VirtualFitError.ThirdPartyServiceError(errorContent, response.StatusCode));
             }
-
+            _logger.LogInformation("get response2");
             // Получаем ID созданного предсказания из первого ответа
             var responseContent = await response.Content.ReadAsStringAsync();
             using var document = JsonDocument.Parse(responseContent);

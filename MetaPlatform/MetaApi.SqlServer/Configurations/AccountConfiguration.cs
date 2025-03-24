@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MetaApi.SqlServer.Configurations
 {
-    public sealed class UserConfiguration : IEntityTypeConfiguration<UserEntity>
+    public sealed class AccountConfiguration : IEntityTypeConfiguration<AccountEntity>
     {
-        public void Configure(EntityTypeBuilder<UserEntity> builder)
+        public void Configure(EntityTypeBuilder<AccountEntity> builder)
         {
-            builder.ToTable("Users");
+            builder.ToTable("Accounts");
 
             builder.HasKey(entity => entity.Id);
 
@@ -20,9 +20,6 @@ namespace MetaApi.SqlServer.Configurations
 
             builder.Property(user => user.JwtRefreshToken)
                    .HasMaxLength(128);
-
-            builder.Property(user => user.AuthJson)
-                   .HasMaxLength(1024);
 
             builder.Property(user => user.AuthType)
                    .IsRequired();

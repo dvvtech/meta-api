@@ -7,7 +7,7 @@ namespace MetaApi.Services
 {
     public partial class VkAuthService
     {
-        public async Task<TokenResponse> HandleCallback(string code, string state, string deviceId)
+        public async Task<MetaApi.Models.Auth.TokenResponse> HandleCallback(string code, string state, string deviceId)
         {
             // Извлекаем code_verifier из кэша по state
             if (!_cache.TryGetValue(state, out string codeVerifier))
@@ -27,28 +27,29 @@ namespace MetaApi.Services
 
             string userName = await GetUserName(tokenResponse.AccessToken, tokenResponse.RefreshToken, deviceId);
 
+            string accessToken = _jwtProvider.GenerateToken(userName, tokenResponse.UserId.ToString());
             string refreshToken = _jwtProvider.GenerateRefreshToken();
 
-            var newUserEntity = new UserEntity
+            var newUserEntity = new AccountEntity
             {
                 ExternalId = tokenResponse.UserId.ToString(),
                 UserName = userName,
                 JwtRefreshToken = refreshToken,
                 AuthType = AuthTypeEntity.Vk,
-                AuthJson = authJson,
+//                AuthJson = authJson,
                 Role = RoleEntity.User                
             };
 
-            UserEntity userEntity = await _metaDbContext.Users.AsNoTracking().FirstOrDefaultAsync(user => user.ExternalId == newUserEntity.ExternalId);
+            AccountEntity userEntity = await _metaDbContext.Accounts.AsNoTracking().FirstOrDefaultAsync(user => user.ExternalId == newUserEntity.ExternalId);
             if (userEntity == null)
             {
-                _metaDbContext.Users.AddAsync(userEntity);
+                _metaDbContext.Accounts.AddAsync(userEntity);
             }
 
-            return new TokenResponse
+            return new MetaApi.Models.Auth.TokenResponse
             {
-                AccessToken = tokenResponse.AccessToken,
-                RefreshToken = tokenResponse.RefreshToken
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
             };
         }
 

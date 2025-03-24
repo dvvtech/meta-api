@@ -3,6 +3,7 @@ using MetaApi.Constants;
 using MetaApi.Core;
 using MetaApi.Core.Configurations;
 using MetaApi.Services;
+using MetaApi.Services.Auth;
 
 namespace MetaApi.AppStart
 {
@@ -40,6 +41,7 @@ namespace MetaApi.AppStart
         private void InitConfig()
         {
             _builder.Services.Configure<VirtualFitConfig>(_builder.Configuration.GetSection(VirtualFitConfig.SectionName));
+            _builder.Services.Configure<GoogleAuthConfig>(_builder.Configuration.GetSection(GoogleAuthConfig.SectionName));
 
             _builder.Services.AddOptions<JwtConfig>()
                 .Bind(_builder.Configuration.GetSection(JwtConfig.SectionName))
@@ -50,7 +52,7 @@ namespace MetaApi.AppStart
             if (_jwtConf == null)
             {
                 throw new InvalidOperationException("JWT configuration section is missing or invalid");
-            }
+            }            
         }
 
         private void AddServices()
@@ -60,6 +62,7 @@ namespace MetaApi.AppStart
 
             _builder.Services.AddSingleton<JwtProvider>();
             _builder.Services.AddScoped<VkAuthService>();
+            _builder.Services.AddScoped<GoogleAuthService>();            
             _builder.Services.AddScoped<VirtualFitService>();
             _builder.Services.AddSingleton<FileCrcHostedService>();
             _builder.Services.AddHostedService(provider => provider.GetService<FileCrcHostedService>());

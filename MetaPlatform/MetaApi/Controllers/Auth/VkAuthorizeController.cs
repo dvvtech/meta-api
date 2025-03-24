@@ -1,13 +1,11 @@
 ﻿using MetaApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Cryptography;
-using System.Text;
 
 
 namespace MetaApi.Controllers
 {
-    [Route("api/vk-authorize")]
+    [Route("api/vk-auth")]
     [ApiController]
     public class VkAuthorizeController : ControllerBase
     {
@@ -48,8 +46,7 @@ namespace MetaApi.Controllers
         {
             _logger.LogInformation("authorize");
 
-            var authUrl = _authService.GenerateAuthUrl();
-            //mabre Redirect(authUrl) and rename Authorize to Login
+            var authUrl = _authService.GenerateAuthUrl();            
             return Ok(authUrl);
             //return Redirect(authUrl);
 
@@ -96,12 +93,11 @@ namespace MetaApi.Controllers
                                     $"type: {type}  {Environment.NewLine}");*/
 
             try
-            {                
-                await _authService.HandleCallback(code, state, device_id);
-                _logger.LogInformation("Callback8");
-                //return Ok("Authorization successful");
+            {
+                MetaApi.Models.Auth.TokenResponse tokenResponse = await _authService.HandleCallback(code, state, device_id);
+                _logger.LogInformation("Callback8");                
                 //Перенаправляем пользователя на фронтенд
-                return Redirect("https://virtual-fit.one?accessToken=123567&refreshToken={tokens.RefreshToken}");
+                return Redirect($"https://virtual-fit.one?accessToken={tokenResponse.AccessToken}&refreshToken={tokenResponse.RefreshToken}");
             }
             catch (Exception ex)
             {

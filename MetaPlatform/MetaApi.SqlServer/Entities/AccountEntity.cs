@@ -1,7 +1,7 @@
 ﻿
 namespace MetaApi.SqlServer.Entities
 {
-    public class UserEntity
+    public class AccountEntity
     {
         public int Id { get; set; }
 
@@ -12,8 +12,7 @@ namespace MetaApi.SqlServer.Entities
 
         public string UserName { get; set; }
         public string JwtRefreshToken { get; set; }
-        public string AuthJson { get; set; } // Это будет хранить JSON
-
+        
         public AuthTypeEntity AuthType { get; set; }
 
         public RoleEntity Role { get; set; }

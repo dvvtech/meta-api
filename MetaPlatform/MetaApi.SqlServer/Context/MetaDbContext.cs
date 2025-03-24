@@ -11,7 +11,7 @@ namespace MetaApi.SqlServer.Context
 
         public DbSet<FittingResultEntity> FittingResult { get; set; }
 
-        public DbSet<UserEntity> Users { get; set; }
+        public DbSet<AccountEntity> Accounts { get; set; }
 
         public MetaDbContext(DbContextOptions<MetaDbContext> options) : base(options)
         {
@@ -22,6 +22,7 @@ namespace MetaApi.SqlServer.Context
         {
             modelBuilder.ApplyConfiguration(new FittingResultConfiguration());
             modelBuilder.ApplyConfiguration(new PromocodeConfiguration());
+            modelBuilder.ApplyConfiguration(new AccountConfiguration());
 
             base.OnModelCreating(modelBuilder);
 
