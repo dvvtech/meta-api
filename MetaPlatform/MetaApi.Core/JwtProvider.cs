@@ -53,10 +53,5 @@ namespace MetaApi.Core
         {
             return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
         }
-
-        public string GenerateConfirmationToken()
-        {
-            return Convert.ToHexString(RandomNumberGenerator.GetBytes(64));
-        }
     }
 }

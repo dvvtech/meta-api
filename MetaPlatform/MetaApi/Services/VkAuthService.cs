@@ -1,4 +1,5 @@
-﻿using MetaApi.SqlServer.Context;
+﻿using MetaApi.Core;
+using MetaApi.SqlServer.Context;
 using Microsoft.Extensions.Caching.Memory;
 using System.Text.Json.Serialization;
 
@@ -12,13 +13,19 @@ namespace MetaApi.Services
         private const string RedirectUri = "https://a30944-8332.x.d-f.pw/api/vk-authorize/callback";
         private const string Scope = "email phone";//"email phone";
 
+        private readonly JwtProvider _jwtProvider;
+
         private readonly ILogger<VkAuthService> _logger;
 
-        public VkAuthService(IMemoryCache cache, ILogger<VkAuthService> logger, MetaDbContext metaContext)
+        public VkAuthService(IMemoryCache cache,
+                             ILogger<VkAuthService> logger,
+                             MetaDbContext metaContext,
+                             JwtProvider jwtProvider)
         {
             _cache = cache;
             _logger = logger;
             _metaDbContext = metaContext;
+            _jwtProvider = jwtProvider;
         }                        
     }
 

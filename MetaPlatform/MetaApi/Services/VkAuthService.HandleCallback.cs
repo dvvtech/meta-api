@@ -1,4 +1,5 @@
 ﻿using MetaApi.SqlServer.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using System.Text.Json;
 
@@ -6,7 +7,7 @@ namespace MetaApi.Services
 {
     public partial class VkAuthService
     {
-        public async Task HandleCallback(string code, string state, string deviceId)
+        public async Task<TokenResponse> HandleCallback(string code, string state, string deviceId)
         {
             // Извлекаем code_verifier из кэша по state
             if (!_cache.TryGetValue(state, out string codeVerifier))
@@ -19,28 +20,40 @@ namespace MetaApi.Services
                                    $"device_id: {deviceId}  {Environment.NewLine}");
 
             // Обмениваем код на токен
-            var tokenResponse = await ExchangeCodeForToken(code, codeVerifier, deviceId);
+            var authJson = await ExchangeCodeForToken(code, codeVerifier, deviceId);
+            var tokenResponse = JsonSerializer.Deserialize<TokenResponse>(authJson);
 
             _logger.LogInformation($"token: {tokenResponse.AccessToken}");
 
-            //string userName = GetUserName(accessToken, "", "");
+            string userName = await GetUserName(tokenResponse.AccessToken, tokenResponse.RefreshToken, deviceId);
 
-            //string jwt
+            string refreshToken = _jwtProvider.GenerateRefreshToken();
 
-            // Дальнейшая логика (например, сохранение токена в базе данных)
-
-            var user = new UserEntity
+            var newUserEntity = new UserEntity
             {
                 ExternalId = tokenResponse.UserId.ToString(),
-                //UserName = GetUserName,
-                
-
+                UserName = userName,
+                JwtRefreshToken = refreshToken,
+                AuthType = AuthTypeEntity.Vk,
+                AuthJson = authJson,
+                Role = RoleEntity.User                
             };
-            //_metaDbContext.Users.AddOrUpdate()
+
+            UserEntity userEntity = await _metaDbContext.Users.AsNoTracking().FirstOrDefaultAsync(user => user.ExternalId == newUserEntity.ExternalId);
+            if (userEntity == null)
+            {
+                _metaDbContext.Users.AddAsync(userEntity);
+            }
+
+            return new TokenResponse
+            {
+                AccessToken = tokenResponse.AccessToken,
+                RefreshToken = tokenResponse.RefreshToken
+            };
         }
 
-        private async Task<TokenResponse> ExchangeCodeForToken(string code, string codeVerifier, string deviceId)
-        {
+        private async Task<string> ExchangeCodeForToken(string code, string codeVerifier, string deviceId)
+        {            
             var client = new HttpClient();
             var requestContent = new FormUrlEncodedContent(new[]
             {
@@ -65,11 +78,11 @@ namespace MetaApi.Services
             _logger.LogInformation("token info:" + responseContent);
 
             // Парсим ответ и извлекаем access_token
-            var tokenResponse = JsonSerializer.Deserialize<TokenResponse>(responseContent);
-            return tokenResponse;
+            
+            return responseContent;
         }
 
-        public async Task<bool> GetUserName(string accessToken, string refreshToken, string deviceId)
+        public async Task<string> GetUserName(string accessToken, string refreshToken, string deviceId)
         {
             string ApiUrl = "https://api.vk.com/method/";
 
@@ -97,13 +110,17 @@ namespace MetaApi.Services
 
                 var userResponse = JsonSerializer.Deserialize<VkUserResponse>(response);
 
+                if (userResponse?.Response.Count > 0)
+                {
+                    return userResponse?.Response[0].FirstName;
+                }
 
-                return userResponse?.Response?.Count > 0;
+                return string.Empty;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Token validation failed: {ex.Message}");
-                return false;
+                Console.WriteLine($"GetUserName failed: {ex.Message}");
+                return string.Empty;
             }
         }
     }

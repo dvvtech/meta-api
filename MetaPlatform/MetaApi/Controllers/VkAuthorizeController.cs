@@ -1,4 +1,5 @@
 ﻿using MetaApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
 using System.Text;
@@ -20,12 +21,13 @@ namespace MetaApi.Controllers
             _authService = authService;
         }
 
+        [Authorize]
         [HttpGet("test")]
         public async Task<IActionResult> Test(string token)
         {
             _logger.LogInformation("test");
 
-            bool res = await _authService.ValidateToken(token, "", "");
+            /*bool res = await _authService.ValidateToken(token, "", "");
             if (res)
             {
                 return Ok();
@@ -33,7 +35,8 @@ namespace MetaApi.Controllers
             else
             {
                 return BadRequest();
-            }
+            }*/
+            return Ok("return");
         }
 
         /// <summary>
@@ -97,7 +100,8 @@ namespace MetaApi.Controllers
                 await _authService.HandleCallback(code, state, device_id);
                 _logger.LogInformation("Callback8");
                 //return Ok("Authorization successful");
-                return Redirect("https://virtual-fit.one?accessToken=123567");
+                //Перенаправляем пользователя на фронтенд
+                return Redirect("https://virtual-fit.one?accessToken=123567&refreshToken={tokens.RefreshToken}");
             }
             catch (Exception ex)
             {

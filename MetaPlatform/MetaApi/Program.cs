@@ -8,20 +8,21 @@ using MetaApi.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//string response = "{\"response\":[{\"id\":884910363,\"first_name\":\"Vladimir\",\"last_name\":\"Dezhurnyuk\",\"can_access_closed\":true,\"is_closed\":false}]}";
+//var userResponse = JsonSerializer.Deserialize<VkUserResponse>(response);
+
 var startup = new Startup();
 startup.Initialize(builder);
 
 var app = builder.Build();
 
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-var virtualFitConfig = builder.Configuration.GetSection(VirtualFitConfig.SectionName).Get<VirtualFitConfig>();
 var dbInfo = builder.Configuration.GetConnectionString(DatabaseConfig.MetaDbMsSqlConnection);
-var rootPath = builder.Environment.ContentRootPath;
+//var rootPath = builder.Environment.ContentRootPath;
 StringBuilder sb = new StringBuilder();
 sb.AppendLine($"Environment: {environment}");
-sb.AppendLine($"config: {virtualFitConfig.ApiToken}");
 sb.AppendLine($"dbInfo: {dbInfo}");
-sb.AppendLine($"rootPath: {rootPath}");
+//sb.AppendLine($"rootPath: {rootPath}");
 app.Logger.LogInformation(sb.ToString());
 
 app.UseSwagger();
