@@ -15,6 +15,9 @@ namespace MetaApi.SqlServer.Configurations
             builder.Property(user => user.UserName)
                    .HasMaxLength(512);
 
+            builder.Property(e => e.ExternalId)
+                   .HasMaxLength(256);                                      
+
             builder.Property(user => user.JwtRefreshToken)
                    .HasMaxLength(128);
 
@@ -35,7 +38,11 @@ namespace MetaApi.SqlServer.Configurations
                 .IsRequired()
                 .HasColumnType("datetime2");
 
+
             builder.HasIndex(user => user.JwtRefreshToken)
+                   .IsUnique();
+
+            builder.HasIndex(e => e.ExternalId)
                    .IsUnique();
         }
     }
