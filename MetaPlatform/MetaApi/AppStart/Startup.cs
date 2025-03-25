@@ -16,7 +16,7 @@ namespace MetaApi.AppStart
         {
             _builder = builder ?? throw new ArgumentNullException(nameof(builder));
 
-            InitConfig();
+            InitConfigs();
             ConfigureAuth();
 
             builder.Services.AddHttpClient(ApiNames.REPLICATE_API, client =>
@@ -38,10 +38,11 @@ namespace MetaApi.AppStart
             builder.Services.AddControllers();
         }
 
-        private void InitConfig()
+        private void InitConfigs()
         {
             _builder.Services.Configure<VirtualFitConfig>(_builder.Configuration.GetSection(VirtualFitConfig.SectionName));
             _builder.Services.Configure<GoogleAuthConfig>(_builder.Configuration.GetSection(GoogleAuthConfig.SectionName));
+            _builder.Services.Configure<VkAuthConfig>(_builder.Configuration.GetSection(VkAuthConfig.SectionName));            
 
             _builder.Services.AddOptions<JwtConfig>()
                 .Bind(_builder.Configuration.GetSection(JwtConfig.SectionName))

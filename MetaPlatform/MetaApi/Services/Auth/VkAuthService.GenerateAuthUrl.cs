@@ -15,7 +15,7 @@ namespace MetaApi.Services
             // Сохраняем code_verifier в кэше по state
             _cache.Set(state, codeVerifier, TimeSpan.FromMinutes(5)); // Храним 5 минут
 
-            var authUrl = $"https://id.vk.com/authorize?response_type=code&client_id={ClientId}&scope={Scope}&redirect_uri={RedirectUri}&state={state}&code_challenge={codeChallenge}&code_challenge_method=S256";
+            var authUrl = $"https://id.vk.com/authorize?response_type=code&client_id={_authConfig.ClientId}&scope={_authConfig.Scope}&redirect_uri={_authConfig.RedirectUrl}&state={state}&code_challenge={codeChallenge}&code_challenge_method=S256";
 
             return authUrl;
         }

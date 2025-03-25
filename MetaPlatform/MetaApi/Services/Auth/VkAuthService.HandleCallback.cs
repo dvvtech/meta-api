@@ -36,14 +36,25 @@ namespace MetaApi.Services
                 UserName = userName,
                 JwtRefreshToken = refreshToken,
                 AuthType = AuthTypeEntity.Vk,
-//                AuthJson = authJson,
-                Role = RoleEntity.User                
+                Role = RoleEntity.User,
+                CreatedUtcDate = DateTime.UtcNow,
+                UpdateUtcDate = DateTime.UtcNow
             };
 
             AccountEntity userEntity = await _metaDbContext.Accounts.AsNoTracking().FirstOrDefaultAsync(user => user.ExternalId == newUserEntity.ExternalId);
             if (userEntity == null)
             {
-                _metaDbContext.Accounts.AddAsync(userEntity);
+                await _metaDbContext.Accounts.AddAsync(newUserEntity);
+                await _metaDbContext.SaveChangesAsync();                
+            }
+            else
+            {
+                //update refreshtoken
+                await _metaDbContext.Accounts
+                            .Where(updateUser => updateUser.ExternalId == userEntity.ExternalId)
+                            .ExecuteUpdateAsync(updateUser => updateUser
+                                .SetProperty(c => c.JwtRefreshToken, userEntity.JwtRefreshToken)
+                                .SetProperty(c => c.UpdateUtcDate, DateTime.UtcNow));
             }
 
             return new MetaApi.Models.Auth.TokenResponse
@@ -58,10 +69,10 @@ namespace MetaApi.Services
             var client = new HttpClient();
             var requestContent = new FormUrlEncodedContent(new[]
             {
-                new KeyValuePair<string, string>("client_id", VkAuthService.ClientId),
+                new KeyValuePair<string, string>("client_id", _authConfig.ClientId),
                 new KeyValuePair<string, string>("grant_type", "authorization_code"),
                 new KeyValuePair<string, string>("code", code),
-                new KeyValuePair<string, string>("redirect_uri", VkAuthService.RedirectUri),
+                new KeyValuePair<string, string>("redirect_uri", _authConfig.RedirectUrl),
                 new KeyValuePair<string, string>("code_verifier", codeVerifier),
                 new KeyValuePair<string, string>("device_id", deviceId)
             });
