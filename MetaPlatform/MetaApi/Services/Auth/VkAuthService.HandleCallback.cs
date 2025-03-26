@@ -1,5 +1,4 @@
 ﻿using MetaApi.SqlServer.Entities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using System.Text.Json;
 
@@ -9,62 +8,61 @@ namespace MetaApi.Services
     {
         public async Task<MetaApi.Models.Auth.TokenResponse> HandleCallback(string code, string state, string deviceId)
         {
-            // Извлекаем code_verifier из кэша по state
-            if (!_cache.TryGetValue(state, out string codeVerifier))
+            try
             {
-                throw new Exception("Invalid or expired state");
+                // Извлекаем code_verifier из кэша по state
+                if (!_cache.TryGetValue(state, out string codeVerifier))
+                {
+                    throw new Exception("Invalid or expired state");
+                }
+
+                _logger.LogInformation($"code: {code} {Environment.NewLine}" +
+                                       $"codeVerifier: {codeVerifier}  {Environment.NewLine}" +
+                                       $"device_id: {deviceId}  {Environment.NewLine}");
+
+                // Обмениваем код на токен
+                TokenResponse tokenResponse = await ExchangeCodeForToken(code, codeVerifier, deviceId);
+
+                string userName = await GetUserName(tokenResponse.AccessToken, tokenResponse.RefreshToken, deviceId);
+
+                string accessToken = _jwtProvider.GenerateToken(userName, tokenResponse.UserId.ToString());
+                string refreshToken = _jwtProvider.GenerateRefreshToken();
+
+                var newUserEntity = new AccountEntity
+                {
+                    ExternalId = tokenResponse.UserId.ToString(),
+                    UserName = userName,
+                    JwtRefreshToken = refreshToken,
+                    AuthType = AuthTypeEntity.Vk,
+                    Role = RoleEntity.User,
+                    CreatedUtcDate = DateTime.UtcNow,
+                    UpdateUtcDate = DateTime.UtcNow
+                };
+
+                AccountEntity accountEntity = await _accountRepository.GetByExternalId(newUserEntity.ExternalId);
+                if (accountEntity == null)
+                {
+                    await _accountRepository.Add(newUserEntity);
+                }
+                else
+                {
+                    await _accountRepository.UpdateRefreshToken(accountEntity);
+                }
+
+                return new MetaApi.Models.Auth.TokenResponse
+                {
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken
+                };
             }
-
-            _logger.LogInformation($"code: {code} {Environment.NewLine}" +
-                                   $"codeVerifier: {codeVerifier}  {Environment.NewLine}" +
-                                   $"device_id: {deviceId}  {Environment.NewLine}");
-
-            // Обмениваем код на токен
-            var authJson = await ExchangeCodeForToken(code, codeVerifier, deviceId);
-            var tokenResponse = JsonSerializer.Deserialize<TokenResponse>(authJson);
-
-            _logger.LogInformation($"token: {tokenResponse.AccessToken}");
-
-            string userName = await GetUserName(tokenResponse.AccessToken, tokenResponse.RefreshToken, deviceId);
-
-            string accessToken = _jwtProvider.GenerateToken(userName, tokenResponse.UserId.ToString());
-            string refreshToken = _jwtProvider.GenerateRefreshToken();
-
-            var newUserEntity = new AccountEntity
+            catch (Exception ex)
             {
-                ExternalId = tokenResponse.UserId.ToString(),
-                UserName = userName,
-                JwtRefreshToken = refreshToken,
-                AuthType = AuthTypeEntity.Vk,
-                Role = RoleEntity.User,
-                CreatedUtcDate = DateTime.UtcNow,
-                UpdateUtcDate = DateTime.UtcNow
-            };
-
-            AccountEntity userEntity = await _metaDbContext.Accounts.AsNoTracking().FirstOrDefaultAsync(user => user.ExternalId == newUserEntity.ExternalId);
-            if (userEntity == null)
-            {
-                await _metaDbContext.Accounts.AddAsync(newUserEntity);
-                await _metaDbContext.SaveChangesAsync();                
+                _logger.LogError(ex, "HandleCallback error");
+                return null;
             }
-            else
-            {
-                //update refreshtoken
-                await _metaDbContext.Accounts
-                            .Where(updateUser => updateUser.ExternalId == userEntity.ExternalId)
-                            .ExecuteUpdateAsync(updateUser => updateUser
-                                .SetProperty(c => c.JwtRefreshToken, userEntity.JwtRefreshToken)
-                                .SetProperty(c => c.UpdateUtcDate, DateTime.UtcNow));
-            }
-
-            return new MetaApi.Models.Auth.TokenResponse
-            {
-                AccessToken = accessToken,
-                RefreshToken = refreshToken
-            };
         }
 
-        private async Task<string> ExchangeCodeForToken(string code, string codeVerifier, string deviceId)
+        private async Task<TokenResponse> ExchangeCodeForToken(string code, string codeVerifier, string deviceId)
         {            
             var client = new HttpClient();
             var requestContent = new FormUrlEncodedContent(new[]
@@ -90,8 +88,9 @@ namespace MetaApi.Services
             _logger.LogInformation("token info:" + responseContent);
 
             // Парсим ответ и извлекаем access_token
-            
-            return responseContent;
+            var tokenResponse = JsonSerializer.Deserialize<TokenResponse>(responseContent);
+
+            return tokenResponse;
         }
 
         public async Task<string> GetUserName(string accessToken, string refreshToken, string deviceId)

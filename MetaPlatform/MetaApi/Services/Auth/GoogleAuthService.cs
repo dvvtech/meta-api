@@ -1,23 +1,26 @@
 ﻿using MetaApi.Configuration;
 using MetaApi.Core;
-using MetaApi.SqlServer.Context;
+using MetaApi.SqlServer.Repositories;
 using Microsoft.Extensions.Options;
 
 namespace MetaApi.Services.Auth
 {
     public partial class GoogleAuthService
     {
-        private readonly GoogleAuthConfig _authConfig;
-        private readonly MetaDbContext _metaDbContext;
+        private readonly GoogleAuthConfig _authConfig;        
         private readonly JwtProvider _jwtProvider;
+        private readonly AccountRepository _accountRepository;
+        private readonly ILogger<GoogleAuthService> _logger;
 
         public GoogleAuthService(IOptions<GoogleAuthConfig> authConfig,
-                                 MetaDbContext metaDbContext,
-                                 JwtProvider jwtProvider)
+                                 AccountRepository accountRepository,                                 
+                                 JwtProvider jwtProvider,
+                                 ILogger<GoogleAuthService> logger)
         {
             _authConfig = authConfig.Value;
-            _metaDbContext = metaDbContext;
+            _accountRepository = accountRepository;            
             _jwtProvider = jwtProvider;
+            _logger = logger;
         }        
     }
 

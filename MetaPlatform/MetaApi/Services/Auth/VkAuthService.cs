@@ -1,6 +1,6 @@
 ﻿using MetaApi.Configuration;
 using MetaApi.Core;
-using MetaApi.SqlServer.Context;
+using MetaApi.SqlServer.Repositories;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System.Text.Json.Serialization;
@@ -8,24 +8,24 @@ using System.Text.Json.Serialization;
 namespace MetaApi.Services
 {
     public partial class VkAuthService
-    {
-        private readonly MetaDbContext _metaDbContext;
+    {        
         private readonly IMemoryCache _cache;        
         private readonly JwtProvider _jwtProvider;
         private readonly ILogger<VkAuthService> _logger;
         private readonly VkAuthConfig _authConfig;
+        private readonly AccountRepository _accountRepository;
 
         public VkAuthService(IMemoryCache cache,
-                             ILogger<VkAuthService> logger,
-                             MetaDbContext metaContext,
+                             ILogger<VkAuthService> logger,                             
+                             AccountRepository accountRepository,
                              JwtProvider jwtProvider,
                              IOptions<VkAuthConfig> authConfig)
         {
             _cache = cache;
-            _logger = logger;
-            _metaDbContext = metaContext;
+            _logger = logger;            
             _jwtProvider = jwtProvider;
             _authConfig = authConfig.Value;
+            _accountRepository = accountRepository;
         }                        
     }
 

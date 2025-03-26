@@ -2,9 +2,6 @@
 using System.Net.Http.Headers;
 using MetaApi.Models.Auth;
 using MetaApi.SqlServer.Entities;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
-using Google.Apis.Auth.OAuth2.Responses;
 
 namespace MetaApi.Services.Auth
 {
@@ -43,20 +40,14 @@ namespace MetaApi.Services.Auth
                     UpdateUtcDate = DateTime.UtcNow
                 };
 
-                AccountEntity userEntity = await _metaDbContext.Accounts.AsNoTracking().FirstOrDefaultAsync(user => user.ExternalId == newUserEntity.ExternalId);
-                if (userEntity == null)
+                AccountEntity accountEntity = await _accountRepository.GetByExternalId(newUserEntity.ExternalId);                
+                if (accountEntity == null)
                 {
-                    await _metaDbContext.Accounts.AddAsync(newUserEntity);
-                    await _metaDbContext.SaveChangesAsync();
+                    await _accountRepository.Add(accountEntity);                    
                 }
                 else
-                {
-                    //update refreshtoken
-                    await _metaDbContext.Accounts
-                                .Where(updateUser => updateUser.ExternalId == userEntity.ExternalId)
-                                .ExecuteUpdateAsync(updateUser => updateUser
-                                    .SetProperty(c => c.JwtRefreshToken, userEntity.JwtRefreshToken)
-                                    .SetProperty(c => c.UpdateUtcDate, DateTime.UtcNow));
+                {                    
+                    await _accountRepository.UpdateRefreshToken(accountEntity);
                 }
 
                 return new MetaApi.Models.Auth.TokenResponse
@@ -67,6 +58,7 @@ namespace MetaApi.Services.Auth
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "HandleCallback error");
                 return null;
             }
         }
