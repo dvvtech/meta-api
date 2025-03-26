@@ -2,6 +2,7 @@
 using MetaApi.Models.VirtualFit;
 using MetaApi.Services;
 using MetaApi.Core.OperationResults.Base;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MetaApi.Controllers
 {
@@ -97,7 +98,8 @@ namespace MetaApi.Controllers
         /// </summary>
         /// <param name="requestData"></param>
         /// <returns></returns>
-        [HttpPost("try-on")]        
+        [HttpPost("try-on")]
+        [Authorize]
         public async Task<ActionResult<string>> TryOnRequest(FittingRequest request)
         {
             Result<FittingResultResponse> resultFit = await _virtualFitService.TryOnClothesAsync(request, Request.Host.Value);
