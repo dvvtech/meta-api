@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MetaApi.Controllers.Auth
 {
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     [ApiController]
     public class AuthorizeController : ControllerBase
     {
