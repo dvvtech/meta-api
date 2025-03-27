@@ -63,7 +63,8 @@ namespace MetaApi.AppStart
             _builder.Services.AddMemoryCache();
 
             _builder.Services.AddScoped<AccountRepository>();
-            _builder.Services.AddSingleton<JwtProvider>();
+            _builder.Services.AddSingleton<JwtProvider>();            
+            _builder.Services.AddScoped<AuthService>();
             _builder.Services.AddScoped<VkAuthService>();
             _builder.Services.AddScoped<GoogleAuthService>();            
             _builder.Services.AddScoped<VirtualFitService>();
