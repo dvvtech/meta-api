@@ -11,10 +11,19 @@ namespace MetaApi.Controllers.Auth
     public class AuthorizeController : ControllerBase
     {
         private readonly AuthService _authService;
+        private readonly ILogger<AuthorizeController> _logger;
 
-        public AuthorizeController(AuthService authService)
+        public AuthorizeController(AuthService authService, ILogger<AuthorizeController> logger)
         {
             _authService = authService;
+            _logger = logger;
+        }
+
+        [HttpPost("test")]
+        public async Task<ActionResult> Test()
+        {
+            _logger.LogInformation("12345");
+            return Ok("123");
         }
 
         [HttpPost("logout"), Authorize]
