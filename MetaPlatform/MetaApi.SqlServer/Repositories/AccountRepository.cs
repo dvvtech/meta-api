@@ -41,5 +41,10 @@ namespace MetaApi.SqlServer.Repositories
                                         .SetProperty(c => c.JwtRefreshToken, accountEntity.JwtRefreshToken)
                                         .SetProperty(c => c.UpdateUtcDate, DateTime.UtcNow));
         }
+
+        public async Task SaveChanges()
+        {
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }

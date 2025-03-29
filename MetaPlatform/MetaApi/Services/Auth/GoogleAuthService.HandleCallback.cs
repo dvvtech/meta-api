@@ -46,8 +46,10 @@ namespace MetaApi.Services.Auth
                     await _accountRepository.Add(accountEntity);                    
                 }
                 else
-                {                    
-                    await _accountRepository.UpdateRefreshToken(accountEntity);
+                {
+                    accountEntity.JwtRefreshToken = refreshToken;
+                    await _accountRepository.SaveChanges();
+                    //await _accountRepository.UpdateRefreshToken(accountEntity);
                 }
 
                 return new MetaApi.Models.Auth.TokenResponse

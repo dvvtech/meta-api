@@ -21,15 +21,7 @@ namespace MetaApi.Controllers
         {
             _virtualFitService = virtualFitService;                        
             _logger = logger;            
-        }
-
-        [HttpGet("test")]
-        public string Test()
-        {            
-            _logger.LogInformation("count images: " + _virtualFitService.GetCount());
-            //_virtualFitService.Test();
-            return "777";
-        }
+        }        
 
         [HttpGet("clothing-collection")]
         public ActionResult<ClothingCollection> GetClothingCollection()
@@ -100,10 +92,10 @@ namespace MetaApi.Controllers
         /// <returns></returns>
         [HttpPost("try-on")]
         [Authorize]
-        public async Task<ActionResult<string>> TryOnRequest(FittingRequest request)
+        public async Task<ActionResult<FittingResultResponse>> TryOnClothes(FittingRequest request)
         {
-            Result<FittingResultResponse> resultFit = await _virtualFitService.TryOnClothesAsync(request, Request.Host.Value);
-            //Result<FittingResultResponse> resultFit = await _virtualFitService.TryOnClothesFakeAsync(request);            
+            _logger.LogInformation("Start try on");
+            /*Result<FittingResultResponse> resultFit = await _virtualFitService.TryOnClothesAsync(request, Request.Host.Value);                      
             if (resultFit.IsFailure)
             {
                 if (int.TryParse(resultFit.Error.Code, out int httpStatusCode))
@@ -115,8 +107,16 @@ namespace MetaApi.Controllers
                     return BadRequest(new { description = resultFit.Error.Description });
                 }
             }
+            return Ok(resultFit.Value);
+             */
 
-            return Ok(resultFit.Value);            
+            FittingResultResponse resultFit = new FittingResultResponse
+            {
+                Url = "https://a33140-9deb.k.d-f.pw/oldv2/result/563117e4-9ca2-4460-9e02-c154587ef137_t.jpg",
+                RemainingUsage = 4
+            };
+
+            return Ok(resultFit);
         }
 
         [HttpDelete("history")]
@@ -136,6 +136,14 @@ namespace MetaApi.Controllers
             }
 
             return Ok(fittingResults.Value);
+        }
+
+        [HttpGet("test")]
+        public string Test()
+        {
+            _logger.LogInformation("123count_images1: " + _virtualFitService.GetCount());
+            //_virtualFitService.Test();
+            return "777";
         }
     }
 }
