@@ -35,6 +35,12 @@ namespace MetaApi.SqlServer.Configurations
                 .IsRequired()
                 .HasColumnType("datetime2");
 
+            // Связь с FittingResultEntity (коллекция)
+            builder.HasMany(p => p.FittingResults)
+                .WithOne(f => f.Account)
+                .HasForeignKey(f => f.AccountId)
+                .OnDelete(DeleteBehavior.Cascade); // Удаление связанных данных
+
 
             builder.HasIndex(user => user.JwtRefreshToken)
                    .IsUnique();

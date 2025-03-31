@@ -6,9 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace MetaApi.SqlServer.Context
 {
     public class MetaDbContext : DbContext
-    {
-        public DbSet<PromocodeEntity> Promocode { get; set; }
-
+    {        
         public DbSet<FittingResultEntity> FittingResult { get; set; }
 
         public DbSet<AccountEntity> Accounts { get; set; }

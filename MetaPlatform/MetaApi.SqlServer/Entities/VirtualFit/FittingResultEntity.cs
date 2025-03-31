@@ -19,7 +19,10 @@ namespace MetaApi.SqlServer.Entities.VirtualFit
 
         public string ResultImgUrl { get; set; }
 
-        public int PromocodeId { get; set; }
+        //public int PromocodeId { get; set; }
+
+        public int AccountId { get; set; }
+
 
         public DateTime CreatedUtcDate { get; set; }
 
@@ -31,6 +34,11 @@ namespace MetaApi.SqlServer.Entities.VirtualFit
         /// <summary>
         /// Навигационное свойство на PromocodeEntity
         /// </summary>
-        public PromocodeEntity Promocode { get; set; }
+        public AccountEntity Account { get; set; }
+
+        /// <summary>
+        /// Навигационное свойство на PromocodeEntity
+        /// </summary>
+        //public PromocodeEntity Promocode { get; set; }
     }
 }

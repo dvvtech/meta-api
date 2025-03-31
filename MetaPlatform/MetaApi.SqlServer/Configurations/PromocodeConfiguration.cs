@@ -37,10 +37,10 @@ namespace MetaApi.SqlServer.Configurations
                 .HasColumnType("datetime2");
 
             // Связь с FittingResultEntity (коллекция)
-            builder.HasMany(p => p.FittingResults)
+            /*builder.HasMany(p => p.FittingResults)
                 .WithOne(f => f.Promocode)
                 .HasForeignKey(f => f.PromocodeId)
-                .OnDelete(DeleteBehavior.Cascade); // Удаление связанных данных
+                .OnDelete(DeleteBehavior.Cascade); // Удаление связанных данных*/
 
             // Индекс на поле Promocode
             builder.HasIndex(p => p.Promocode)

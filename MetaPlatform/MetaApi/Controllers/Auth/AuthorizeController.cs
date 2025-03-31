@@ -23,7 +23,7 @@ namespace MetaApi.Controllers.Auth
         [HttpPost("logout"), Authorize]
         public async Task<ActionResult> Logout()
         {
-            Result<string> accountExternalIdResult = this.GetCurrentUserId();
+            Result<int> accountExternalIdResult = this.GetCurrentUserId();
             /*if (accountExternalIdResult.IsFailure)
             {
                 return BadRequest(accountExternalIdResult.Error);
@@ -50,7 +50,7 @@ namespace MetaApi.Controllers.Auth
             return Ok(tokenResult.Value);
         }
 
-        [HttpPost("test4")]
+        [HttpPost("test9")]
         public async Task<ActionResult> Test()
         {
             _logger.LogInformation("555");

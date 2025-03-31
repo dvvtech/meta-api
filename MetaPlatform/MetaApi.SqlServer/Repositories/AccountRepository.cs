@@ -13,6 +13,13 @@ namespace MetaApi.SqlServer.Repositories
             _dbContext = dbContext;
         }
 
+        public async Task<AccountEntity?> GetById(int userId)
+        {
+            return await _dbContext.Accounts
+                                   .AsNoTracking()
+                                   .FirstOrDefaultAsync(user => user.Id == userId);
+        }
+
         public async Task<AccountEntity?> GetByExternalId(string externalId)
         {
             return await _dbContext.Accounts

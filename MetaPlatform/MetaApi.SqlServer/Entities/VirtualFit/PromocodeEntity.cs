@@ -34,6 +34,6 @@ namespace MetaApi.SqlServer.Entities.VirtualFit
         /// <summary>
         /// Коллекция связанных FittingResultEntity
         /// </summary>
-        public ICollection<FittingResultEntity> FittingResults { get; set; }
+        //public ICollection<FittingResultEntity> FittingResults { get; set; }
     }
 }

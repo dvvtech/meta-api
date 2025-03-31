@@ -3,6 +3,7 @@ using MetaApi.Models.VirtualFit;
 using MetaApi.Services;
 using MetaApi.Core.OperationResults.Base;
 using Microsoft.AspNetCore.Authorization;
+using MetaApi.Extensions;
 
 namespace MetaApi.Controllers
 {
@@ -27,21 +28,6 @@ namespace MetaApi.Controllers
         public ActionResult<ClothingCollection> GetClothingCollection()
         {
             return Ok(_virtualFitService.GetClothingCollection(Request.Host.Value));
-        }
-
-        [HttpPost("generate-promocode")]
-        public async Task<ActionResult<string>> GeneratePromocode(GeneratePromocodeRequest request)
-        {
-            //todo этот метод должен только админом вызываться
-
-            if (request.UsageLimit <= 0)
-            {
-                return BadRequest("UsageLimit должен быть больше 0.");
-            }
-
-            string promocode = await _virtualFitService.GeneratePromocode(request);
-
-            return Ok(promocode);
         }
 
         [HttpPost("upload-to-collection")]
@@ -90,8 +76,7 @@ namespace MetaApi.Controllers
         /// </summary>
         /// <param name="requestData"></param>
         /// <returns></returns>
-        [HttpPost("try-on")]
-        [Authorize]
+        [HttpPost("try-on"), Authorize]        
         public async Task<ActionResult<FittingResultResponse>> TryOnClothes(FittingRequest request)
         {
             _logger.LogInformation("Start try on");
@@ -119,17 +104,30 @@ namespace MetaApi.Controllers
             return Ok(resultFit);
         }
 
-        [HttpDelete("history")]
+        [HttpDelete("history"), Authorize]        
         public async Task<ActionResult> Delete(FittingDeleteRequest request)
-        { 
-            await _virtualFitService.Delete(request);
+        {
+            Result<int> userIdResult = this.GetCurrentUserId();
+            if (userIdResult.IsFailure)
+            {
+                return BadRequest(userIdResult.Error);
+            }
+
+            await _virtualFitService.Delete(request, userIdResult.Value);
             return Ok();
         }
 
-        [HttpPost("history")]
-        public async Task<ActionResult<FittingHistoryResponse[]>> GetHistory(HistoryRequest request)
+        [HttpPost("history"), Authorize]
+        [Authorize]
+        public async Task<ActionResult<FittingHistoryResponse[]>> GetHistory()
         {
-            Result<FittingHistoryResponse[]> fittingResults = await _virtualFitService.GetHistory(request.Promocode);
+            Result<int> userIdResult = this.GetCurrentUserId();
+            if (userIdResult.IsFailure)
+            {
+                return BadRequest(userIdResult.Error);
+            }
+
+            Result<FittingHistoryResponse[]> fittingResults = await _virtualFitService.GetHistory(userIdResult.Value);
             if (fittingResults.IsFailure)
             {
                 return BadRequest(new { description = fittingResults.Error.Description });

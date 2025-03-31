@@ -1,4 +1,6 @@
 ﻿
+using MetaApi.SqlServer.Entities.VirtualFit;
+
 namespace MetaApi.SqlServer.Entities
 {
     public class AccountEntity
@@ -25,6 +27,11 @@ namespace MetaApi.SqlServer.Entities
         public DateTime CreatedUtcDate { get; set; }
 
         public DateTime UpdateUtcDate { get; set; }
+
+        /// <summary>
+        /// Коллекция связанных FittingResultEntity
+        /// </summary>
+        public ICollection<FittingResultEntity> FittingResults { get; set; }
     }
 
     public enum AuthTypeEntity

@@ -1,23 +1,15 @@
 ﻿using MetaApi.Core.OperationResults.Base;
-using MetaApi.Core.OperationResults;
 using MetaApi.Models.VirtualFit;
-using MetaApi.SqlServer.Entities.VirtualFit;
 using Microsoft.EntityFrameworkCore;
 
 namespace MetaApi.Services
 {
     public partial class VirtualFitService
     {
-        public async Task<Result<FittingHistoryResponse[]>> GetHistory(string promocode)
-        {
-            PromocodeEntity? promocodeEntity = await _metaDbContext.Promocode.FirstOrDefaultAsync(p => p.Promocode == promocode);
-            if (promocodeEntity == null)
-            {
-                return Result<FittingHistoryResponse[]>.Failure(VirtualFitError.NotValidPromocodeError());
-            }
-
+        public async Task<Result<FittingHistoryResponse[]>> GetHistory(int userId)
+        {            
             FittingHistoryResponse[] fittingResults = await _metaDbContext.FittingResult
-                                                                  .Where(result => result.PromocodeId == promocodeEntity.Id && !result.IsDeleted)
+                                                                  .Where(result => result.AccountId == userId && !result.IsDeleted)
                                                                   .Select(s => new FittingHistoryResponse
                                                                   {
                                                                       Id = s.Id,

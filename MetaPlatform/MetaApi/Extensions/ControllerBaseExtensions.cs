@@ -7,16 +7,18 @@ namespace MetaApi.Extensions
 {
     public static class ControllerBaseExtensions
     {
-        public static Result<string> GetCurrentUserId(this ControllerBase apiController)
+        public static Result<int> GetCurrentUserId(this ControllerBase apiController)
         {
             var identifier = apiController.User.FindFirst(ClaimTypes.NameIdentifier);
 
             if (string.IsNullOrEmpty(identifier?.Value))
             {
-                return Result<string>.Failure(ClaimsError.ClaimUserIdNotFound());
+                return Result<int>.Failure(ClaimsError.ClaimUserIdNotFound());
             }
 
-            return Result<string>.Success(identifier.Value);
+            var userId = int.Parse(identifier?.Value);
+
+            return Result<int>.Success(userId);
         }
     }
 }

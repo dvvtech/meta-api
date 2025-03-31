@@ -17,22 +17,12 @@ namespace MetaApi.Services
         /// <summary>
         /// Попытка примерки одежды.
         /// </summary>
-        public async Task<Result<FittingResultResponse>> TryOnClothesAsync(FittingRequest request, string host)
+        public async Task<Result<FittingResultResponse>> TryOnClothesAsync(FittingRequest request, string host, string userId)
         {
             if (string.IsNullOrWhiteSpace(request.Promocode) ||
                 request.Promocode.Length > FittingConstants.PROMOCODE_MAX_LENGTH)
             {
                 return Result<FittingResultResponse>.Failure(VirtualFitError.NotValidPromocodeError());
-            }
-
-            PromocodeEntity? promocode = await _metaDbContext.Promocode.FirstOrDefaultAsync(p => p.Promocode == request.Promocode);
-            if (promocode == null)
-            {
-                return Result<FittingResultResponse>.Failure(VirtualFitError.NotValidPromocodeError());
-            }
-            if (promocode.RemainingUsage <= 0)
-            {
-                return Result<FittingResultResponse>.Failure(VirtualFitError.LimitIsOverError());
             }
 
             var httpClient = _httpClientFactory.CreateClient("ReplicateAPI");
@@ -124,20 +114,18 @@ namespace MetaApi.Services
                         GarmentImgUrl = garmImg.Replace("_p", FittingConstants.THUMBNAIL_SUFFIX_URL).Replace("_v", FittingConstants.THUMBNAIL_SUFFIX_URL),
                         HumanImgUrl = humanImg.Replace("_p", FittingConstants.THUMBNAIL_SUFFIX_URL).Replace("_v", FittingConstants.THUMBNAIL_SUFFIX_URL),
                         ResultImgUrl = urlResult.Replace("_v", FittingConstants.THUMBNAIL_SUFFIX_URL),
-                        PromocodeId = promocode.Id,
+                        //PromocodeId = promocode.Id,
                         CreatedUtcDate = DateTime.UtcNow,
                     };
 
-                    _metaDbContext.FittingResult.Add(fitingResult);
-                    promocode.RemainingUsage--;
-                    promocode.UpdateUtcDate = DateTime.UtcNow;
+                    _metaDbContext.FittingResult.Add(fitingResult);                    
                     // Сохранение в базе данных
                     await _metaDbContext.SaveChangesAsync();
 
                     return Result<FittingResultResponse>.Success(new FittingResultResponse
                     {
                         Url = urlResult ?? string.Empty,
-                        RemainingUsage = promocode.RemainingUsage
+                        //RemainingUsage = promocode.RemainingUsage
                     });
                 }
 
@@ -267,27 +255,15 @@ namespace MetaApi.Services
                 return Result<FittingResultResponse>.Failure(VirtualFitError.NotValidPromocodeError());
             }
 
-            PromocodeEntity? promocode = await _metaDbContext.Promocode.FirstOrDefaultAsync(p => p.Promocode == request.Promocode);
-            if (promocode == null)
-            {
-                return Result<FittingResultResponse>.Failure(VirtualFitError.NotValidPromocodeError());
-            }
-            if (promocode.RemainingUsage <= 0)
-            {
-                return Result<FittingResultResponse>.Failure(VirtualFitError.LimitIsOverError());
-            }
-
             await Task.Delay(5000);
 
-            promocode.RemainingUsage--;
-            promocode.UpdateUtcDate = DateTime.UtcNow;
             // Сохранение в базе данных
             await _metaDbContext.SaveChangesAsync();
 
             return Result<FittingResultResponse>.Success(new FittingResultResponse
             {
                 Url = "https://a30944-8332.x.d-f.pw/result/d211d593-59b4-497b-8368-8d13b14f8dc1.jpg",
-                RemainingUsage = promocode.RemainingUsage
+                //RemainingUsage = promocode.RemainingUsage
             });
         }
     }

@@ -32,14 +32,24 @@ namespace MetaApi.SqlServer.Configurations
                 .HasColumnType("datetime2");
 
             // Связь с PromocodeEntity (внешний ключ)
-            builder.HasOne(f => f.Promocode)
+            builder.HasOne(f => f.Account)
+                .WithMany(p => p.FittingResults)
+                .HasForeignKey(f => f.AccountId)
+                .OnDelete(DeleteBehavior.Cascade); // Удаление связанных данных
+
+            // Индекс на PromocodeId
+            builder.HasIndex(f => f.AccountId)
+                   .HasDatabaseName("IX_FittingResults_AccountId");
+
+            // Связь с PromocodeEntity (внешний ключ)
+            /*builder.HasOne(f => f.Promocode)
                 .WithMany(p => p.FittingResults)
                 .HasForeignKey(f => f.PromocodeId)
                 .OnDelete(DeleteBehavior.Cascade); // Удаление связанных данных
 
             // Индекс на PromocodeId
             builder.HasIndex(f => f.PromocodeId)
-                   .HasDatabaseName("IX_FittingResults_PromocodeId");
+                   .HasDatabaseName("IX_FittingResults_PromocodeId");*/
         }
     }
 }

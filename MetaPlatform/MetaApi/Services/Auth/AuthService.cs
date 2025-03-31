@@ -18,9 +18,9 @@ namespace MetaApi.Services.Auth
             _jwtProvider = jwtProvider;
         }
 
-        public async Task<Result> LogoutAsync(string externalId)
+        public async Task<Result> LogoutAsync(int userId)
         {
-            AccountEntity userEntity = await _accountRepository.GetByExternalId(externalId);            
+            AccountEntity userEntity = await _accountRepository.GetById(userId);            
             if (userEntity is null)
             {
                 return Result.Failure(UserErrors.UserNotFound("logout:"));
@@ -44,7 +44,7 @@ namespace MetaApi.Services.Auth
                 return Result<MetaApi.Models.Auth.TokenResponse>.Failure(UserErrors.UserIsBlocked());
             }
 
-            var newAccessToken = _jwtProvider.GenerateToken(account.UserName, account.ExternalId);
+            var newAccessToken = _jwtProvider.GenerateToken(account.UserName, account.Id);
             var newRefreshToken = _jwtProvider.GenerateRefreshToken();
 
             account.JwtRefreshToken = newRefreshToken;
