@@ -13,42 +13,7 @@ using SixLabors.ImageSharp.Formats.Jpeg;
 namespace MetaApi.Services
 {
     public partial class VirtualFitService
-    {
-        private string GetUrl(string url)
-        {            
-            string imgFileName = System.IO.Path.GetFileNameWithoutExtension(url);
-            var count = imgFileName.Count(s => s == '_');
-            if (count == 1)
-            {
-                //todo если оканчивается на _t то заменить на _v
-                if (imgFileName.EndsWith("_t", StringComparison.OrdinalIgnoreCase))
-                {
-                    return url.Replace("_t", FittingConstants.FULLSIZE_SUFFIX_URL);
-                }
-
-                return url;
-            }
-
-            /*if (imgFileName.EndsWith("_p", StringComparison.OrdinalIgnoreCase))
-            {
-                return url;
-            }*/
-
-            //если фото из внутренней коллекции и для него есть паддинг то нужно заменить название файла чтоб оканчивался на _p
-            if (imgFileName.EndsWith("_v", StringComparison.OrdinalIgnoreCase))
-            {
-                return url.Replace("_v", FittingConstants.PADDING_SUFFIX_URL);                
-            }
-
-            //если фото из внутренней коллекции 
-            if (imgFileName.EndsWith("_t", StringComparison.OrdinalIgnoreCase))
-            {
-                return url.Replace("_t", FittingConstants.PADDING_SUFFIX_URL);
-            }
-
-            throw new Exception("internal error");
-        }
-
+    {        
         /// <summary>
         /// Попытка примерки одежды.
         /// </summary>
@@ -182,9 +147,39 @@ namespace MetaApi.Services
             return Result<FittingResultResponse>.Failure(VirtualFitError.VirtualFitServiceError("Something went wrong"));
         }
 
-        public static string ReplaceEndingToT(string input)
-        {            
-            return input.Substring(0, input.Length - 2) + "_t";            
+        private string GetUrl(string url)
+        {
+            string imgFileName = System.IO.Path.GetFileNameWithoutExtension(url);
+            var count = imgFileName.Count(s => s == '_');
+            if (count == 1)
+            {
+                //todo если оканчивается на _t то заменить на _v
+                if (imgFileName.EndsWith("_t", StringComparison.OrdinalIgnoreCase))
+                {
+                    return url.Replace("_t", FittingConstants.FULLSIZE_SUFFIX_URL);
+                }
+
+                return url;
+            }
+
+            /*if (imgFileName.EndsWith("_p", StringComparison.OrdinalIgnoreCase))
+            {
+                return url;
+            }*/
+
+            //если фото из внутренней коллекции и для него есть паддинг то нужно заменить название файла чтоб оканчивался на _p
+            if (imgFileName.EndsWith("_v", StringComparison.OrdinalIgnoreCase))
+            {
+                return url.Replace("_v", FittingConstants.PADDING_SUFFIX_URL);
+            }
+
+            //если фото из внутренней коллекции 
+            if (imgFileName.EndsWith("_t", StringComparison.OrdinalIgnoreCase))
+            {
+                return url.Replace("_t", FittingConstants.PADDING_SUFFIX_URL);
+            }
+
+            throw new Exception("internal error");
         }
 
         private double? GetImageRatio(string fileName)
@@ -195,29 +190,6 @@ namespace MetaApi.Services
             if (parts.Length <= 1) return null;
 
             return double.TryParse(parts[1], out var ratio) ? ratio : null;
-        }
-
-        private string AppendSuffixToUrl(string url, string suffix)
-        {
-            if (string.IsNullOrEmpty(url))
-            {
-                throw new ArgumentException("URL не может быть пустым или null", nameof(url));
-            }
-
-            ReadOnlySpan<char> urlSpan = url.AsSpan();
-            int lastDotIndex = urlSpan.LastIndexOf('.');
-
-            if (lastDotIndex == -1 || lastDotIndex <= urlSpan.LastIndexOf('/'))
-            {
-                throw new ArgumentException("Некорректный формат URL: отсутствует расширение файла", nameof(url));
-            }
-
-            Span<char> result = stackalloc char[url.Length + suffix.Length];
-            urlSpan.Slice(0, lastDotIndex).CopyTo(result);
-            suffix.AsSpan().CopyTo(result.Slice(lastDotIndex));
-            urlSpan.Slice(lastDotIndex).CopyTo(result.Slice(lastDotIndex + suffix.Length));
-
-            return new string(result);
         }
 
         private async Task<string> UploadResultFileAsync(string imageUrl, string host, string humanImg)
