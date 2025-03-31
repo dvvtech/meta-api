@@ -13,6 +13,8 @@ namespace MetaApi.SqlServer.Context
 
         public DbSet<AccountEntity> Accounts { get; set; }
 
+        //public DbSet<UserTryOnLimitEntity> UserTryOnLimits { get; set; }
+
         public MetaDbContext(DbContextOptions<MetaDbContext> options) : base(options)
         {
             //Database.EnsureCreated();

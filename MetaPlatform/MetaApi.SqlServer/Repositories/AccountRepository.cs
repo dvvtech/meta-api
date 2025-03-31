@@ -27,10 +27,11 @@ namespace MetaApi.SqlServer.Repositories
                                    .FirstOrDefaultAsync(x => x.JwtRefreshToken == refreshToken);            
         }
 
-        public async Task Add(AccountEntity user)
+        public async Task<int> Add(AccountEntity user)
         {
             await _dbContext.Accounts.AddAsync(user);
             await _dbContext.SaveChangesAsync();
+            return user.Id;
         }
 
         public async Task UpdateRefreshToken(AccountEntity accountEntity)

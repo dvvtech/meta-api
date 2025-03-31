@@ -1,7 +1,6 @@
 ﻿using MetaApi.SqlServer.Context;
 using MetaApi.SqlServer.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace MetaApi.Services
 {
@@ -51,7 +50,7 @@ namespace MetaApi.Services
         private async Task<UserTryOnLimitEntity> GetOrCreateLimitAsync(int userId)
         {
             var limit = await _context.UserTryOnLimits
-                .FirstOrDefaultAsync(l => l.AccountId == userId);
+                                      .FirstOrDefaultAsync(l => l.AccountId == userId);
 
             if (limit == null)
             {

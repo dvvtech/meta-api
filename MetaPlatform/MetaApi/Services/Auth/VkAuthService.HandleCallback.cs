@@ -25,27 +25,31 @@ namespace MetaApi.Services
 
                 string userName = await GetUserName(tokenResponse.AccessToken, tokenResponse.RefreshToken, deviceId);
 
-                string accessToken = _jwtProvider.GenerateToken(userName, tokenResponse.UserId.ToString());
+                string accessToken = string.Empty;
                 string refreshToken = _jwtProvider.GenerateRefreshToken();
+                string externalId = tokenResponse.UserId.ToString();
 
-                var newUserEntity = new AccountEntity
-                {
-                    ExternalId = tokenResponse.UserId.ToString(),
-                    UserName = userName,
-                    JwtRefreshToken = refreshToken,
-                    AuthType = AuthTypeEntity.Vk,
-                    Role = RoleEntity.User,
-                    CreatedUtcDate = DateTime.UtcNow,
-                    UpdateUtcDate = DateTime.UtcNow
-                };
-
-                AccountEntity accountEntity = await _accountRepository.GetByExternalId(newUserEntity.ExternalId);
+                AccountEntity accountEntity = await _accountRepository.GetByExternalId(externalId);
                 if (accountEntity == null)
                 {
-                    await _accountRepository.Add(newUserEntity);
+                    var newUserEntity = new AccountEntity
+                    {
+                        ExternalId = externalId,
+                        UserName = userName,
+                        JwtRefreshToken = refreshToken,
+                        AuthType = AuthTypeEntity.Vk,
+                        Role = RoleEntity.User,
+                        CreatedUtcDate = DateTime.UtcNow,
+                        UpdateUtcDate = DateTime.UtcNow
+                    };
+
+                    int accountId = await _accountRepository.Add(newUserEntity);
+                    accessToken = _jwtProvider.GenerateToken(userName, accountId);
                 }
                 else
                 {
+                    accessToken = _jwtProvider.GenerateToken(userName, accountEntity.Id);
+                    accountEntity.JwtRefreshToken = refreshToken;
                     await _accountRepository.UpdateRefreshToken(accountEntity);
                 }
 

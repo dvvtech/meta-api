@@ -23,12 +23,12 @@ namespace MetaApi.Core
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        public string GenerateToken(string userName, string userId)
-        {
+        public string GenerateToken(string userName, int accountId)
+        {            
             var claims = new[]
             {
                 new Claim(ClaimTypes.Name, userName),
-                new Claim(ClaimTypes.NameIdentifier, userId),
+                new Claim(ClaimTypes.NameIdentifier, accountId.ToString()),
                 new Claim(ClaimTypes.Role, Role.User.ToString())
             };
 
