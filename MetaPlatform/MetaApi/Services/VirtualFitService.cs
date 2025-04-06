@@ -6,20 +6,18 @@ namespace MetaApi.Services
     {
         private readonly MetaDbContext _metaDbContext;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IWebHostEnvironment _env;
-        private readonly FileCrcHostedService _fileCrcService;
+        private readonly FileService _fileService;                
         private readonly ILogger<VirtualFitService> _logger;
 
         public VirtualFitService(MetaDbContext metaContext,
                                  IHttpClientFactory httpClientFactory,
-                                 IWebHostEnvironment env,
-                                 FileCrcHostedService fileCrcService,
+                                 FileService fileService,                                 
+        
                                  ILogger<VirtualFitService> logger)
         {
             _metaDbContext = metaContext;
             _httpClientFactory = httpClientFactory;
-            _env = env;
-            _fileCrcService = fileCrcService;
+            _fileService = fileService;                    
             _logger = logger;
         }
     }

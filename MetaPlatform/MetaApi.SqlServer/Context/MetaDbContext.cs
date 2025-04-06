@@ -20,8 +20,7 @@ namespace MetaApi.SqlServer.Context
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new FittingResultConfiguration());
-            modelBuilder.ApplyConfiguration(new PromocodeConfiguration());
+            modelBuilder.ApplyConfiguration(new FittingResultConfiguration());            
             modelBuilder.ApplyConfiguration(new AccountConfiguration());
 
             base.OnModelCreating(modelBuilder);
@@ -31,7 +30,7 @@ namespace MetaApi.SqlServer.Context
 
         private void Seed(ModelBuilder modelBuilder)
         {
-            DateTime dtUtcNow = DateTime.UtcNow;
+            /*DateTime dtUtcNow = DateTime.UtcNow;
             modelBuilder.Entity<PromocodeEntity>().HasData(
                 new PromocodeEntity
                 { 
@@ -43,6 +42,6 @@ namespace MetaApi.SqlServer.Context
                     CreatedUtcDate = dtUtcNow,
                     UpdateUtcDate = dtUtcNow,
                 });
-        }
+        }*/
     }
 }

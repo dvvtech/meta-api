@@ -34,7 +34,8 @@ app.ApplyMigrations();
 
 app.UseHttpsRedirection();
 
-if (builder.Environment.IsDevelopment())
+app.ApplyCors();
+/*if (builder.Environment.IsDevelopment())
 {
     app.UseCors("AllowAll");
     //app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
@@ -44,7 +45,7 @@ else
     //app.UseCors("AllowSpecificOrigin"); 
     app.UseCors("AllowAll");
     //app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-}
+}*/
 
 app.UseAuthorization();
 

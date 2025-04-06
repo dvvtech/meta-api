@@ -24,7 +24,7 @@ namespace MetaApi.Controllers
             _logger = logger;            
         }        
 
-        [HttpGet("clothing-collection")]
+        /*[HttpGet("clothing-collection")]
         public ActionResult<ClothingCollection> GetClothingCollection()
         {
             return Ok(_virtualFitService.GetClothingCollection(Request.Host.Value));
@@ -69,7 +69,7 @@ namespace MetaApi.Controllers
             {
                 return StatusCode(500, $"Внутренняя ошибка сервера: {ex.Message}");
             }
-        }
+        }*/
 
         /// <summary>
         /// Примерка одежды
@@ -80,6 +80,7 @@ namespace MetaApi.Controllers
         public async Task<ActionResult<FittingResultResponse>> TryOnClothes(FittingRequest request)
         {
             _logger.LogInformation("Start try on");
+            Result<int> accountExternalIdResult = this.GetCurrentUserId();
             /*Result<FittingResultResponse> resultFit = await _virtualFitService.TryOnClothesAsync(request, Request.Host.Value);                      
             if (resultFit.IsFailure)
             {
@@ -117,8 +118,7 @@ namespace MetaApi.Controllers
             return Ok();
         }
 
-        [HttpPost("history"), Authorize]
-        [Authorize]
+        [HttpPost("history"), Authorize]        
         public async Task<ActionResult<FittingHistoryResponse[]>> GetHistory()
         {
             Result<int> userIdResult = this.GetCurrentUserId();
@@ -139,7 +139,7 @@ namespace MetaApi.Controllers
         [HttpGet("test")]
         public string Test()
         {
-            _logger.LogInformation("123count_images1: " + _virtualFitService.GetCount());
+            _logger.LogInformation("123count_images1: ");
             //_virtualFitService.Test();
             return "777";
         }

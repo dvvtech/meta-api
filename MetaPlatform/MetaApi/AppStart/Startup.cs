@@ -2,6 +2,7 @@
 using MetaApi.Constants;
 using MetaApi.Core;
 using MetaApi.Core.Configurations;
+using MetaApi.Extensions;
 using MetaApi.Services;
 using MetaApi.Services.Auth;
 using MetaApi.SqlServer.Repositories;
@@ -31,8 +32,8 @@ namespace MetaApi.AppStart
             });
 
             builder.Services.AddSwaggerGen();
-            
-            ConfigureCors();
+                        
+            _builder.Services.ConfigureCors();
             ConfigureDatabase(builder.Configuration);
             AddServices();
 
@@ -61,7 +62,9 @@ namespace MetaApi.AppStart
         {
             //храним временные данные для авторизации vk в кеше памяти
             _builder.Services.AddMemoryCache();
-
+            
+            _builder.Services.AddScoped<ImageService>();
+            _builder.Services.AddScoped<FileService>();
             _builder.Services.AddScoped<AccountRepository>();
             _builder.Services.AddSingleton<JwtProvider>();            
             _builder.Services.AddScoped<AuthService>();

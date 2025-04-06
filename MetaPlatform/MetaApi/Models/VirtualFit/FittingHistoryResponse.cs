@@ -9,5 +9,10 @@
         public string HumanImgUrl { get; set; }
 
         public string ResultImgUrl { get; set; }
+
+        /// <summary>
+        /// Кол-во оставшихся попыток
+        /// </summary>
+        public int RemainingUsage { get; set; }
     }
 }

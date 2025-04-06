@@ -3,12 +3,9 @@ using MetaApi.Core.OperationResults;
 using MetaApi.Models.VirtualFit;
 using MetaApi.SqlServer.Entities.VirtualFit;
 using MetaApi.Utilities;
-using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Text;
 using MetaApi.Consts;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace MetaApi.Services
 {
@@ -17,14 +14,8 @@ namespace MetaApi.Services
         /// <summary>
         /// Попытка примерки одежды.
         /// </summary>
-        public async Task<Result<FittingResultResponse>> TryOnClothesAsync(FittingRequest request, string host, string userId)
-        {
-            if (string.IsNullOrWhiteSpace(request.Promocode) ||
-                request.Promocode.Length > FittingConstants.PROMOCODE_MAX_LENGTH)
-            {
-                return Result<FittingResultResponse>.Failure(VirtualFitError.NotValidPromocodeError());
-            }
-
+        public async Task<Result<FittingResultResponse>> TryOnClothesAsync(FittingRequest request, string host, int userId)
+        {            
             var httpClient = _httpClientFactory.CreateClient("ReplicateAPI");
 
             string logRequestBefore = $"{request.GarmImg} {Environment.NewLine} {request.HumanImg}";
@@ -107,14 +98,14 @@ namespace MetaApi.Services
                         throw new InvalidOperationException("Output URL is missing or empty.");
                     }
                                         
-                    string urlResult = await UploadResultFileAsync(outputUrl, host, request.HumanImg);
+                    string urlResult = await _fileService.UploadResultFileAsync(outputUrl, host, request.HumanImg);
 
                     var fitingResult = new FittingResultEntity
                     {
                         GarmentImgUrl = garmImg.Replace("_p", FittingConstants.THUMBNAIL_SUFFIX_URL).Replace("_v", FittingConstants.THUMBNAIL_SUFFIX_URL),
                         HumanImgUrl = humanImg.Replace("_p", FittingConstants.THUMBNAIL_SUFFIX_URL).Replace("_v", FittingConstants.THUMBNAIL_SUFFIX_URL),
-                        ResultImgUrl = urlResult.Replace("_v", FittingConstants.THUMBNAIL_SUFFIX_URL),
-                        //PromocodeId = promocode.Id,
+                        ResultImgUrl = urlResult.Replace("_v", FittingConstants.THUMBNAIL_SUFFIX_URL),                        
+                        AccountId = userId,
                         CreatedUtcDate = DateTime.UtcNow,
                     };
 
@@ -168,93 +159,12 @@ namespace MetaApi.Services
             }
 
             throw new Exception("internal error");
-        }
+        }        
 
-        private double? GetImageRatio(string fileName)
-        {
-            if (string.IsNullOrEmpty(fileName)) return null;
-
-            var parts = fileName.Split('_');
-            if (parts.Length <= 1) return null;
-
-            return double.TryParse(parts[1], out var ratio) ? ratio : null;
-        }
-
-        private async Task<string> UploadResultFileAsync(string imageUrl, string host, string humanImg)
-        {
-            byte[] imageBytes = await GetImageResult(imageUrl);
-
-            var image = Image.Load(imageBytes);
-
-            double? imageRatio = GetImageRatio(humanImg);
-            if (imageRatio != null)
-            {
-                PerformCropping(image, imageRatio.Value);
-            }
-
-            // Сохранение файла на диск
-            var uniqueFileName = await SaveFileAsync(imageUrl, image, FileType.Result);
-
-            // Генерация публичной ссылки
-            return GenerateFileUrl(uniqueFileName, FileType.Result, host);
-        }
-
-        public async Task<byte[]> GetImageResult(string imageUrl)
-        {            
-            byte[] imageBytes;
-            using (var httpClient = _httpClientFactory.CreateClient())
-            {
-                imageBytes = await httpClient.GetByteArrayAsync(imageUrl);
-            }
-
-            return imageBytes;
-        }
-
-        private async Task<string> SaveFileAsync(string imageUrl, Image image, FileType fileType)
-        {
-            var uploadsPath = Path.Combine(_env.WebRootPath, fileType.GetFolderName());
-            if (!Directory.Exists(uploadsPath))
-            {
-                Directory.CreateDirectory(uploadsPath);
-            }
-
-            // Определение расширения файла из URL 
-            // (берём часть пути из URL и извлекаем расширение)
-            var uri = new Uri(imageUrl);
-            var extension = Path.GetExtension(uri.AbsolutePath);
-            if (string.IsNullOrWhiteSpace(extension))
-            {
-                // Если невозможно определить расширение, зададим по умолчанию .jpg
-                extension = ".jpg";
-            }
-
-            string fileName = Guid.NewGuid().ToString();
-            string uniqueFileName = $"{fileName}_v{extension}";
-            string filePath = Path.Combine(uploadsPath, uniqueFileName);
-
-            // Сохраняем оригинальный файл            
-            image.Save(filePath, new JpegEncoder
-            {
-                Quality = FittingConstants.QUALITY_JPEG
-            });
-
-            //Сохраняем уменьшенную копию для раздела история            
-            byte[] resizedBytes = ImageResizer.ResizeImage(image, FittingConstants.THUMBNAIL_WIDTH);
-            string newFileName = $"{fileName}_t{extension}";
-            string newfilePath = Path.Combine(uploadsPath, newFileName);
-            await File.WriteAllBytesAsync(newfilePath, resizedBytes);
-
-            return uniqueFileName;
-        }
+        
 
         public async Task<Result<FittingResultResponse>> TryOnClothesFakeAsync(FittingRequest request)
-        {
-            if (string.IsNullOrWhiteSpace(request.Promocode) ||
-                request.Promocode.Length > FittingConstants.PROMOCODE_MAX_LENGTH)
-            {
-                return Result<FittingResultResponse>.Failure(VirtualFitError.NotValidPromocodeError());
-            }
-
+        {            
             await Task.Delay(5000);
 
             // Сохранение в базе данных
