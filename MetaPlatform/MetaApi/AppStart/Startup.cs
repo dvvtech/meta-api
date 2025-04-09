@@ -64,7 +64,7 @@ namespace MetaApi.AppStart
             //храним временные данные для авторизации vk в кеше памяти
             _builder.Services.AddMemoryCache();
 
-            _builder.Services.ConfigureHealthChech();
+            _builder.Services.AddAllHealthChecks(_builder.Configuration);
 
             _builder.Services.AddScoped<ImageService>();
             _builder.Services.AddScoped<FileService>();

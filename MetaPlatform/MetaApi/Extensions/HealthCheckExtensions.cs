@@ -1,4 +1,5 @@
 ﻿using HealthChecks.UI.Client;
+using MetaApi.Configuration;
 using MetaApi.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
@@ -6,13 +7,14 @@ namespace MetaApi.Extensions
 {
     public static class HealthCheckExtensions
     {
-        public static void ConfigureHealthChech(this IServiceCollection services)
+        public static void AddAllHealthChecks(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddHealthChecks()
-                .AddCheck<DatabseHealthCheck>(nameof(DatabseHealthCheck));
+                .AddCheck<DatabseHealthCheck>(nameof(DatabseHealthCheck))
+                .AddSqlServer(configuration.GetConnectionString(DatabaseConfig.MetaDbMsSqlConnection)); ;
         }
 
-        public static void ApplyHealthCheck(this WebApplication app)
+        public static void ApplyAllHealthChecks(this WebApplication app)
         {
             app.MapHealthChecks("/health", new HealthCheckOptions
             {

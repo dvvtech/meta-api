@@ -37,7 +37,7 @@ app.UseHttpsRedirection();
 app.ApplyCors();
 
 
-app.ApplyHealthCheck();
+app.ApplyAllHealthChecks();
 /*if (builder.Environment.IsDevelopment())
 {
     app.UseCors("AllowAll");
