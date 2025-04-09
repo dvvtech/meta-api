@@ -4,6 +4,7 @@ using MetaApi.Services;
 using MetaApi.Core.OperationResults.Base;
 using Microsoft.AspNetCore.Authorization;
 using MetaApi.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace MetaApi.Controllers
 {
@@ -79,7 +80,7 @@ namespace MetaApi.Controllers
         [HttpPost("try-on"), Authorize]        
         public async Task<ActionResult<FittingResultResponse>> TryOnClothes(FittingRequest request)
         {
-            _logger.LogInformation("Start try on");
+            _logger.LogInformation("Start try on123");
             Result<int> accountExternalIdResult = this.GetCurrentUserId();
             /*Result<FittingResultResponse> resultFit = await _virtualFitService.TryOnClothesAsync(request, Request.Host.Value);                      
             if (resultFit.IsFailure)
@@ -121,27 +122,32 @@ namespace MetaApi.Controllers
         [HttpPost("history"), Authorize]        
         public async Task<ActionResult<FittingHistoryResponse[]>> GetHistory()
         {
+            _logger.LogInformation("GetHistory1");
             Result<int> userIdResult = this.GetCurrentUserId();
+            _logger.LogInformation("accountId: " + userIdResult.Value.ToString());
             if (userIdResult.IsFailure)
             {
+                _logger.LogInformation("GetHistory2");
                 return BadRequest(userIdResult.Error);
             }
 
+            _logger.LogInformation("GetHistory3");
             Result<FittingHistoryResponse[]> fittingResults = await _virtualFitService.GetHistory(userIdResult.Value);
             if (fittingResults.IsFailure)
             {
                 return BadRequest(new { description = fittingResults.Error.Description });
             }
+            _logger.LogInformation("GetHistory4");
 
             return Ok(fittingResults.Value);
         }
 
-        [HttpGet("test")]
-        public string Test()
+        [HttpGet("test1")]
+        public IResult Test()
         {
             _logger.LogInformation("123count_images1: ");
             //_virtualFitService.Test();
-            return "777";
+            return Results.Ok("777");
         }
     }
 }

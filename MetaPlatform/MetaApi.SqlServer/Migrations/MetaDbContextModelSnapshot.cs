@@ -111,45 +111,6 @@ namespace MetaApi.SqlServer.Migrations
                     b.ToTable("FittingResults", (string)null);
                 });
 
-            modelBuilder.Entity("MetaApi.SqlServer.Entities.VirtualFit.PromocodeEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedUtcDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Promocode")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("RemainingUsage")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdateUtcDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UsageLimit")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Promocode")
-                        .IsUnique()
-                        .HasDatabaseName("IX_Promocodes_Promocode");
-
-                    b.ToTable("Promocodes", (string)null);
-                });
-
             modelBuilder.Entity("MetaApi.SqlServer.Entities.VirtualFit.FittingResultEntity", b =>
                 {
                     b.HasOne("MetaApi.SqlServer.Entities.AccountEntity", "Account")

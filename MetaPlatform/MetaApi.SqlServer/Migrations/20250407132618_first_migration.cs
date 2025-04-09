@@ -6,27 +6,29 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MetaApi.SqlServer.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class first_migration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Promocodes",
+                name: "Accounts",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Promocode = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    UsageLimit = table.Column<int>(type: "int", nullable: false),
-                    RemainingUsage = table.Column<int>(type: "int", nullable: false),
+                    ExternalId = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: false),
+                    JwtRefreshToken = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    AuthType = table.Column<int>(type: "int", nullable: false),
+                    Role = table.Column<int>(type: "int", nullable: false),
+                    IsBlocked = table.Column<bool>(type: "bit", nullable: false),
                     CreatedUtcDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdateUtcDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Promocodes", x => x.Id);
+                    table.PrimaryKey("PK_Accounts", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -38,35 +40,37 @@ namespace MetaApi.SqlServer.Migrations
                     GarmentImgUrl = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     HumanImgUrl = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     ResultImgUrl = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
-                    PromocodeId = table.Column<int>(type: "int", nullable: false),
-                    CreatedUtcDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    AccountId = table.Column<int>(type: "int", nullable: false),
+                    CreatedUtcDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_FittingResults", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_FittingResults_Promocodes_PromocodeId",
-                        column: x => x.PromocodeId,
-                        principalTable: "Promocodes",
+                        name: "FK_FittingResults_Accounts_AccountId",
+                        column: x => x.AccountId,
+                        principalTable: "Accounts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.InsertData(
-                table: "Promocodes",
-                columns: new[] { "Id", "CreatedUtcDate", "Name", "Promocode", "RemainingUsage", "UpdateUtcDate", "UsageLimit" },
-                values: new object[] { 1, new DateTime(2024, 12, 17, 7, 50, 37, 636, DateTimeKind.Utc).AddTicks(3506), "admin", "PRBA34YNI9!QWC7IZS", 500000, new DateTime(2024, 12, 17, 7, 50, 37, 636, DateTimeKind.Utc).AddTicks(3506), 500000 });
-
             migrationBuilder.CreateIndex(
-                name: "IX_FittingResults_PromocodeId",
-                table: "FittingResults",
-                column: "PromocodeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Promocodes_Promocode",
-                table: "Promocodes",
-                column: "Promocode",
+                name: "IX_Accounts_ExternalId",
+                table: "Accounts",
+                column: "ExternalId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Accounts_JwtRefreshToken",
+                table: "Accounts",
+                column: "JwtRefreshToken",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FittingResults_AccountId",
+                table: "FittingResults",
+                column: "AccountId");
         }
 
         /// <inheritdoc />
@@ -76,7 +80,7 @@ namespace MetaApi.SqlServer.Migrations
                 name: "FittingResults");
 
             migrationBuilder.DropTable(
-                name: "Promocodes");
+                name: "Accounts");
         }
     }
 }

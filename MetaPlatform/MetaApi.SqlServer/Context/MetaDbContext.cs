@@ -41,7 +41,7 @@ namespace MetaApi.SqlServer.Context
                     RemainingUsage = 500000,
                     CreatedUtcDate = dtUtcNow,
                     UpdateUtcDate = dtUtcNow,
-                });
-        }*/
+                });*/
+        }
     }
 }

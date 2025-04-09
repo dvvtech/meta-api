@@ -10,10 +10,12 @@ namespace MetaApi.Controllers
     public class FileUploadController : ControllerBase
     {
         private readonly FileService _fileService;
+        private readonly ILogger<FileUploadController> _logger;
 
-        public FileUploadController(FileService fileService)
+        public FileUploadController(FileService fileService, ILogger<FileUploadController> logger)
         {
             _fileService = fileService;
+            _logger = logger;
         }
 
         [HttpPost, Authorize]
@@ -23,10 +25,11 @@ namespace MetaApi.Controllers
             {
                 return BadRequest("Файл не выбран или пустой.");
             }
-
+            _logger.LogInformation("Upload1");
             try
             {
                 var fileUrl = await _fileService.UploadFileAsync(file, FileType.Upload, Request.Host.Value);
+                _logger.LogInformation("Upload2");
                 return Ok(new { url = fileUrl });
             }
             catch (Exception ex)
