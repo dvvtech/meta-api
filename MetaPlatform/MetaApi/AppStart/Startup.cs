@@ -3,6 +3,7 @@ using MetaApi.Constants;
 using MetaApi.Core;
 using MetaApi.Core.Configurations;
 using MetaApi.Extensions;
+using MetaApi.HealthChecks;
 using MetaApi.Services;
 using MetaApi.Services.Auth;
 using MetaApi.SqlServer.Repositories;
@@ -62,7 +63,9 @@ namespace MetaApi.AppStart
         {
             //храним временные данные для авторизации vk в кеше памяти
             _builder.Services.AddMemoryCache();
-            
+
+            _builder.Services.ConfigureHealthChech();
+
             _builder.Services.AddScoped<ImageService>();
             _builder.Services.AddScoped<FileService>();
             _builder.Services.AddScoped<AccountRepository>();
