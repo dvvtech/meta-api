@@ -1,4 +1,4 @@
-﻿namespace MetaApi.Extensions
+﻿namespace MetaApi.AppStart.Extensions
 {
     public static class CorsExtensions
     {

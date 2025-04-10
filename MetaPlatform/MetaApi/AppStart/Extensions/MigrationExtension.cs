@@ -1,8 +1,7 @@
 ﻿using MetaApi.SqlServer.Context;
 using Microsoft.EntityFrameworkCore;
-using System.Runtime.CompilerServices;
 
-namespace MetaApi.Extensions
+namespace MetaApi.AppStart.Extensions
 {
     public static class MigrationExtension
     {

@@ -3,7 +3,7 @@ using MetaApi.Configuration;
 using MetaApi.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
-namespace MetaApi.Extensions
+namespace MetaApi.AppStart.Extensions
 {
     public static class HealthCheckExtensions
     {

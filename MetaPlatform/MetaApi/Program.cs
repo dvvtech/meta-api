@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Hosting.Server;
 using MetaApi.Configuration;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-using MetaApi.Extensions;
+using MetaApi.AppStart.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 

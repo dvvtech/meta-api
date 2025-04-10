@@ -1,8 +1,8 @@
-﻿using MetaApi.Configuration;
+﻿using MetaApi.AppStart.Extensions;
+using MetaApi.Configuration;
 using MetaApi.Constants;
 using MetaApi.Core;
 using MetaApi.Core.Configurations;
-using MetaApi.Extensions;
 using MetaApi.HealthChecks;
 using MetaApi.Services;
 using MetaApi.Services.Auth;
