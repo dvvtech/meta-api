@@ -11,7 +11,7 @@ namespace MetaApi.SqlServer.Context
 
         public DbSet<AccountEntity> Accounts { get; set; }
 
-        //public DbSet<UserTryOnLimitEntity> UserTryOnLimits { get; set; }
+        public DbSet<UserTryOnLimitEntity> UserTryOnLimits { get; set; }
 
         public MetaDbContext(DbContextOptions<MetaDbContext> options) : base(options)
         {
@@ -22,6 +22,7 @@ namespace MetaApi.SqlServer.Context
         {
             modelBuilder.ApplyConfiguration(new FittingResultConfiguration());            
             modelBuilder.ApplyConfiguration(new AccountConfiguration());
+            modelBuilder.ApplyConfiguration(new UserTryOnLimitConfiguration());
 
             base.OnModelCreating(modelBuilder);
 

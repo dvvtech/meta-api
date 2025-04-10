@@ -10,28 +10,28 @@ namespace MetaApi.SqlServer.Configurations
         {
             builder.ToTable("Accounts");
 
-            builder.HasKey(entity => entity.Id);
+            builder.HasKey(x => x.Id);
 
-            builder.Property(user => user.UserName)
+            builder.Property(x => x.UserName)
                    .HasMaxLength(512);
 
-            builder.Property(e => e.ExternalId)
+            builder.Property(x => x.ExternalId)
                    .HasMaxLength(256);                                      
 
-            builder.Property(user => user.JwtRefreshToken)
+            builder.Property(x => x.JwtRefreshToken)
                    .HasMaxLength(128);
 
-            builder.Property(user => user.AuthType)
+            builder.Property(x => x.AuthType)
                    .IsRequired();
 
-            builder.Property(user => user.Role)
+            builder.Property(x => x.Role)
                    .IsRequired();
 
-            builder.Property(p => p.CreatedUtcDate)
+            builder.Property(x => x.CreatedUtcDate)
                 .IsRequired()
                 .HasColumnType("datetime2");
 
-            builder.Property(p => p.UpdateUtcDate)
+            builder.Property(x => x.UpdateUtcDate)
                 .IsRequired()
                 .HasColumnType("datetime2");
 
@@ -42,10 +42,10 @@ namespace MetaApi.SqlServer.Configurations
                 .OnDelete(DeleteBehavior.Cascade); // Удаление связанных данных
 
 
-            builder.HasIndex(user => user.JwtRefreshToken)
+            builder.HasIndex(x => x.JwtRefreshToken)
                    .IsUnique();
 
-            builder.HasIndex(e => e.ExternalId)
+            builder.HasIndex(x => x.ExternalId)
                    .IsUnique();
         }
     }

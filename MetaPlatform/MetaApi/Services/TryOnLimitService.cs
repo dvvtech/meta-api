@@ -1,82 +1,103 @@
-﻿//using MetaApi.SqlServer.Context;
-//using MetaApi.SqlServer.Entities;
-//using Microsoft.EntityFrameworkCore;
+﻿using MetaApi.SqlServer.Context;
+using MetaApi.SqlServer.Entities;
+using Microsoft.EntityFrameworkCore;
 
-//namespace MetaApi.Services
-//{
-//    public class TryOnLimitService
-//    {
-//        private readonly MetaDbContext _context;
+namespace MetaApi.Services
+{
+    public class TryOnLimitService
+    {
+        private readonly MetaDbContext _context;
 
-//        public TryOnLimitService(MetaDbContext context)
-//        {
-//            _context = context;
-//        }
+        public TryOnLimitService(MetaDbContext context)
+        {
+            _context = context;
+        }
 
-//        public async Task<bool> CanUserTryOnAsync(int userId)
-//        {
-//            var limit = await GetOrCreateLimitAsync(userId);
-//            UpdateDailyLimitIfNeeded(limit);
+        /// <summary>
+        /// Проверяет, может ли пользователь совершить попытку
+        /// </summary>
+        public async Task<bool> CanUserTryOnAsync(int userId)
+        {
+            var limit = await GetOrCreateLimitAsync(userId);
+            ResetLimitIfPeriodPassed(limit);
 
-//            return limit.TriesUsedToday < limit.DailyLimit;
-//        }
+            return limit.AttemptsUsed < limit.MaxAttempts;
+        }
 
-//        public async Task DecrementTryOnLimitAsync(int userId)
-//        {
-//            var limit = await GetOrCreateLimitAsync(userId);
-//            UpdateDailyLimitIfNeeded(limit);
+        /// <summary>
+        /// Уменьшает лимит после успешной попытки
+        /// </summary>
+        public async Task DecrementTryOnLimitAsync(int userId)
+        {
+            var limit = await GetOrCreateLimitAsync(userId);
+            ResetLimitIfPeriodPassed(limit);
 
-//            limit.TriesUsedToday++;
-//            limit.LastTryDate = DateTime.UtcNow.Date;
+            limit.AttemptsUsed++;
+            limit.LastResetTime = DateTime.UtcNow;
 
-//            await _context.SaveChangesAsync();
-//        }
+            await _context.SaveChangesAsync();
+        }
 
-//        public async Task<int> GetRemainingTriesAsync(int userId)
-//        {
-//            var limit = await GetOrCreateLimitAsync(userId);
-//            UpdateDailyLimitIfNeeded(limit);
+        /// <summary>
+        /// Получает оставшиеся попытки
+        /// </summary>
+        public async Task<int> GetRemainingTriesAsync(int userId)
+        {
+            var limit = await GetOrCreateLimitAsync(userId);
+            ResetLimitIfPeriodPassed(limit);
 
-//            return limit.DailyLimit - limit.TriesUsedToday;
-//        }
+            return limit.MaxAttempts - limit.AttemptsUsed;
+        }
 
-//        public async Task SetDailyLimitAsync(int userId, int newLimit)
-//        {
-//            var limit = await GetOrCreateLimitAsync(userId);
-//            limit.DailyLimit = newLimit;
-//            await _context.SaveChangesAsync();
-//        }
+        /// <summary>
+        /// Устанавливает новый лимит (например, 3 попытки в час)
+        /// </summary>
+        public async Task SetLimitAsync(int userId, int maxAttempts, TimeSpan resetPeriod)
+        {
+            var limit = await GetOrCreateLimitAsync(userId);
+            limit.MaxAttempts = maxAttempts;
+            limit.ResetPeriod = resetPeriod;
+            await _context.SaveChangesAsync();
+        }
 
-//        private async Task<UserTryOnLimitEntity> GetOrCreateLimitAsync(int userId)
-//        {
-//            var limit = await _context.UserTryOnLimits
-//                                      .FirstOrDefaultAsync(l => l.AccountId == userId);
+        /// <summary>
+        /// Сбрасывает счетчик, если прошел заданный период
+        /// </summary>
+        private void ResetLimitIfPeriodPassed(UserTryOnLimitEntity limit)
+        {
+            var now = DateTime.UtcNow;
+            var timeSinceLastReset = now - limit.LastResetTime;
 
-//            if (limit == null)
-//            {
-//                limit = new UserTryOnLimitEntity
-//                {
-//                    AccountId = userId,
-//                    DailyLimit = 3,
-//                    TriesUsedToday = 0,
-//                    LastTryDate = DateTime.UtcNow.Date.AddDays(-1)
-//                };
-//                _context.UserTryOnLimits.Add(limit);
-//                await _context.SaveChangesAsync();
-//            }
+            if (timeSinceLastReset >= limit.ResetPeriod)
+            {
+                limit.AttemptsUsed = 0;
+                limit.LastResetTime = now;
+            }
+        }
 
-//            return limit;
-//        }
+        /// <summary>
+        /// Создает или получает лимит пользователя
+        /// </summary>
+        private async Task<UserTryOnLimitEntity> GetOrCreateLimitAsync(int userId)
+        {
+            var limit = await _context.UserTryOnLimits
+                .FirstOrDefaultAsync(l => l.AccountId == userId);
 
-//        private void UpdateDailyLimitIfNeeded(UserTryOnLimitEntity limit)
-//        {
-//            var today = DateTime.UtcNow.Date;
+            if (limit == null)
+            {
+                limit = new UserTryOnLimitEntity
+                {
+                    AccountId = userId,
+                    MaxAttempts = 3, // Дефолтное значение (можно вынести в конфиг)
+                    AttemptsUsed = 0,
+                    LastResetTime = DateTime.UtcNow,
+                    ResetPeriod = TimeSpan.FromDays(1) // Дефолтный период (1 день)
+                };
+                _context.UserTryOnLimits.Add(limit);
+                await _context.SaveChangesAsync();
+            }
 
-//            if (limit.LastTryDate < today)
-//            {
-//                limit.TriesUsedToday = 0;
-//                limit.LastTryDate = today;
-//            }
-//        }
-//    }
-//}
+            return limit;
+        }
+    }
+}

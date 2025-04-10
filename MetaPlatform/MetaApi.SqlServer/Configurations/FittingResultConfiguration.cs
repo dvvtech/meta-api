@@ -31,7 +31,7 @@ namespace MetaApi.SqlServer.Configurations
                 .IsRequired()
                 .HasColumnType("datetime2");
 
-            // Связь с PromocodeEntity (внешний ключ)
+            // Связь с AccountEntity (внешний ключ)
             builder.HasOne(f => f.Account)
                 .WithMany(p => p.FittingResults)
                 .HasForeignKey(f => f.AccountId)
@@ -39,6 +39,7 @@ namespace MetaApi.SqlServer.Configurations
 
             // Индекс на PromocodeId
             builder.HasIndex(f => f.AccountId)
+                   .IsUnique()
                    .HasDatabaseName("IX_FittingResults_AccountId");
 
             // Связь с PromocodeEntity (внешний ключ)

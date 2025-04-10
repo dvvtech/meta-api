@@ -1,27 +1,38 @@
 ﻿
 namespace MetaApi.SqlServer.Entities
-{
-    //todo хранить часовой пояс чтобы пересчет кол-ва выполнялся относительно часового пояса клиента
-
+{    
     public class UserTryOnLimitEntity
     {
         public int Id { get; set; }
-        public int AccountId { get; set; } 
-        public AccountEntity User { get; set; }
 
         /// <summary>
-        /// // Стандартный лимит - 3
+        /// Внешний ключ на AccountEntity
         /// </summary>
-        public int DailyLimit { get; set; } = 3;
+        public int AccountId { get; set; }
 
         /// <summary>
-        /// Кол-во использованных попыток за день
+        /// Навигационное свойство
         /// </summary>
-        public int TriesUsedToday { get; set; }
+        public AccountEntity Account { get; set; }
 
         /// <summary>
-        /// Дата последней попытки
+        /// Максимальное количество попыток
         /// </summary>
-        public DateTime LastTryDate { get; set; } 
+        public int MaxAttempts { get; set; }
+
+        /// <summary>
+        /// Использованные попытки
+        /// </summary>
+        public int AttemptsUsed { get; set; }
+
+        /// <summary>
+        /// Время последнего сброса
+        /// </summary>
+        public DateTime LastResetTime { get; set; }
+
+        /// <summary>
+        /// Период сброса (например, 1 час, 1 день и т. д.)
+        /// </summary>
+        public TimeSpan ResetPeriod { get; set; } 
     }
 }
