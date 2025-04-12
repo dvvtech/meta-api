@@ -11,7 +11,7 @@ namespace MetaApi.AppStart.Extensions
         {
             services.AddHealthChecks()
                 .AddCheck<DatabseHealthCheck>(nameof(DatabseHealthCheck))
-                .AddSqlServer(configuration.GetConnectionString(DatabaseConfig.MetaDbMsSqlConnection)); ;
+                .AddSqlServer(configuration.GetConnectionString(DatabaseConfig.MetaDbMsSqlConnection));
         }
 
         public static void ApplyAllHealthChecks(this WebApplication app)
