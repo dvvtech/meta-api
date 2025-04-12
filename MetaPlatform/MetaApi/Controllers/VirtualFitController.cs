@@ -4,7 +4,6 @@ using MetaApi.Services;
 using MetaApi.Core.OperationResults.Base;
 using Microsoft.AspNetCore.Authorization;
 using MetaApi.Extensions;
-using Microsoft.Extensions.Logging;
 
 namespace MetaApi.Controllers
 {
@@ -24,53 +23,6 @@ namespace MetaApi.Controllers
             _virtualFitService = virtualFitService;                        
             _logger = logger;            
         }
-
-        /*[HttpGet("clothing-collection")]
-        public ActionResult<ClothingCollection> GetClothingCollection()
-        {
-            return Ok(_virtualFitService.GetClothingCollection(Request.Host.Value));
-        }
-
-        [HttpPost("upload-to-collection")]
-        public async Task<ActionResult<string>> UploadToCollection(IFormFile file, string promocode, FileType fileType)
-        {            
-            //http://localhost:5023/api/virtual-fit/upload-to-collection?promocode=123&fileType=3
-            if (file == null || file.Length == 0)
-            {
-                return BadRequest("Файл не выбран или пустой.");
-            }
-            //todo проверка на админский промокод
-            //request.Promcode
-
-            try
-            {
-                var fileUrl = await _virtualFitService.UploadFileAsync(file, fileType, Request.Host.Value);
-                return Ok(new { url = fileUrl });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Внутренняя ошибка сервера: {ex.Message}");
-            }
-        }
-
-        [HttpPost("upload")]
-        public async Task<ActionResult<string>> Upload(IFormFile file)
-        {            
-            if (file == null || file.Length == 0)
-            {
-                return BadRequest("Файл не выбран или пустой.");
-            }
-            
-            try
-            {
-                var fileUrl = await _virtualFitService.UploadFileAsync(file, FileType.Upload, Request.Host.Value);
-                return Ok(new { url = fileUrl });                
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Внутренняя ошибка сервера: {ex.Message}");
-            }
-        }*/
 
         /// <summary>
         /// Примерка одежды
@@ -96,10 +48,12 @@ namespace MetaApi.Controllers
                     return BadRequest(new { description = resultFit.Error.Description });
                 }
             }
+
+            _logger.LogInformation("Success try-on");
             return Ok(resultFit.Value);            
         }
 
-        [HttpDelete("history"), Authorize]        
+        /*[HttpDelete("history"), Authorize]        
         public async Task<ActionResult> Delete(FittingDeleteRequest request)
         {
             Result<int> userIdResult = this.GetCurrentUserId();
@@ -110,27 +64,24 @@ namespace MetaApi.Controllers
 
             await _virtualFitService.Delete(request, userIdResult.Value);
             return Ok();
-        }
+        }*/
 
         [HttpPost("history"), Authorize]        
         public async Task<ActionResult<FittingHistoryResponse[]>> GetHistory()
         {
-            _logger.LogInformation("GetHistory1");
-            Result<int> userIdResult = this.GetCurrentUserId();
-            _logger.LogInformation("accountId: " + userIdResult.Value.ToString());
+            _logger.LogInformation("GetHistory");
+
+            Result<int> userIdResult = this.GetCurrentUserId();            
             if (userIdResult.IsFailure)
-            {
-                _logger.LogInformation("GetHistory2");
+            {                
                 return BadRequest(userIdResult.Error);
             }
-
-            _logger.LogInformation("GetHistory3");
+            
             Result<FittingHistoryResponse[]> fittingResults = await _virtualFitService.GetHistory(userIdResult.Value);
             if (fittingResults.IsFailure)
             {
                 return BadRequest(new { description = fittingResults.Error.Description });
             }
-            _logger.LogInformation("GetHistory4");
 
             return Ok(fittingResults.Value);
         }
