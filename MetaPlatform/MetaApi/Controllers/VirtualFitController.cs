@@ -53,7 +53,7 @@ namespace MetaApi.Controllers
             return Ok(resultFit.Value);            
         }
 
-        /*[HttpDelete("history"), Authorize]        
+        [HttpDelete("history"), Authorize]        
         public async Task<ActionResult> Delete(FittingDeleteRequest request)
         {
             Result<int> userIdResult = this.GetCurrentUserId();
@@ -64,7 +64,7 @@ namespace MetaApi.Controllers
 
             await _virtualFitService.Delete(request, userIdResult.Value);
             return Ok();
-        }*/
+        }
 
         [HttpPost("history"), Authorize]        
         public async Task<ActionResult<FittingHistoryResponse[]>> GetHistory()
@@ -86,7 +86,7 @@ namespace MetaApi.Controllers
             return Ok(fittingResults.Value);
         }
 
-        [HttpGet("test1")]
+        [HttpGet("test3")]
         public IResult Test()
         {
             _logger.LogInformation("123count_images1: ");

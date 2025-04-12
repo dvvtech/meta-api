@@ -6,6 +6,7 @@ using MetaApi.Utilities;
 using System.Text.Json;
 using System.Text;
 using MetaApi.Consts;
+using Microsoft.EntityFrameworkCore;
 
 namespace MetaApi.Services
 {
@@ -28,7 +29,9 @@ namespace MetaApi.Services
             // Подготовьте данные для отправки            
             var internalRequestData = new PredictionRequest
             {
-                Version = "c871bb9b046607b680449ecbae55fd8c6d945e0a1948644bf2361b3d021d3ff4",
+                //old//cuuupid/idm-vton:c871bb9b046607b680449ecbae55fd8c6d945e0a1948644bf2361b3d021d3ff4
+                //new//cuuupid/idm-vton:0513734a452173b8173e907e3a59d19a36266e55b48528559432bd21c7d7e985
+                Version = "0513734a452173b8173e907e3a59d19a36266e55b48528559432bd21c7d7e985",
                 Input = new InputData
                 {
                     Crop = false,
@@ -113,10 +116,14 @@ namespace MetaApi.Services
                     // Сохранение в базе данных
                     await _metaDbContext.SaveChangesAsync();
 
+                    var limit = await _metaDbContext.UserTryOnLimits.FirstOrDefaultAsync(l => l.AccountId == userId);
+
+                    _logger.LogInformation("get response3");
+
                     return Result<FittingResultResponse>.Success(new FittingResultResponse
                     {
                         Url = urlResult ?? string.Empty,
-                        //RemainingUsage = promocode.RemainingUsage
+                        RemainingUsage = (limit != null) ? limit.AttemptsUsed : 0
                     });
                 }
 
