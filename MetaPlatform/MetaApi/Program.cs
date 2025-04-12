@@ -37,7 +37,6 @@ app.UseHttpsRedirection();
 
 app.ApplyCors();
 
-
 app.ApplyAllHealthChecks();
 /*if (builder.Environment.IsDevelopment())
 {

@@ -2,7 +2,7 @@
 
 namespace MetaApi.HealthChecks
 {
-    public class DatabseHealthCheck : IHealthCheck
+    public class DatabaseHealthCheck : IHealthCheck
     {
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
