@@ -5,6 +5,7 @@ using MetaApi.Configuration;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using MetaApi.AppStart.Extensions;
+using MetaApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +52,9 @@ else
 }*/
 
 app.UseAuthorization();
+
+// Ваш кастомный middleware
+app.UseMiddleware<TryOnLimitMiddleware>();
 
 // Добавление поддержки статических файлов
 app.UseStaticFiles();

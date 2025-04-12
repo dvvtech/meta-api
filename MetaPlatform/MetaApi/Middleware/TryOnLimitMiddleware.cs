@@ -14,7 +14,7 @@ namespace MetaApi.Middleware
 
         public async Task InvokeAsync(HttpContext context, TryOnLimitService limitService)
         {
-            if (context.Request.Path.StartsWithSegments("/api/tryon"))
+            if (context.Request.Path.StartsWithSegments("/api/virtual-fit/try-on"))
             {
                 var userId = GetCurrentUserId(context);
 
