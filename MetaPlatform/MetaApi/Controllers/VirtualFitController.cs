@@ -23,7 +23,7 @@ namespace MetaApi.Controllers
         {
             _virtualFitService = virtualFitService;                        
             _logger = logger;            
-        }        
+        }
 
         /*[HttpGet("clothing-collection")]
         public ActionResult<ClothingCollection> GetClothingCollection()
@@ -77,12 +77,14 @@ namespace MetaApi.Controllers
         /// </summary>
         /// <param name="requestData"></param>
         /// <returns></returns>
-        [HttpPost("try-on"), Authorize]        
+        [HttpPost("try-on"), Authorize]                
         public async Task<ActionResult<FittingResultResponse>> TryOnClothes(FittingRequest request)
         {
-            _logger.LogInformation("Start try on123");
-            Result<int> accountExternalIdResult = this.GetCurrentUserId();
-            /*Result<FittingResultResponse> resultFit = await _virtualFitService.TryOnClothesAsync(request, Request.Host.Value);                      
+            _logger.LogInformation("Start try-on");
+            
+            Result<int> userIdResult = this.GetCurrentUserId();
+
+            Result<FittingResultResponse> resultFit = await _virtualFitService.TryOnClothesAsync(request, Request.Host.Value, userIdResult.Value);                      
             if (resultFit.IsFailure)
             {
                 if (int.TryParse(resultFit.Error.Code, out int httpStatusCode))
@@ -94,16 +96,7 @@ namespace MetaApi.Controllers
                     return BadRequest(new { description = resultFit.Error.Description });
                 }
             }
-            return Ok(resultFit.Value);
-             */
-
-            FittingResultResponse resultFit = new FittingResultResponse
-            {
-                Url = "https://a33140-9deb.k.d-f.pw/oldv2/result/563117e4-9ca2-4460-9e02-c154587ef137_t.jpg",
-                RemainingUsage = 4
-            };
-
-            return Ok(resultFit);
+            return Ok(resultFit.Value);            
         }
 
         [HttpDelete("history"), Authorize]        
