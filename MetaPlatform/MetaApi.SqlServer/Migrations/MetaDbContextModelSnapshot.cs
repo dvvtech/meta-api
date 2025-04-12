@@ -17,7 +17,7 @@ namespace MetaApi.SqlServer.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.0")
+                .HasAnnotation("ProductVersion", "9.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -100,8 +100,7 @@ namespace MetaApi.SqlServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountId")
-                        .IsUnique();
+                    b.HasIndex("AccountId");
 
                     b.ToTable("UserTryOnLimits", (string)null);
                 });
@@ -140,9 +139,7 @@ namespace MetaApi.SqlServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountId")
-                        .IsUnique()
-                        .HasDatabaseName("IX_FittingResults_AccountId");
+                    b.HasIndex("AccountId");
 
                     b.ToTable("FittingResults", (string)null);
                 });

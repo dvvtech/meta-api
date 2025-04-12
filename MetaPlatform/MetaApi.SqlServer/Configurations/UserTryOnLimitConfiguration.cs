@@ -41,8 +41,8 @@ namespace MetaApi.SqlServer.Configurations
                    );
 
             // Уникальный индекс на AccountId (чтобы у пользователя был только один лимит)
-            builder.HasIndex(x => x.AccountId)
-                   .IsUnique();
+            //builder.HasIndex(x => x.AccountId)
+            //       .IsUnique();
         }
     }
 }

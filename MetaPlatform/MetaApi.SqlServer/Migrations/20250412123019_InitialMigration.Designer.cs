@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MetaApi.SqlServer.Migrations
 {
     [DbContext(typeof(MetaDbContext))]
-    [Migration("20250410163342_userLimitTable")]
-    partial class userLimitTable
+    [Migration("20250412123019_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.0")
+                .HasAnnotation("ProductVersion", "9.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -103,8 +103,7 @@ namespace MetaApi.SqlServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountId")
-                        .IsUnique();
+                    b.HasIndex("AccountId");
 
                     b.ToTable("UserTryOnLimits", (string)null);
                 });
@@ -143,9 +142,7 @@ namespace MetaApi.SqlServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountId")
-                        .IsUnique()
-                        .HasDatabaseName("IX_FittingResults_AccountId");
+                    b.HasIndex("AccountId");
 
                     b.ToTable("FittingResults", (string)null);
                 });

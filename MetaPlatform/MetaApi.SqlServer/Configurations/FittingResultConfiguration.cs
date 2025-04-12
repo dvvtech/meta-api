@@ -38,9 +38,9 @@ namespace MetaApi.SqlServer.Configurations
                 .OnDelete(DeleteBehavior.Cascade); // Удаление связанных данных
 
             // Индекс на PromocodeId
-            builder.HasIndex(f => f.AccountId)
+            /*builder.HasIndex(f => f.AccountId)
                    .IsUnique()
-                   .HasDatabaseName("IX_FittingResults_AccountId");
+                   .HasDatabaseName("IX_FittingResults_AccountId");*/
 
             // Связь с PromocodeEntity (внешний ключ)
             /*builder.HasOne(f => f.Promocode)

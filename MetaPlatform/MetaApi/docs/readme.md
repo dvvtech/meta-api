@@ -128,7 +128,7 @@ Startup project -> API Project
 Add-Migration InitialCreate
 Update-Database
 
-Remove-Migration
+Remove-Migration first_migration
 
 Тонкости миграции:
 
