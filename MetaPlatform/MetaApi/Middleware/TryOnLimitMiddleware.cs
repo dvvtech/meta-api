@@ -20,8 +20,13 @@ namespace MetaApi.Middleware
 
                 if (!await limitService.CanUserTryOnAsync(userId))
                 {
+                    var timeRemaining = await limitService.GetTimeUntilLimitResetAsync(userId);
+
                     context.Response.StatusCode = StatusCodes.Status429TooManyRequests;
-                    await context.Response.WriteAsync("Try-on limit exceeded. Try again later.");
+
+                    var message = $"Try-on limit exceeded. Please try again in {FormatTimeRemaining(timeRemaining)}.";
+                    await context.Response.WriteAsync(message);
+
                     return;
                 }
 
@@ -48,6 +53,30 @@ namespace MetaApi.Middleware
         {
             var userIdClaim = context.User.FindFirst(ClaimTypes.NameIdentifier);
             return int.Parse(userIdClaim.Value);
+        }
+
+        private string FormatTimeRemaining(TimeSpan timeRemaining)
+        {
+            var parts = new List<string>();
+
+            if (timeRemaining.Days > 0)
+                parts.Add($"{timeRemaining.Days} day(s)");
+
+            if (timeRemaining.Hours > 0)
+                parts.Add($"{timeRemaining.Hours} hour(s)");
+
+            if (timeRemaining.Minutes > 0)
+                parts.Add($"{timeRemaining.Minutes} minute(s)");
+
+            if (timeRemaining.Seconds > 0 || parts.Count == 0) // Всегда показываем хотя бы секунды
+                parts.Add($"{timeRemaining.Seconds} second(s)");
+
+            // Соединяем все части с правильными разделителями
+            if (parts.Count == 1)
+                return parts[0];
+
+            var allExceptLast = string.Join(", ", parts.Take(parts.Count - 1));
+            return $"{allExceptLast} and {parts.Last()}";
         }
     }
 }

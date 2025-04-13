@@ -11,5 +11,10 @@
         /// Кол-во оставшихся попыток
         /// </summary>
         public int RemainingUsage { get; set; }
+
+        /// <summary>
+        /// Сколько минут осталось ждать
+        /// </summary>
+        public TimeSpan RemainingWaitTime { get; set; }
     }
 }

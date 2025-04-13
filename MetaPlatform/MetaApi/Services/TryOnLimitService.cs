@@ -13,6 +13,30 @@ namespace MetaApi.Services
             _context = context;
         }
 
+        public async Task<TimeSpan> GetTimeUntilLimitResetAsync(int userId)
+        {
+            var userLimit = await _context.UserTryOnLimits
+                .FirstOrDefaultAsync(l => l.AccountId == userId);
+
+            if (userLimit == null)
+                return TimeSpan.Zero;
+
+            // Вычисляем время следующего сброса
+            DateTime nextResetTime = userLimit.LastResetTime + userLimit.ResetPeriod;
+
+            // Текущее время (UTC, чтобы избежать проблем с часовыми поясами)
+            DateTime currentTime = DateTime.UtcNow;
+
+            // Если время сброса уже наступило, значит лимит уже сброшен (осталось 0 времени)
+            if (currentTime >= nextResetTime)
+            {
+                return TimeSpan.Zero;
+            }
+
+            // Иначе возвращаем разницу между следующим сбросом и текущим временем
+            return nextResetTime - currentTime;
+        }
+
         /// <summary>
         /// Проверяет, может ли пользователь совершить попытку
         /// </summary>

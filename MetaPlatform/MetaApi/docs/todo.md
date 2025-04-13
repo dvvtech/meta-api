@@ -1,4 +1,6 @@
-﻿
+﻿после долгого неиспользования сервиса когда нажимаю photo from the collection почему-то не может обновить токен и сбрасывает его
+
+
 LastResetTime maybe rename to LastResetUtcDateTime
 
 Seq можно развернуть и сделать структурные логи
