@@ -3,7 +3,6 @@ using MetaApi.Configuration;
 using MetaApi.Constants;
 using MetaApi.Core;
 using MetaApi.Core.Configurations;
-using MetaApi.HealthChecks;
 using MetaApi.Services;
 using MetaApi.Services.Auth;
 using MetaApi.SqlServer.Repositories;
@@ -21,16 +20,7 @@ namespace MetaApi.AppStart
 
             InitConfigs();
             ConfigureAuth();
-
-            builder.Services.AddHttpClient(ApiNames.REPLICATE_API_CLIENT_NAME, client =>
-            {
-                var virtualFitConfig = builder.Configuration.GetSection(VirtualFitConfig.SectionName).Get<VirtualFitConfig>();
-
-                client.BaseAddress = new Uri("https://api.replicate.com/v1/");
-                client.Timeout = TimeSpan.FromSeconds(45); // Таймаут запроса
-                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {virtualFitConfig.ApiToken}");
-                client.DefaultRequestHeaders.Add("Prefer", "wait");
-            });
+            ConfigureClientAPI();
 
             builder.Services.AddSwaggerGen();
                         
@@ -57,6 +47,19 @@ namespace MetaApi.AppStart
             {
                 throw new InvalidOperationException("JWT configuration section is missing or invalid");
             }            
+        }
+
+        private void ConfigureClientAPI()
+        {
+            _builder.Services.AddHttpClient(ApiNames.REPLICATE_API_CLIENT_NAME, client =>
+            {
+                var virtualFitConfig = _builder.Configuration.GetSection(VirtualFitConfig.SectionName).Get<VirtualFitConfig>();
+
+                client.BaseAddress = new Uri("https://api.replicate.com/v1/");
+                client.Timeout = TimeSpan.FromSeconds(45); // Таймаут запроса
+                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {virtualFitConfig.ApiToken}");
+                client.DefaultRequestHeaders.Add("Prefer", "wait");
+            });            
         }
 
         private void AddServices()

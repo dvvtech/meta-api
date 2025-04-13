@@ -1,5 +1,6 @@
 ﻿using HealthChecks.UI.Client;
 using MetaApi.Configuration;
+using MetaApi.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 namespace MetaApi.AppStart.Extensions
@@ -11,7 +12,7 @@ namespace MetaApi.AppStart.Extensions
             var sqlServerConnectionString = configuration.GetConnectionString(DatabaseConfig.MetaDbMsSqlConnection);
 
             services.AddHealthChecks()
-                //.AddCheck<DatabaseHealthCheck>(nameof(DatabaseHealthCheck))
+                //.AddCheck<ReplicateApiHealthCheck>(nameof(ReplicateApiHealthCheck))
                 .AddSqlServer(sqlServerConnectionString);            
         }
 

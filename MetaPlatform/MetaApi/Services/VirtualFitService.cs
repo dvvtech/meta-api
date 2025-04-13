@@ -11,8 +11,7 @@ namespace MetaApi.Services
 
         public VirtualFitService(MetaDbContext metaContext,
                                  IHttpClientFactory httpClientFactory,
-                                 FileService fileService,                                 
-        
+                                 FileService fileService,                                         
                                  ILogger<VirtualFitService> logger)
         {
             _metaDbContext = metaContext;
