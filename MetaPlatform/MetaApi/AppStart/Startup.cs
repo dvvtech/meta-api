@@ -22,7 +22,7 @@ namespace MetaApi.AppStart
             InitConfigs();
             ConfigureAuth();
 
-            builder.Services.AddHttpClient(ApiNames.REPLICATE_API, client =>
+            builder.Services.AddHttpClient(ApiNames.REPLICATE_API_CLIENT_NAME, client =>
             {
                 var virtualFitConfig = builder.Configuration.GetSection(VirtualFitConfig.SectionName).Get<VirtualFitConfig>();
 
