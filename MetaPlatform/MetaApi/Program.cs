@@ -29,6 +29,8 @@ app.Logger.LogInformation(sb.ToString());
 app.UseSwagger();
 app.UseSwaggerUI();
 
+app.ApplyRateLimit();
+
 app.ApplyMigrations();
 
 // Configure the HTTP request pipeline.
