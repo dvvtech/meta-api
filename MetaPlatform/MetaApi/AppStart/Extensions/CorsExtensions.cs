@@ -35,7 +35,7 @@
             }
             else
             {
-                app.UseCors(AllowAllPolicy);//AllowSpecificOriginPolicy
+                app.UseCors(AllowSpecificOriginPolicy);
             }
         }
     }
