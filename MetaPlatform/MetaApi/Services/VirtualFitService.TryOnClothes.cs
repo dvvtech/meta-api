@@ -174,7 +174,8 @@ namespace MetaApi.Services
             var limit = await _metaDbContext.UserTryOnLimits.FirstOrDefaultAsync(l => l.AccountId == userId);
             if (limit != null)
             {
-                return limit.MaxAttempts - limit.AttemptsUsed - 1;//-1 так как на текущий момент попытка еще не вычтена
+                //-1 так как на текущий момент попытка еще не вычтена, она вычитается в middleware после запроса
+                return limit.MaxAttempts - limit.AttemptsUsed - 1;
             }
 
             return 0;

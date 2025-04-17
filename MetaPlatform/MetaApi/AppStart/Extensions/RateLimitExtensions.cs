@@ -13,7 +13,7 @@ namespace MetaApi.AppStart.Extensions
             {
                 options.AddFixedWindowLimiter(LimitPolicyName, options =>
                 {
-                    options.PermitLimit = 3; // Максимум 3 запроса
+                    options.PermitLimit = 4;                   // Максимум 4 запроса
                     options.Window = TimeSpan.FromSeconds(10); // За 10 секунд
                     //options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
                     options.QueueLimit = 0; // Очередь из 0 дополнительных запросов
