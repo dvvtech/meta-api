@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MetaApi.Controllers
 {
+    /// <summary>
+    /// Загрузка пользовательских фото
+    /// </summary>
     [Route("api/uploads")]
     [ApiController]
     public class FileUploadController : ControllerBase

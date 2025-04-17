@@ -2,6 +2,7 @@
 using MetaApi.Extensions;
 using MetaApi.Models.VirtualFit;
 using MetaApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MetaApi.Controllers
@@ -20,12 +21,16 @@ namespace MetaApi.Controllers
             _logger = logger;
         }
 
-        [HttpGet]
-        public async Task<LimitResponse> GetCurrentLimit()
+        [HttpGet, Authorize]
+        public async Task<ActionResult<LimitResponse>> GetCurrentLimit()
         {
             _logger.LogInformation("get limit");
 
             Result<int> userIdResult = this.GetCurrentUserId();
+            if (userIdResult.IsFailure)
+            {
+                return BadRequest(userIdResult.Error);
+            }
 
             int remainingTries = await _tryOnLimitService.GetRemainingTriesAsync(userIdResult.Value);
 

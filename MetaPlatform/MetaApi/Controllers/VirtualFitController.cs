@@ -35,6 +35,10 @@ namespace MetaApi.Controllers
             _logger.LogInformation("Start try-on");
             
             Result<int> userIdResult = this.GetCurrentUserId();
+            if (userIdResult.IsFailure)
+            {
+                return BadRequest(userIdResult.Error);
+            }
 
             Result<FittingResultResponse> resultFit = await _virtualFitService.TryOnClothesAsync(request, Request.Host.Value, userIdResult.Value);                      
             if (resultFit.IsFailure)
