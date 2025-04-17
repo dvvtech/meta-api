@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.RateLimiting;
-using System.Threading.RateLimiting;
 
 namespace MetaApi.AppStart.Extensions
 {
@@ -24,8 +23,7 @@ namespace MetaApi.AppStart.Extensions
         }
 
         public static void ApplyRateLimit(this WebApplication app)
-        {
-            app.UseRouting();
+        {            
             app.UseRateLimiter();
             app.UseEndpoints(endpoints =>
             {

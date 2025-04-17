@@ -19,7 +19,7 @@ namespace MetaApi.AppStart
             _builder = builder ?? throw new ArgumentNullException(nameof(builder));
 
             InitConfigs();
-            //_builder.Services.ConfigureRateLimit();            
+            _builder.Services.ConfigureRateLimit();            
             ConfigureAuth();
             ConfigureClientAPI();
 

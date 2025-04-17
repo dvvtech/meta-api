@@ -30,29 +30,16 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
-app.UseAuthorization();
 
 app.ApplyCors();
 
-//app.ApplyRateLimit();
+app.UseRouting();
+app.UseAuthorization();
+app.ApplyRateLimit();
 
 app.ApplyMigrations();
 
-// Configure the HTTP request pipeline.
-
-
 app.ApplyAllHealthChecks();
-/*if (builder.Environment.IsDevelopment())
-{
-    app.UseCors("AllowAll");
-    //app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-}
-else
-{
-    //app.UseCors("AllowSpecificOrigin"); 
-    app.UseCors("AllowAll");
-    //app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-}*/
 
 // Ваш кастомный middleware
 app.UseMiddleware<TryOnLimitMiddleware>();
