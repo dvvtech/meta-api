@@ -29,15 +29,17 @@ app.Logger.LogInformation(sb.ToString());
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.ApplyRateLimit();
+app.UseHttpsRedirection();
+app.UseAuthorization();
+
+app.ApplyCors();
+
+//app.ApplyRateLimit();
 
 app.ApplyMigrations();
 
 // Configure the HTTP request pipeline.
 
-app.UseHttpsRedirection();
-
-app.ApplyCors();
 
 app.ApplyAllHealthChecks();
 /*if (builder.Environment.IsDevelopment())
@@ -51,8 +53,6 @@ else
     app.UseCors("AllowAll");
     //app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 }*/
-
-app.UseAuthorization();
 
 // Ваш кастомный middleware
 app.UseMiddleware<TryOnLimitMiddleware>();
