@@ -1,5 +1,7 @@
 ﻿выделить отдельный сервис ReplicateService в папку Services -> AIServices
 
+method GetUrl в 2 сервисах нужно вынести его куда-то возможно в статик класс
+
 
 todo rename FittingResults to FittingHistory
 
