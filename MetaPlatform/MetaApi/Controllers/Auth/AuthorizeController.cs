@@ -50,7 +50,7 @@ namespace MetaApi.Controllers.Auth
             return Ok(tokenResult.Value);
         }
 
-        [HttpPost("test9")]
+        [HttpPost("test1")]
         public async Task<ActionResult> Test()
         {
             _logger.LogInformation("555");

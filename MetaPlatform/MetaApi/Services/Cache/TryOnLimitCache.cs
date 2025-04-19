@@ -1,21 +1,20 @@
-﻿using MetaApi.SqlServer.Context;
-using MetaApi.SqlServer.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using MetaApi.SqlServer.Entities;
+using MetaApi.SqlServer.Repositories;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace MetaApi.Services.Cache
 {
     public class TryOnLimitCache
     {
-        private readonly MetaDbContext _metaDbContext;
+        private readonly ITryOnLimitRepository _repository;
         private readonly IMemoryCache _memoryCache;
         private readonly ILogger<TryOnLimitCache> _logger;
 
-        public TryOnLimitCache(MetaDbContext dbContext,
+        public TryOnLimitCache(ITryOnLimitRepository repository,
                                IMemoryCache memoryCache,
                                ILogger<TryOnLimitCache> logger)
         {
-            _metaDbContext = dbContext;
+            _repository = repository;
             _memoryCache = memoryCache;
             _logger = logger;
         }
@@ -33,8 +32,8 @@ namespace MetaApi.Services.Cache
 
             // 2. Если нет в memory cache, идем в БД
             _logger.LogDebug("Loading limit from DB for user {UserId}", userId);
-
-            var limitEntity = await _metaDbContext.UserTryOnLimits.FirstOrDefaultAsync(l => l.AccountId == userId);
+            
+            var limitEntity = await _repository.GetLimit(userId);
             if (limitEntity != null)
             {
                 // 3. Сохраняем в memory cache
@@ -47,8 +46,7 @@ namespace MetaApi.Services.Cache
 
         public async Task AddLimit(UserTryOnLimitEntity userTryOnLimitEntity)
         {
-            _metaDbContext.UserTryOnLimits.Add(userTryOnLimitEntity);
-            await _metaDbContext.SaveChangesAsync();
+            await _repository.AddLimit(userTryOnLimitEntity);            
 
             //Сохраняем в memory cache
             var cacheKey = $"try_on_limit_{userTryOnLimitEntity.Account}";
@@ -57,13 +55,7 @@ namespace MetaApi.Services.Cache
 
         public async Task UpdateLimit(UserTryOnLimitEntity userTryOnLimitEntity)
         {
-            await _metaDbContext.UserTryOnLimits.Where(limit => limit.Id == userTryOnLimitEntity.Id)
-                                                .ExecuteUpdateAsync(limit => limit
-                                                    .SetProperty(p => p.MaxAttempts, userTryOnLimitEntity.MaxAttempts)
-                                                    .SetProperty(p => p.AttemptsUsed, userTryOnLimitEntity.AttemptsUsed)
-                                                    .SetProperty(p => p.LastResetTime, userTryOnLimitEntity.LastResetTime)
-                                                    .SetProperty(p => p.ResetPeriod, userTryOnLimitEntity.ResetPeriod));
-            await _metaDbContext.SaveChangesAsync();
+            await _repository.UpdateLimit(userTryOnLimitEntity);
 
             var cacheKey = $"try_on_limit_{userTryOnLimitEntity.AccountId}";
             _memoryCache.Set(cacheKey, userTryOnLimitEntity);            
