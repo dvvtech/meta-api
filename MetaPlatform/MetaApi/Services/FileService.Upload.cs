@@ -2,9 +2,7 @@
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
 using Image = SixLabors.ImageSharp.Image;
-using SixLabors.ImageSharp.PixelFormats;
 using MetaApi.Consts;
 using SixLabors.ImageSharp.Formats.Jpeg;
 

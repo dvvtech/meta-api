@@ -4,7 +4,6 @@ using MetaApi.Utilities;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.Json;
-using MetaApi.Consts;
 
 namespace MetaApi.Services
 {
@@ -27,20 +26,28 @@ namespace MetaApi.Services
         {
             var httpClient = _httpClientFactory.CreateClient(ApiNames.REPLICATE_API_CLIENT_NAME);
 
-            var predictionRequest = CreatePredictionRequest(request);
-            var jsonContent = SerializeToJson(predictionRequest);
-            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-            var response = await httpClient.PostAsync("predictions", content);
-            if (!response.IsSuccessStatusCode)
+            try
             {
+                var predictionRequest = CreatePredictionRequest(request);
+                var jsonContent = SerializeToJson(predictionRequest);
+                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                var response = await httpClient.PostAsync("predictions", content);
+                if (!response.IsSuccessStatusCode)
+                {
+                    return ("failed", "");
+                }
+
+                var predictionId = await ExtractPredictionId(response);
+                var predictionResult = await CheckPredictionStatus(httpClient, predictionId);
+
+                return predictionResult;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"ProcessPredictionAsync: {ex}");
                 return ("failed", "");
             }
-
-            var predictionId = await ExtractPredictionId(response);
-            var predictionResult = await CheckPredictionStatus(httpClient, predictionId);
-
-            return predictionResult;
         }
 
         private PredictionRequest CreatePredictionRequest(FittingRequest request)
