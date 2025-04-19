@@ -1,22 +1,21 @@
 ﻿using MetaApi.Models.VirtualFit;
-using MetaApi.SqlServer.Context;
 using MetaApi.SqlServer.Entities.VirtualFit;
-using Microsoft.EntityFrameworkCore;
+using MetaApi.SqlServer.Repositories;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace MetaApi.Services.Cache
 {
     public class FittingHistoryCache
     {
-        private readonly MetaDbContext _metaDbContext;
+        private readonly IFittingHistoryRepository _repository;
         private readonly IMemoryCache _memoryCache;
         private readonly ILogger<FittingHistoryCache> _logger;
         
-        public FittingHistoryCache(MetaDbContext dbContext,
+        public FittingHistoryCache(IFittingHistoryRepository repository,
                                    IMemoryCache memoryCache,
                                    ILogger<FittingHistoryCache> logger)
         {
-            _metaDbContext = dbContext;
+            _repository = repository;
             _memoryCache = memoryCache;
             _logger = logger;
         }
@@ -34,29 +33,26 @@ namespace MetaApi.Services.Cache
 
             // 2. Если нет в memory cache, идем в БД
             _logger.LogDebug("Loading history from DB for user {UserId}", userId);
+            var dbResults = await _repository.GetHistoryAsync(userId);
+            var fittingHistories = dbResults.Select(s => new FittingHistoryResponse
+            {
+                Id = s.Id,
+                GarmentImgUrl = s.GarmentImgUrl,
+                HumanImgUrl = s.HumanImgUrl,
+                ResultImgUrl = s.ResultImgUrl,
+            }).ToArray();
 
-            var dbResults = await _metaDbContext.FittingResult
-                .Where(result => result.AccountId == userId && !result.IsDeleted)
-                .Select(s => new FittingHistoryResponse
-                {
-                    Id = s.Id,
-                    GarmentImgUrl = s.GarmentImgUrl,
-                    HumanImgUrl = s.HumanImgUrl,
-                    ResultImgUrl = s.ResultImgUrl,
-                })
-                .ToArrayAsync();
-
+            
             // 3. Сохраняем в memory cache            
-            _memoryCache.Set(cacheKey, dbResults);
+            _memoryCache.Set(cacheKey, fittingHistories);
 
-            return dbResults;
+            return fittingHistories;
         }
 
         public async Task AddToHistory(FittingResultEntity entity)
         {
             // 1. Сначала сохраняем в БД
-            _metaDbContext.FittingResult.Add(entity);
-            await _metaDbContext.SaveChangesAsync();
+            await _repository.AddToHistoryAsync(entity);            
 
             // 2. Пытаемся получить текущий кеш
             var cacheKey = $"fitting_history_{entity.AccountId}";            
@@ -88,19 +84,10 @@ namespace MetaApi.Services.Cache
         public async Task Delete(FittingDeleteRequest request, int userId)
         {
             // 1. Находим и "удаляем" запись (помечаем IsDeleted)
-            var fittingResult = await _metaDbContext.FittingResult
-                .FirstOrDefaultAsync(x => x.Id == request.FittingResultId && x.AccountId == userId);
+            await _repository.DeleteAsync(request.FittingResultId, userId);
 
-            if (fittingResult == null)
-                return;
-
-            fittingResult.IsDeleted = true;
-            await _metaDbContext.SaveChangesAsync();
-
-            var cacheKey = $"fitting_history_{userId}";
-
-            // 2. Обновляем кеш            
-            //Частичное обновление кеша (быстрее)
+            // 2. Обновляем кеш                        
+            var cacheKey = $"fitting_history_{userId}";            
             await UpdateCacheAfterDeletion(userId, request.FittingResultId);
         }
 

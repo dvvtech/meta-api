@@ -76,9 +76,9 @@ namespace MetaApi.AppStart
             //храним временные данные для авторизации vk и кешируем бд в кеше памяти
             _builder.Services.AddMemoryCache();
 
-
+            _builder.Services.AddScoped<IFittingHistoryRepository, FittingHistoryRepository>();
             _builder.Services.AddScoped<ITryOnLimitRepository, TryOnLimitRepository>();
-            
+
             _builder.Services.AddScoped<ReplicateClientService>();
             _builder.Services.AddScoped<FittingHistoryCache>();
             _builder.Services.AddScoped<TryOnLimitCache>();            
