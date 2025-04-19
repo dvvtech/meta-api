@@ -7,19 +7,11 @@ namespace MetaApi.Services
     public partial class VirtualFitService
     {
         public async Task<Result<FittingHistoryResponse[]>> GetHistory(int userId)
-        {            
-            FittingHistoryResponse[] fittingResults = await _metaDbContext.FittingResult
-                                                                  .Where(result => result.AccountId == userId && !result.IsDeleted)
-                                                                  .Select(s => new FittingHistoryResponse
-                                                                  {
-                                                                      Id = s.Id,
-                                                                      GarmentImgUrl = s.GarmentImgUrl,
-                                                                      HumanImgUrl = s.HumanImgUrl,
-                                                                      ResultImgUrl = s.ResultImgUrl,
-                                                                  })
-                                                                  .ToArrayAsync();
-            
+        {
+            FittingHistoryResponse[] fittingResults = await _fittingHistoryCache.GetHistory(userId);
+
             return Result<FittingHistoryResponse[]>.Success(fittingResults);
+
         }
     }
 }

@@ -130,6 +130,26 @@ namespace MetaApi.Services
             }
 
             return ("failed", "");
+        }        
+
+        private async Task<Result<FittingResultResponse>> ProcessSuccessfulPrediction(FittingRequest request,
+                                                                                      string host,
+                                                                                      int userId,
+                                                                                      string outputUrl)
+        {
+            var urlResult = await _fileService.UploadResultFileAsync(outputUrl, host, request.HumanImg);
+
+            var fittingResultEntity = CreateFittingResultEntity(request, urlResult, userId);
+
+            await _fittingHistoryCache.AddToHistory(fittingResultEntity);
+
+            await _tryOnLimitService.DecrementTryOnLimitAsync(userId);
+
+            return Result<FittingResultResponse>.Success(new FittingResultResponse
+            {
+                Url = urlResult ?? string.Empty,
+                RemainingUsage = await _tryOnLimitService.GetRemainingUsage(userId)
+            });
         }
 
         private FittingResultEntity CreateFittingResultEntity(FittingRequest request, string urlResult, int userId)
@@ -144,41 +164,6 @@ namespace MetaApi.Services
                 AccountId = userId,
                 CreatedUtcDate = DateTime.UtcNow
             };
-        }
-
-        private async Task<Result<FittingResultResponse>> ProcessSuccessfulPrediction(FittingRequest request,
-                                                                                      string host,
-                                                                                      int userId,
-                                                                                      string outputUrl)
-        {
-            var urlResult = await _fileService.UploadResultFileAsync(outputUrl, host, request.HumanImg);
-
-            var fittingResult = CreateFittingResultEntity(request, urlResult, userId);
-            _metaDbContext.FittingResult.Add(fittingResult);
-            await _metaDbContext.SaveChangesAsync();
-
-            return Result<FittingResultResponse>.Success(new FittingResultResponse
-            {
-                Url = urlResult ?? string.Empty,
-                RemainingUsage = await GetRemainingUsage(userId)
-            });
-        }
-
-        /// <summary>
-        /// Кол-во оставшихся попыток
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <returns></returns>
-        private async Task<int> GetRemainingUsage(int userId)
-        {
-            var limit = await _metaDbContext.UserTryOnLimits.FirstOrDefaultAsync(l => l.AccountId == userId);
-            if (limit != null)
-            {
-                //-1 так как на текущий момент попытка еще не вычтена, она вычитается в middleware после запроса
-                return limit.MaxAttempts - limit.AttemptsUsed - 1;
-            }
-
-            return 0;
         }
 
         private string GetUrl(string url)

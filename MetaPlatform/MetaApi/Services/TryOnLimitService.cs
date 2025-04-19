@@ -1,22 +1,31 @@
-﻿using MetaApi.SqlServer.Context;
+﻿using MetaApi.Services.Cache;
 using MetaApi.SqlServer.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace MetaApi.Services
 {
     public class TryOnLimitService
-    {
-        private readonly MetaDbContext _context;
+    {        
+        private readonly TryOnLimitCache _cache;
 
-        public TryOnLimitService(MetaDbContext context)
+        public TryOnLimitService(TryOnLimitCache cache)
         {
-            _context = context;
+            _cache = cache;
+        }
+
+        public async Task<int> GetRemainingUsage(int userId)
+        {
+            var userLimit = await _cache.GetLimit(userId);
+            if (userLimit == null)
+            {
+                return 0;
+            }
+
+            return userLimit.MaxAttempts - userLimit.AttemptsUsed;
         }
 
         public async Task<TimeSpan> GetTimeUntilLimitResetAsync(int userId)
         {
-            var userLimit = await _context.UserTryOnLimits
-                .FirstOrDefaultAsync(l => l.AccountId == userId);
+            var userLimit = await _cache.GetLimit(userId);
 
             if (userLimit == null)
                 return TimeSpan.Zero;
@@ -59,7 +68,7 @@ namespace MetaApi.Services
             limit.AttemptsUsed++;
             limit.LastResetTime = DateTime.UtcNow;
 
-            await _context.SaveChangesAsync();
+            await _cache.UpdateLimit(limit);
         }
 
         /// <summary>
@@ -71,18 +80,7 @@ namespace MetaApi.Services
             ResetLimitIfPeriodPassed(limit);
 
             return limit.MaxAttempts - limit.AttemptsUsed;
-        }
-
-        /// <summary>
-        /// Устанавливает новый лимит (например, 3 попытки в час)
-        /// </summary>
-        public async Task SetLimitAsync(int userId, int maxAttempts, TimeSpan resetPeriod)
-        {
-            var limit = await GetOrCreateLimitAsync(userId);
-            limit.MaxAttempts = maxAttempts;
-            limit.ResetPeriod = resetPeriod;
-            await _context.SaveChangesAsync();
-        }
+        }        
 
         /// <summary>
         /// Сбрасывает счетчик, если прошел заданный период
@@ -99,13 +97,13 @@ namespace MetaApi.Services
             }
         }
 
+
         /// <summary>
         /// Создает или получает лимит пользователя
         /// </summary>
         private async Task<UserTryOnLimitEntity> GetOrCreateLimitAsync(int userId)
         {
-            var limit = await _context.UserTryOnLimits
-                .FirstOrDefaultAsync(l => l.AccountId == userId);
+            var limit = await _cache.GetLimit(userId);
 
             if (limit == null)
             {
@@ -117,8 +115,8 @@ namespace MetaApi.Services
                     LastResetTime = DateTime.UtcNow,
                     ResetPeriod = TimeSpan.FromDays(1) // Дефолтный период (1 день)
                 };
-                _context.UserTryOnLimits.Add(limit);
-                await _context.SaveChangesAsync();
+
+                await _cache.AddLimit(limit);
             }
 
             return limit;

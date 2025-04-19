@@ -9,9 +9,6 @@ using MetaApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//string response = "{\"response\":[{\"id\":884910363,\"first_name\":\"Vladimir\",\"last_name\":\"Dezhurnyuk\",\"can_access_closed\":true,\"is_closed\":false}]}";
-//var userResponse = JsonSerializer.Deserialize<VkUserResponse>(response);
-
 var startup = new Startup();
 startup.Initialize(builder);
 

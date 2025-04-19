@@ -32,11 +32,6 @@ namespace MetaApi.Middleware
 
                 await _next(context);
 
-                // Уменьшаем лимит только если запрос успешный
-                if (context.Response.StatusCode < 400)
-                {
-                    await limitService.DecrementTryOnLimitAsync(userId);
-                }
             }
             else
             {

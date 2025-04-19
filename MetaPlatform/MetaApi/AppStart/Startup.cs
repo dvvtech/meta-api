@@ -5,7 +5,9 @@ using MetaApi.Core;
 using MetaApi.Core.Configurations;
 using MetaApi.Services;
 using MetaApi.Services.Auth;
+using MetaApi.Services.Cache;
 using MetaApi.SqlServer.Repositories;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace MetaApi.AppStart
 {
@@ -17,6 +19,12 @@ namespace MetaApi.AppStart
         public void Initialize(WebApplicationBuilder builder)
         {
             _builder = builder ?? throw new ArgumentNullException(nameof(builder));
+
+            // Настройка ограничения размера тела запроса (10 МБ)
+            builder.Services.Configure<KestrelServerOptions>(options =>
+            {
+                options.Limits.MaxRequestBodySize = 10 * 1024 * 1024; // 10 MB для Kestrel
+            });
 
             InitConfigs();
             _builder.Services.ConfigureRateLimit();            
@@ -65,20 +73,27 @@ namespace MetaApi.AppStart
 
         private void AddServices()
         {
-            //храним временные данные для авторизации vk в кеше памяти
+            //храним временные данные для авторизации vk и кешируем бд в кеше памяти
             _builder.Services.AddMemoryCache();
+
+            _builder.Services.AddScoped<FittingHistoryCache>();
+            _builder.Services.AddScoped<TryOnLimitCache>();            
 
             _builder.Services.AddAllHealthChecks(_builder.Configuration);
 
             _builder.Services.AddScoped<TryOnLimitService>();
+            _builder.Services.AddScoped<VirtualFitService>();
+
             _builder.Services.AddScoped<ImageService>();
             _builder.Services.AddScoped<FileService>();
+
             _builder.Services.AddScoped<AccountRepository>();
+
             _builder.Services.AddSingleton<JwtProvider>();            
             _builder.Services.AddScoped<AuthService>();
             _builder.Services.AddScoped<VkAuthService>();
-            _builder.Services.AddScoped<GoogleAuthService>();            
-            _builder.Services.AddScoped<VirtualFitService>();
+            _builder.Services.AddScoped<GoogleAuthService>();                  
+            
             _builder.Services.AddSingleton<FileCrcHostedService>();
             _builder.Services.AddHostedService(provider => provider.GetService<FileCrcHostedService>());
         }
