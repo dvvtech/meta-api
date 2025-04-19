@@ -3,6 +3,7 @@ using MetaApi.Core.OperationResults;
 using MetaApi.Models.VirtualFit;
 using MetaApi.SqlServer.Entities.VirtualFit;
 using MetaApi.Consts;
+using MetaApi.Utilities;
 
 namespace MetaApi.Services
 {
@@ -39,46 +40,16 @@ namespace MetaApi.Services
         {
             return new FittingResultEntity
             {
-                GarmentImgUrl = GetUrl(request.GarmImg).Replace(FittingConstants.PADDING_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL)
-                                                       .Replace(FittingConstants.FULLSIZE_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL),
-                HumanImgUrl = GetUrl(request.HumanImg).Replace(FittingConstants.PADDING_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL)
-                                                      .Replace(FittingConstants.FULLSIZE_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL),
+                GarmentImgUrl = ImageUrlHelper.GetUrl(request.GarmImg).Replace(FittingConstants.PADDING_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL)
+                                                                      .Replace(FittingConstants.FULLSIZE_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL),
+                HumanImgUrl = ImageUrlHelper.GetUrl(request.HumanImg).Replace(FittingConstants.PADDING_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL)
+                                                                     .Replace(FittingConstants.FULLSIZE_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL),
                 ResultImgUrl = urlResult.Replace(FittingConstants.FULLSIZE_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL),
                 AccountId = userId,
                 CreatedUtcDate = DateTime.UtcNow
             };
         }
 
-        private string GetUrl(string url)
-        {
-            string imgFileName = Path.GetFileNameWithoutExtension(url);
-            var underscoreCount = imgFileName.Count(c => c == '_');
-            if (underscoreCount == 1)
-            {
-                //todo если оканчивается на _t то заменить на _v
-                if (imgFileName.EndsWith(FittingConstants.THUMBNAIL_SUFFIX_URL, StringComparison.OrdinalIgnoreCase))
-                {
-                    return url.Replace(FittingConstants.THUMBNAIL_SUFFIX_URL, FittingConstants.FULLSIZE_SUFFIX_URL);
-                }
-
-                return url;
-            }
-
-            //если фото из внутренней коллекции и для него есть паддинг, то нужно заменить название файла, чтоб оканчивался на _p
-            if (imgFileName.EndsWith(FittingConstants.FULLSIZE_SUFFIX_URL, StringComparison.OrdinalIgnoreCase))
-            {
-                return url.Replace(FittingConstants.FULLSIZE_SUFFIX_URL, FittingConstants.PADDING_SUFFIX_URL);
-            }
-
-            //если фото из внутренней коллекции 
-            if (imgFileName.EndsWith(FittingConstants.THUMBNAIL_SUFFIX_URL, StringComparison.OrdinalIgnoreCase))
-            {
-                return url.Replace(FittingConstants.THUMBNAIL_SUFFIX_URL, FittingConstants.PADDING_SUFFIX_URL);
-            }
-
-            throw new InvalidOperationException("Invalid image URL format");
-        }        
-        
 
         public async Task<Result<FittingResultResponse>> TryOnClothesFakeAsync(FittingRequest request)
         {            

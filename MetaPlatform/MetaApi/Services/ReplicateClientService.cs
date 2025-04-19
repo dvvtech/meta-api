@@ -55,8 +55,8 @@ namespace MetaApi.Services
                     Steps = 30,
                     Category = request.Category,
                     ForceDc = false,
-                    GarmImg = GetUrl(request.GarmImg),
-                    HumanImg = GetUrl(request.HumanImg),
+                    GarmImg = ImageUrlHelper.GetUrl(request.GarmImg),
+                    HumanImg = ImageUrlHelper.GetUrl(request.HumanImg),
                     MaskOnly = false,
                     GarmentDes = ""
                 }
@@ -118,36 +118,6 @@ namespace MetaApi.Services
             }
 
             return ("failed", "");
-        }
-
-        private string GetUrl(string url)
-        {
-            string imgFileName = Path.GetFileNameWithoutExtension(url);
-            var underscoreCount = imgFileName.Count(c => c == '_');
-            if (underscoreCount == 1)
-            {
-                //todo если оканчивается на _t то заменить на _v
-                if (imgFileName.EndsWith(FittingConstants.THUMBNAIL_SUFFIX_URL, StringComparison.OrdinalIgnoreCase))
-                {
-                    return url.Replace(FittingConstants.THUMBNAIL_SUFFIX_URL, FittingConstants.FULLSIZE_SUFFIX_URL);
-                }
-
-                return url;
-            }
-
-            //если фото из внутренней коллекции и для него есть паддинг, то нужно заменить название файла, чтоб оканчивался на _p
-            if (imgFileName.EndsWith(FittingConstants.FULLSIZE_SUFFIX_URL, StringComparison.OrdinalIgnoreCase))
-            {
-                return url.Replace(FittingConstants.FULLSIZE_SUFFIX_URL, FittingConstants.PADDING_SUFFIX_URL);
-            }
-
-            //если фото из внутренней коллекции 
-            if (imgFileName.EndsWith(FittingConstants.THUMBNAIL_SUFFIX_URL, StringComparison.OrdinalIgnoreCase))
-            {
-                return url.Replace(FittingConstants.THUMBNAIL_SUFFIX_URL, FittingConstants.PADDING_SUFFIX_URL);
-            }
-
-            throw new InvalidOperationException("Invalid image URL format");
-        }
+        }        
     }
 }
