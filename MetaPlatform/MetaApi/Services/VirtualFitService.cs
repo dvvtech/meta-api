@@ -6,22 +6,19 @@ namespace MetaApi.Services
     {
         private readonly ReplicateClientService _replicateClientService;
         private readonly IFittingHistoryRepository _fittingHistoryRepository;
-        private readonly TryOnLimitService _tryOnLimitService;
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly TryOnLimitService _tryOnLimitService;        
         private readonly FileService _fileService;                
         private readonly ILogger<VirtualFitService> _logger;
 
         public VirtualFitService(ReplicateClientService replicateClientService,
                                  IFittingHistoryRepository fittingHistoryCache,
-                                 TryOnLimitService tryOnLimitService,
-                                 IHttpClientFactory httpClientFactory,
+                                 TryOnLimitService tryOnLimitService,                                 
                                  FileService fileService,                                         
                                  ILogger<VirtualFitService> logger)
         {
             _replicateClientService = replicateClientService;
             _fittingHistoryRepository = fittingHistoryCache;
-            _tryOnLimitService = tryOnLimitService;
-            _httpClientFactory = httpClientFactory;
+            _tryOnLimitService = tryOnLimitService;            
             _fileService = fileService;                    
             _logger = logger;
         }

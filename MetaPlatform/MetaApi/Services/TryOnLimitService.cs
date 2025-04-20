@@ -1,20 +1,20 @@
-﻿using MetaApi.Services.Cache;
-using MetaApi.SqlServer.Entities;
+﻿using MetaApi.SqlServer.Entities;
+using MetaApi.SqlServer.Repositories;
 
 namespace MetaApi.Services
 {
     public class TryOnLimitService
     {        
-        private readonly CachedTryOnLimitRepository _cache;
+        private readonly ITryOnLimitRepository _repository;
 
-        public TryOnLimitService(CachedTryOnLimitRepository cache)
+        public TryOnLimitService(ITryOnLimitRepository cache)
         {
-            _cache = cache;
+            _repository = cache;
         }
 
         public async Task<int> GetRemainingUsage(int userId)
         {
-            var userLimit = await _cache.GetLimit(userId);
+            var userLimit = await _repository.GetLimit(userId);
             if (userLimit == null)
             {
                 return 0;
@@ -25,7 +25,7 @@ namespace MetaApi.Services
 
         public async Task<TimeSpan> GetTimeUntilLimitResetAsync(int userId)
         {
-            var userLimit = await _cache.GetLimit(userId);
+            var userLimit = await _repository.GetLimit(userId);
 
             if (userLimit == null)
                 return TimeSpan.Zero;
@@ -68,7 +68,7 @@ namespace MetaApi.Services
             limit.AttemptsUsed++;
             limit.LastResetTime = DateTime.UtcNow;
 
-            await _cache.UpdateLimit(limit);
+            await _repository.UpdateLimit(limit);
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace MetaApi.Services
         /// </summary>
         private async Task<UserTryOnLimitEntity> GetOrCreateLimitAsync(int userId)
         {
-            var limit = await _cache.GetLimit(userId);
+            var limit = await _repository.GetLimit(userId);
 
             if (limit == null)
             {
@@ -116,7 +116,7 @@ namespace MetaApi.Services
                     ResetPeriod = TimeSpan.FromDays(1) // Дефолтный период (1 день)
                 };
 
-                await _cache.AddLimit(limit);
+                await _repository.AddLimit(limit);
             }
 
             return limit;
