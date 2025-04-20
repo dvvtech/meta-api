@@ -11,13 +11,13 @@ namespace MetaApi.Services
         private readonly ILogger<VirtualFitService> _logger;
 
         public VirtualFitService(ReplicateClientService replicateClientService,
-                                 IFittingHistoryRepository fittingHistoryCache,
+                                 IFittingHistoryRepository fittingHistoryRepository,
                                  TryOnLimitService tryOnLimitService,                                 
                                  FileService fileService,                                         
                                  ILogger<VirtualFitService> logger)
         {
             _replicateClientService = replicateClientService;
-            _fittingHistoryRepository = fittingHistoryCache;
+            _fittingHistoryRepository = fittingHistoryRepository;
             _tryOnLimitService = tryOnLimitService;            
             _fileService = fileService;                    
             _logger = logger;
