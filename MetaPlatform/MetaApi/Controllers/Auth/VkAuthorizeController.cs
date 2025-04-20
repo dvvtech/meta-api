@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-
 namespace MetaApi.Controllers
 {
     [Route("api/vk-auth")]
@@ -17,25 +16,7 @@ namespace MetaApi.Controllers
         {
             _logger = logger;
             _authService = authService;
-        }
-
-        [Authorize]
-        [HttpGet("test")]
-        public async Task<IActionResult> Test(string token)
-        {
-            _logger.LogInformation("test");
-
-            /*bool res = await _authService.ValidateToken(token, "", "");
-            if (res)
-            {
-                return Ok();
-            }
-            else
-            {
-                return BadRequest();
-            }*/
-            return Ok("return");
-        }
+        }        
 
         /// <summary>
         /// Возвращаем пользователю урл для авторизации в вк
@@ -47,32 +28,7 @@ namespace MetaApi.Controllers
             _logger.LogInformation("authorize");
 
             var authUrl = _authService.GenerateAuthUrl();            
-            return Ok(authUrl);
-            //return Redirect(authUrl);
-
-            /*string clientId = "53137675";//from config
-            string scope = "email";
-            string redirectUrl = "https://a30944-8332.x.d-f.pw/api/vk-authorize/callback";//from config
-            string state = "XXXRandomZZZ";
-
-            var codeVerifier = GenerateCodeVerifier();
-            var codeChallenge = GenerateCodeChallenge(codeVerifier);
-
-            var authUrl = $"https://id.vk.com/authorize?response_type=code&client_id={clientId}&scope={scope}&redirect_uri={redirectUrl}&state={state}&code_challenge={codeChallenge}&code_challenge_method=S256";
-
-            return Ok(authUrl);*/
-
-            //https://oauth.vk.com/authorize. 
-
-            //string baseUrl = "https://api.vkontakte.ru/oauth/authorize";
-            //string clientId = "53137675";//from config
-            //string redirectUrl = "https://a30944-8332.x.d-f.pw/api/vk-authorize/callback";//"https://mmm.com/vk-authorize/callback";//from config
-            //string scope = "email";
-            //string response_type = "code";
-
-            //string vkAuthUrl = $"{baseUrl}?client_id={clientId}&scope={scope}&redirect_uri={redirectUrl}&response_type={response_type}";
-
-            //return Ok(vkAuthUrl);
+            return Ok(authUrl);            
         }
 
 
@@ -102,11 +58,25 @@ namespace MetaApi.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
-            }
-            // Теперь у вас есть код авторизации, который можно обменять на токен
-            //var accessToken = ExchangeCodeForToken(code);
+            }            
+        }
 
-            //return Ok();
+        [Authorize]
+        [HttpGet("test")]
+        public async Task<IActionResult> Test(string token)
+        {
+            _logger.LogInformation("test");
+
+            /*bool res = await _authService.ValidateToken(token, "", "");
+            if (res)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }*/
+            return Ok("return");
         }
 
     }
