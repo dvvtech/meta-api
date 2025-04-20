@@ -5,9 +5,9 @@ namespace MetaApi.Services
 {
     public class TryOnLimitService
     {        
-        private readonly TryOnLimitCache _cache;
+        private readonly CachedTryOnLimitRepository _cache;
 
-        public TryOnLimitService(TryOnLimitCache cache)
+        public TryOnLimitService(CachedTryOnLimitRepository cache)
         {
             _cache = cache;
         }

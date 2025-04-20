@@ -6,7 +6,7 @@ namespace MetaApi.Services
     {
         public async Task Delete(FittingDeleteRequest request, int userId)
         {
-            await _fittingHistoryCache.Delete(request, userId);     
+            await _fittingHistoryRepository.DeleteAsync(request.FittingResultId, userId);     
         }
     }
 }

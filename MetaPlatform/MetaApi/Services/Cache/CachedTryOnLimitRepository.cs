@@ -4,15 +4,15 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace MetaApi.Services.Cache
 {
-    public class TryOnLimitCache
+    public class CachedTryOnLimitRepository : ITryOnLimitRepository
     {
         private readonly ITryOnLimitRepository _repository;
         private readonly IMemoryCache _memoryCache;
-        private readonly ILogger<TryOnLimitCache> _logger;
+        private readonly ILogger<CachedTryOnLimitRepository> _logger;
 
-        public TryOnLimitCache(ITryOnLimitRepository repository,
+        public CachedTryOnLimitRepository(ITryOnLimitRepository repository,
                                IMemoryCache memoryCache,
-                               ILogger<TryOnLimitCache> logger)
+                               ILogger<CachedTryOnLimitRepository> logger)
         {
             _repository = repository;
             _memoryCache = memoryCache;
@@ -24,10 +24,10 @@ namespace MetaApi.Services.Cache
             var cacheKey = $"try_on_limit_{userId}";
 
             // 1. Проверяем memory cache
-            if (_memoryCache.TryGetValue(cacheKey, out UserTryOnLimitEntity limitMemoryCached))
+            if (_memoryCache.TryGetValue(cacheKey, out UserTryOnLimitEntity cachedLimit))
             {
                 _logger.LogDebug("Memory cache hit for user {UserId}", userId);
-                return limitMemoryCached;
+                return cachedLimit;
             }
 
             // 2. Если нет в memory cache, идем в БД

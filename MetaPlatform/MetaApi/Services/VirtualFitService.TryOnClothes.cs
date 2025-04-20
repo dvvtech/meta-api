@@ -22,7 +22,7 @@ namespace MetaApi.Services
 
                 var fittingResultEntity = CreateFittingResultEntity(request, urlResult, userId);
 
-                await _fittingHistoryCache.AddToHistory(fittingResultEntity);
+                await _fittingHistoryRepository.AddToHistoryAsync(fittingResultEntity);
 
                 await _tryOnLimitService.DecrementTryOnLimitAsync(userId);
 

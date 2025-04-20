@@ -77,12 +77,13 @@ namespace MetaApi.AppStart
             _builder.Services.AddMemoryCache();
 
             _builder.Services.AddScoped<IFittingHistoryRepository, FittingHistoryRepository>();
+            _builder.Services.Decorate<IFittingHistoryRepository, CachedFittingHistoryRepository>();            
+
             _builder.Services.AddScoped<ITryOnLimitRepository, TryOnLimitRepository>();
+            _builder.Services.Decorate<ITryOnLimitRepository, CachedTryOnLimitRepository>();
 
             _builder.Services.AddScoped<ReplicateClientService>();
-            _builder.Services.AddScoped<FittingHistoryCache>();
-            _builder.Services.AddScoped<CachedTryOnLimitRepository>();            
-
+            
             _builder.Services.AddAllHealthChecks(_builder.Configuration);
 
             _builder.Services.AddScoped<TryOnLimitService>();
