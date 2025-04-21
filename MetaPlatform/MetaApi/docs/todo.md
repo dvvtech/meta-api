@@ -1,6 +1,4 @@
 ﻿
-статусы сделать enum
-predictionResult.status == "succeeded"
 
 на верхнем уровне сделать 2 папки src, tests
 

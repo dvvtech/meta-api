@@ -1,6 +1,5 @@
 ﻿using MetaApi.AppStart.Extensions;
 using MetaApi.Configuration;
-using MetaApi.Constants;
 using MetaApi.Core;
 using MetaApi.Core.Configurations;
 using MetaApi.Core.Time;
@@ -61,7 +60,7 @@ namespace MetaApi.AppStart
 
         private void ConfigureClientAPI()
         {
-            _builder.Services.AddHttpClient(ApiNames.REPLICATE_API_CLIENT_NAME, client =>
+            _builder.Services.AddHttpClient<ReplicateClientService>((serviceProvider, client) =>
             {
                 var virtualFitConfig = _builder.Configuration.GetSection(VirtualFitConfig.SectionName).Get<VirtualFitConfig>();
 
@@ -83,10 +82,7 @@ namespace MetaApi.AppStart
             _builder.Services.AddScoped<ITryOnLimitRepository, TryOnLimitRepository>();
             _builder.Services.Decorate<ITryOnLimitRepository, CachedTryOnLimitRepository>();
 
-            _builder.Services.AddScoped<ReplicateClientService>();
-            
             _builder.Services.AddAllHealthChecks(_builder.Configuration);
-
 
             _builder.Services.AddScoped<ISystemTime, SystemTime>();
             _builder.Services.AddScoped<TryOnLimitService>();

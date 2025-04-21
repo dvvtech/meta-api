@@ -1,5 +1,4 @@
-﻿using MetaApi.Constants;
-using MetaApi.Models.VirtualFit;
+﻿using MetaApi.Models.VirtualFit;
 using MetaApi.Utilities;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -11,30 +10,28 @@ namespace MetaApi.Services
 {
     public class ReplicateClientService
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly HttpClient _httpClient;
         private readonly ILogger<ReplicateClientService> _logger;
         private const string PredictionModelVersion = "0513734a452173b8173e907e3a59d19a36266e55b48528559432bd21c7d7e985";
         private const int MaxRetries = 15;
         private const int RetryDelayMilliseconds = 2000;
 
-        public ReplicateClientService(IHttpClientFactory httpClientFactory,
+        public ReplicateClientService(HttpClient httpClient,
                                       ILogger<ReplicateClientService> logger)
         {
-            _httpClientFactory = httpClientFactory;
+            _httpClient = httpClient;
             _logger = logger;
         }
         
         public async Task<Result<string>> ProcessPredictionAsync(FittingRequest request)
-        {
-            var httpClient = _httpClientFactory.CreateClient(ApiNames.REPLICATE_API_CLIENT_NAME);
-
+        {            
             try
             {
                 var predictionRequest = CreatePredictionRequest(request);
                 var jsonContent = SerializeToJson(predictionRequest);
                 var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-                var response = await httpClient.PostAsync("predictions", content);
+                var response = await _httpClient.PostAsync("predictions", content);
                 if (!response.IsSuccessStatusCode)
                 {
                     string httpStatusCode = ((int)response.StatusCode).ToString();
@@ -42,7 +39,7 @@ namespace MetaApi.Services
                 }
 
                 var predictionId = await ExtractPredictionId(response);
-                return await CheckPredictionStatus(httpClient, predictionId);                
+                return await CheckPredictionStatus(_httpClient, predictionId);                
             }
             catch (Exception ex)
             {                
