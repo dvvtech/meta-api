@@ -4,6 +4,8 @@ using MetaApi.Utilities;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using MetaApi.Core.OperationResults.Base;
+using MetaApi.Core.OperationResults;
 
 namespace MetaApi.Services
 {
@@ -21,8 +23,8 @@ namespace MetaApi.Services
             _httpClientFactory = httpClientFactory;
             _logger = logger;
         }
-
-        public async Task<(string status, string outputUrl)> ProcessPredictionAsync(FittingRequest request)
+        
+        public async Task<Result<string>> ProcessPredictionAsync(FittingRequest request)
         {
             var httpClient = _httpClientFactory.CreateClient(ApiNames.REPLICATE_API_CLIENT_NAME);
 
@@ -35,18 +37,16 @@ namespace MetaApi.Services
                 var response = await httpClient.PostAsync("predictions", content);
                 if (!response.IsSuccessStatusCode)
                 {
-                    return ("failed", "");
+                    string httpStatusCode = ((int)response.StatusCode).ToString();
+                    return Result<string>.Failure(PredictionErrors.PredictionRequestFail(httpStatusCode));
                 }
 
                 var predictionId = await ExtractPredictionId(response);
-                var predictionResult = await CheckPredictionStatus(httpClient, predictionId);
-
-                return predictionResult;
+                return await CheckPredictionStatus(httpClient, predictionId);                
             }
             catch (Exception ex)
-            {
-                _logger.LogError($"ProcessPredictionAsync: {ex}");
-                return ("failed", "");
+            {                
+                return Result<string>.Failure(PredictionErrors.PredictionException(ex.ToString()));
             }
         }
 
@@ -87,7 +87,7 @@ namespace MetaApi.Services
             return document.RootElement.GetProperty("id").GetString();
         }
 
-        private async Task<(string status, string outputUrl)> CheckPredictionStatus(HttpClient httpClient, string predictionId)
+        private async Task<Result<string>> CheckPredictionStatus(HttpClient httpClient, string predictionId)
         {                        
             var checkUrl = $"predictions/{predictionId}";
             int retryCount = 0;
@@ -99,7 +99,8 @@ namespace MetaApi.Services
 
                 if (!checkResponse.IsSuccessStatusCode)
                 {
-                    return ("failed", "");
+                    string httpStatusCode = ((int)checkResponse.StatusCode).ToString();
+                    return Result<string>.Failure(PredictionErrors.PredictionStatusFail(httpStatusCode));
                 }
 
                 var checkContent = await checkResponse.Content.ReadAsStringAsync();
@@ -111,20 +112,20 @@ namespace MetaApi.Services
                     var outputUrl = checkDocument.RootElement.GetProperty("output").GetString();
                     if (string.IsNullOrEmpty(outputUrl))
                     {
-                        throw new InvalidOperationException("Output URL is missing or empty.");
+                        return Result<string>.Failure(PredictionErrors.PredictionImageEmpty());                                                
                     }
 
-                    return (status, outputUrl);
+                    return Result<string>.Success(outputUrl);                    
                 }
                 else if (status == "failed")
                 {
-                    return (status, "");
+                    return Result<string>.Failure(PredictionErrors.PredictionProcessFail(checkContent));
                 }
 
                 retryCount++;
             }
 
-            return ("failed", "");
+            return Result<string>.Failure(PredictionErrors.PredictionTimeout());
         }        
     }
 }

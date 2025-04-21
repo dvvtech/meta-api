@@ -43,6 +43,8 @@ namespace MetaApi.Controllers
             Result<FittingResultResponse> resultFit = await _virtualFitService.TryOnClothesAsync(request, Request.Host.Value, userIdResult.Value);                      
             if (resultFit.IsFailure)
             {
+                _logger.LogError($"try-on failed: {resultFit.Error.Description}");
+
                 if (int.TryParse(resultFit.Error.Code, out int httpStatusCode))
                 {
                     return StatusCode(httpStatusCode, new { description = resultFit.Error.Description });
@@ -53,7 +55,6 @@ namespace MetaApi.Controllers
                 }
             }
 
-            _logger.LogInformation("Success try-on");
             return Ok(resultFit.Value);            
         }
 

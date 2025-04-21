@@ -10,15 +10,15 @@ namespace MetaApi.Services
     public partial class VirtualFitService
     {        
         /// <summary>
-        /// Попытка примерки одежды.
+        /// Примерка одежды
         /// </summary>
         public async Task<Result<FittingResultResponse>> TryOnClothesAsync(FittingRequest request, string host, int userId)
         {            
-            var predictionResult = await _replicateClientService.ProcessPredictionAsync(request);
+            Result<string> predictionResult = await _replicateClientService.ProcessPredictionAsync(request);
 
-            if (predictionResult.status == "succeeded")
+            if (predictionResult.IsSuccess)
             {
-                var urlResult = await _fileService.UploadResultFileAsync(predictionResult.outputUrl, host, request.HumanImg);
+                var urlResult = await _fileService.UploadResultFileAsync(predictionResult.Value, host, request.HumanImg);
 
                 var fittingResultEntity = CreateFittingResultEntity(request, urlResult, userId);
 
@@ -32,8 +32,10 @@ namespace MetaApi.Services
                     RemainingUsage = await _tryOnLimitService.GetRemainingUsage(userId)
                 });
             }
-
-            return Result<FittingResultResponse>.Failure(VirtualFitError.VirtualFitServiceError("Something went wrong"));            
+            else
+            {                
+                return Result<FittingResultResponse>.Failure(VirtualFitError.VirtualFitServiceError("Something went wrong"));
+            }
         }        
 
         private FittingResultEntity CreateFittingResultEntity(FittingRequest request, string urlResult, int userId)
