@@ -3,6 +3,7 @@ using MetaApi.Configuration;
 using MetaApi.Constants;
 using MetaApi.Core;
 using MetaApi.Core.Configurations;
+using MetaApi.Core.Time;
 using MetaApi.Services;
 using MetaApi.Services.Auth;
 using MetaApi.Services.Cache;
@@ -86,6 +87,8 @@ namespace MetaApi.AppStart
             
             _builder.Services.AddAllHealthChecks(_builder.Configuration);
 
+
+            _builder.Services.AddScoped<ISystemTime, SystemTime>();
             _builder.Services.AddScoped<TryOnLimitService>();
             _builder.Services.AddScoped<VirtualFitService>();
 

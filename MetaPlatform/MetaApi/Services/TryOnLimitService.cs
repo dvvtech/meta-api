@@ -1,4 +1,5 @@
-﻿using MetaApi.SqlServer.Entities;
+﻿using MetaApi.Core.Time;
+using MetaApi.SqlServer.Entities;
 using MetaApi.SqlServer.Repositories;
 
 namespace MetaApi.Services
@@ -6,10 +7,12 @@ namespace MetaApi.Services
     public class TryOnLimitService
     {        
         private readonly ITryOnLimitRepository _repository;
+        private readonly ISystemTime _systemTime;
 
-        public TryOnLimitService(ITryOnLimitRepository cache)
+        public TryOnLimitService(ITryOnLimitRepository cache, ISystemTime systemTime)
         {
             _repository = cache;
+            _systemTime = systemTime;
         }
 
         public async Task<int> GetRemainingUsage(int userId)
@@ -34,7 +37,7 @@ namespace MetaApi.Services
             DateTime nextResetTime = userLimit.LastResetTime + userLimit.ResetPeriod;
 
             // Текущее время (UTC, чтобы избежать проблем с часовыми поясами)
-            DateTime currentTime = DateTime.UtcNow;
+            DateTime currentTime = _systemTime.UtcNow;
 
             // Если время сброса уже наступило, значит лимит уже сброшен (осталось 0 времени)
             if (currentTime >= nextResetTime)
@@ -66,7 +69,7 @@ namespace MetaApi.Services
             ResetLimitIfPeriodPassed(limit);
 
             limit.AttemptsUsed++;
-            limit.LastResetTime = DateTime.UtcNow;
+            limit.LastResetTime = _systemTime.UtcNow;
 
             await _repository.UpdateLimit(limit);
         }
@@ -87,7 +90,7 @@ namespace MetaApi.Services
         /// </summary>
         private void ResetLimitIfPeriodPassed(UserTryOnLimitEntity limit)
         {
-            var now = DateTime.UtcNow;
+            var now = _systemTime.UtcNow;
             var timeSinceLastReset = now - limit.LastResetTime;
 
             if (timeSinceLastReset >= limit.ResetPeriod)
@@ -112,7 +115,7 @@ namespace MetaApi.Services
                     AccountId = userId,
                     MaxAttempts = 3, // Дефолтное значение (можно вынести в конфиг)
                     AttemptsUsed = 0,
-                    LastResetTime = DateTime.UtcNow,
+                    LastResetTime = _systemTime.UtcNow,
                     ResetPeriod = TimeSpan.FromDays(1) // Дефолтный период (1 день)
                 };
 
@@ -121,5 +124,5 @@ namespace MetaApi.Services
 
             return limit;
         }
-    }
+    }    
 }
