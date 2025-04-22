@@ -1,7 +1,7 @@
 ﻿using MetaApi.Models.VirtualFit;
 
 namespace MetaApi.Services
-{
+{    
     public partial class FileService
     {
         /// <summary>

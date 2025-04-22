@@ -1,5 +1,5 @@
 ﻿using MetaApi.Models.VirtualFit;
-using MetaApi.Services;
+using MetaApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,9 +9,9 @@ namespace MetaApi.Controllers
     [ApiController]
     public class ClothingController : ControllerBase
     {
-        private readonly FileService _fileService;
+        private readonly IFileService _fileService;
 
-        public ClothingController(FileService fileService)
+        public ClothingController(IFileService fileService)
         {
             _fileService = fileService;
         }

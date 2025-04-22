@@ -1,6 +1,8 @@
-﻿namespace MetaApi.Services
+﻿using MetaApi.Services.Interfaces;
+
+namespace MetaApi.Services
 {
-    public partial class FileService
+    public partial class FileService : IFileService
     {
         private readonly FileCrcHostedService _fileCrcService;
         private readonly ImageService _imageService;

@@ -90,7 +90,7 @@ namespace MetaApi.AppStart
             _builder.Services.AddScoped<IVirtualFitService, VirtualFitService>();
 
             _builder.Services.AddScoped<ImageService>();
-            _builder.Services.AddScoped<FileService>();
+            _builder.Services.AddScoped<IFileService, FileService>();
 
             _builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 

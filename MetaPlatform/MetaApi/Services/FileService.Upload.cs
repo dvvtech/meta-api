@@ -301,7 +301,7 @@ namespace MetaApi.Services
             return double.TryParse(parts[1], out var ratio) ? ratio : null;
         }
 
-        public async Task<byte[]> GetImageResult(string imageUrl)
+        private async Task<byte[]> GetImageResult(string imageUrl)
         {
             byte[] imageBytes;
             using (var httpClient = _httpClientFactory.CreateClient())

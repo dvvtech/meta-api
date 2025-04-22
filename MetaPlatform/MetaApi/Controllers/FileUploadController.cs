@@ -1,5 +1,5 @@
 ﻿using MetaApi.Models.VirtualFit;
-using MetaApi.Services;
+using MetaApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,10 +12,10 @@ namespace MetaApi.Controllers
     [ApiController]
     public class FileUploadController : ControllerBase
     {
-        private readonly FileService _fileService;
+        private readonly IFileService _fileService;
         private readonly ILogger<FileUploadController> _logger;
 
-        public FileUploadController(FileService fileService, ILogger<FileUploadController> logger)
+        public FileUploadController(IFileService fileService, ILogger<FileUploadController> logger)
         {
             _fileService = fileService;
             _logger = logger;
