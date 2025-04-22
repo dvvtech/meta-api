@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MetaApi.Models.VirtualFit;
-using MetaApi.Services;
 using MetaApi.Core.OperationResults.Base;
 using Microsoft.AspNetCore.Authorization;
 using MetaApi.Extensions;
+using MetaApi.Services.Interfaces;
 
 namespace MetaApi.Controllers
 {
@@ -14,10 +14,10 @@ namespace MetaApi.Controllers
     [ApiController]
     public class VirtualFitController : ControllerBase
     {
-        private readonly VirtualFitService _virtualFitService;        
+        private readonly IVirtualFitService _virtualFitService;        
         private readonly ILogger<VirtualFitController> _logger;        
 
-        public VirtualFitController(VirtualFitService virtualFitService,                                    
+        public VirtualFitController(IVirtualFitService virtualFitService,                                    
                                     ILogger<VirtualFitController> logger)
         {
             _virtualFitService = virtualFitService;                        

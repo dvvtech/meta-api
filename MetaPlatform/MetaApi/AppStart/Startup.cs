@@ -6,6 +6,7 @@ using MetaApi.Core.Time;
 using MetaApi.Services;
 using MetaApi.Services.Auth;
 using MetaApi.Services.Cache;
+using MetaApi.Services.Interfaces;
 using MetaApi.SqlServer.Repositories;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 
@@ -86,7 +87,7 @@ namespace MetaApi.AppStart
 
             _builder.Services.AddScoped<ISystemTime, SystemTime>();
             _builder.Services.AddScoped<TryOnLimitService>();
-            _builder.Services.AddScoped<VirtualFitService>();
+            _builder.Services.AddScoped<IVirtualFitService, VirtualFitService>();
 
             _builder.Services.AddScoped<ImageService>();
             _builder.Services.AddScoped<FileService>();

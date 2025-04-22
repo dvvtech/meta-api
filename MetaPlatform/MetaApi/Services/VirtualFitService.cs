@@ -1,8 +1,9 @@
-﻿using MetaApi.SqlServer.Repositories;
+﻿using MetaApi.Services.Interfaces;
+using MetaApi.SqlServer.Repositories;
 
 namespace MetaApi.Services
-{
-    public partial class VirtualFitService
+{    
+    public partial class VirtualFitService : IVirtualFitService
     {
         private readonly ReplicateClientService _replicateClientService;
         private readonly IFittingHistoryRepository _fittingHistoryRepository;
