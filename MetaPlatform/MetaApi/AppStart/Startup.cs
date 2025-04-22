@@ -61,7 +61,7 @@ namespace MetaApi.AppStart
 
         private void ConfigureClientAPI()
         {
-            _builder.Services.AddHttpClient<ReplicateClientService>((serviceProvider, client) =>
+            _builder.Services.AddHttpClient<IReplicateClientService, ReplicateClientService>((serviceProvider, client) =>
             {
                 var virtualFitConfig = _builder.Configuration.GetSection(VirtualFitConfig.SectionName).Get<VirtualFitConfig>();
 

@@ -5,10 +5,11 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using MetaApi.Core.OperationResults.Base;
 using MetaApi.Core.OperationResults;
+using MetaApi.Services.Interfaces;
 
 namespace MetaApi.Services
-{
-    public class ReplicateClientService
+{    
+    public class ReplicateClientService : IReplicateClientService
     {
         private readonly HttpClient _httpClient;
         private readonly ILogger<ReplicateClientService> _logger;
