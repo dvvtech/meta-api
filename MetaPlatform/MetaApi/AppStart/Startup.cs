@@ -86,7 +86,7 @@ namespace MetaApi.AppStart
             _builder.Services.AddAllHealthChecks(_builder.Configuration);
 
             _builder.Services.AddScoped<ISystemTime, SystemTime>();
-            _builder.Services.AddScoped<TryOnLimitService>();
+            _builder.Services.AddScoped<ITryOnLimitService, TryOnLimitService>();
             _builder.Services.AddScoped<IVirtualFitService, VirtualFitService>();
 
             _builder.Services.AddScoped<ImageService>();

@@ -1,7 +1,7 @@
 ﻿using MetaApi.Core.OperationResults.Base;
 using MetaApi.Extensions;
 using MetaApi.Models.VirtualFit;
-using MetaApi.Services;
+using MetaApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,10 +11,10 @@ namespace MetaApi.Controllers
     [ApiController]
     public class TryOnLimitController : ControllerBase
     {
-        private readonly TryOnLimitService _tryOnLimitService;
+        private readonly ITryOnLimitService _tryOnLimitService;
         private readonly ILogger<TryOnLimitController> _logger;
 
-        public TryOnLimitController(TryOnLimitService tryOnLimitService, 
+        public TryOnLimitController(ITryOnLimitService tryOnLimitService, 
                                     ILogger<TryOnLimitController> logger)
         {
             _tryOnLimitService = tryOnLimitService;

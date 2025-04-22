@@ -1,10 +1,11 @@
 ﻿using MetaApi.Core.Time;
+using MetaApi.Services.Interfaces;
 using MetaApi.SqlServer.Entities;
 using MetaApi.SqlServer.Repositories;
 
 namespace MetaApi.Services
-{
-    public class TryOnLimitService
+{    
+    public class TryOnLimitService : ITryOnLimitService
     {        
         private readonly ITryOnLimitRepository _repository;
         private readonly ISystemTime _systemTime;
@@ -75,7 +76,7 @@ namespace MetaApi.Services
         }
 
         /// <summary>
-        /// Получает оставшиеся попытки
+        /// Возвращает оставшиеся попытки
         /// </summary>
         public async Task<int> GetRemainingTriesAsync(int userId)
         {
