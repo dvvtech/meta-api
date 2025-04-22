@@ -13,11 +13,11 @@ namespace MetaApi.Services
         private readonly JwtProvider _jwtProvider;
         private readonly ILogger<VkAuthService> _logger;
         private readonly VkAuthConfig _authConfig;
-        private readonly AccountRepository _accountRepository;
+        private readonly IAccountRepository _accountRepository;
 
         public VkAuthService(IMemoryCache cache,
                              ILogger<VkAuthService> logger,                             
-                             AccountRepository accountRepository,
+                             IAccountRepository accountRepository,
                              JwtProvider jwtProvider,
                              IOptions<VkAuthConfig> authConfig)
         {

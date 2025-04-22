@@ -4,7 +4,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MetaApi.SqlServer.Repositories
 {
-    public class AccountRepository
+    public interface IAccountRepository
+    {
+        Task<AccountEntity?> GetById(int userId);
+
+        Task<AccountEntity?> GetByExternalId(string externalId);
+
+        Task<AccountEntity?> GetByRefreshToken(string refreshToken);        
+
+        Task<int> Add(AccountEntity user);
+
+        Task UpdateRefreshToken(AccountEntity accountEntity);
+
+        Task SaveChanges();
+    }
+
+    public class AccountRepository : IAccountRepository
     {
         private readonly MetaDbContext _dbContext;
 

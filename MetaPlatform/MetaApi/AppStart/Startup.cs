@@ -91,7 +91,7 @@ namespace MetaApi.AppStart
             _builder.Services.AddScoped<ImageService>();
             _builder.Services.AddScoped<FileService>();
 
-            _builder.Services.AddScoped<AccountRepository>();
+            _builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
             _builder.Services.AddSingleton<JwtProvider>();            
             _builder.Services.AddScoped<AuthService>();

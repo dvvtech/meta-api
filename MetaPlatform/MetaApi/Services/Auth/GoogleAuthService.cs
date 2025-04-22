@@ -9,11 +9,11 @@ namespace MetaApi.Services.Auth
     {
         private readonly GoogleAuthConfig _authConfig;        
         private readonly JwtProvider _jwtProvider;
-        private readonly AccountRepository _accountRepository;
+        private readonly IAccountRepository _accountRepository;
         private readonly ILogger<GoogleAuthService> _logger;
 
         public GoogleAuthService(IOptions<GoogleAuthConfig> authConfig,
-                                 AccountRepository accountRepository,                                 
+                                 IAccountRepository accountRepository,                                 
                                  JwtProvider jwtProvider,
                                  ILogger<GoogleAuthService> logger)
         {

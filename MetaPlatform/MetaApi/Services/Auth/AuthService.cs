@@ -8,10 +8,10 @@ namespace MetaApi.Services.Auth
 {
     public class AuthService
     {        
-        private readonly AccountRepository _accountRepository;
+        private readonly IAccountRepository _accountRepository;
         private readonly JwtProvider _jwtProvider;
 
-        public AuthService(AccountRepository accountRepository,
+        public AuthService(IAccountRepository accountRepository,
                            JwtProvider jwtProvider)
         {            
             _accountRepository = accountRepository;
