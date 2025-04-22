@@ -39,6 +39,13 @@ namespace MetaApi.Controllers
             {
                 return StatusCode(500, $"Внутренняя ошибка сервера: {ex.Message}");
             }
-        }        
+        }
+
+        [HttpGet("test")]
+        public IResult Test()
+        {
+            //_fileService.UploadResultFileAsync("https://a33140-9deb.k.d-f.pw/oldv2/woman/85983a8d-e655-447d-85d0-5233aec3d332_t.png", "", "");      
+            return Results.Ok("777");
+        }
     }
 }
