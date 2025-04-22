@@ -31,7 +31,7 @@ namespace MetaApi.Services
             }
 
             string uniqueFileName = Guid.NewGuid().ToString();
-            var uploadsPath = Path.Combine(_env.WebRootPath, fileType.GetFolderName());
+            var uploadsPath = Path.Combine(_webRootPath, fileType.GetFolderName());
 
             string padingFileName = PaddingAndSave(file, uploadsPath, uniqueFileName, out float imageRatio);
 
@@ -256,7 +256,7 @@ namespace MetaApi.Services
 
         private async Task<string> SaveFileAsync(string imageUrl, Image image, FileType fileType)
         {
-            var uploadsPath = Path.Combine(_env.WebRootPath, fileType.GetFolderName());
+            var uploadsPath = Path.Combine(_webRootPath, fileType.GetFolderName());
             if (!Directory.Exists(uploadsPath))
             {
                 Directory.CreateDirectory(uploadsPath);

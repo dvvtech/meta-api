@@ -21,7 +21,7 @@ namespace MetaApi.Services
 
         private ClothingItem[] GetClothingItems(string host, FileType fileType)
         {
-            var uploadsPath = Path.Combine(_env.WebRootPath, fileType.GetFolderName());
+            var uploadsPath = Path.Combine(_webRootPath, fileType.GetFolderName());
             if (Directory.Exists(uploadsPath))
             {
                 var clothingItem = new List<ClothingItem>();

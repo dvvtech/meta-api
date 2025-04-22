@@ -90,7 +90,16 @@ namespace MetaApi.AppStart
             _builder.Services.AddScoped<IVirtualFitService, VirtualFitService>();
 
             _builder.Services.AddScoped<ImageService>();
-            _builder.Services.AddScoped<IFileService, FileService>();
+            _builder.Services.AddScoped<IFileService, FileService>(serviceProvider =>
+            {
+                var fileCrcHostedService = serviceProvider.GetRequiredService<FileCrcHostedService>();
+                var imageService = serviceProvider.GetRequiredService<ImageService>();
+                var httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
+                var logger = serviceProvider.GetRequiredService<ILogger<FileService>>();
+                var webHostEnvironment = serviceProvider.GetRequiredService<IWebHostEnvironment>();
+
+                return new FileService(fileCrcHostedService, imageService, httpClientFactory, logger, webHostEnvironment.WebRootPath);
+            });
 
             _builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
