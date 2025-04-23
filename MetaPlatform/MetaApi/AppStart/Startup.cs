@@ -2,7 +2,9 @@
 using MetaApi.Configuration;
 using MetaApi.Core;
 using MetaApi.Core.Configurations;
+using MetaApi.Core.Interfaces;
 using MetaApi.Core.Time;
+using MetaApi.Infrastructure;
 using MetaApi.Services;
 using MetaApi.Services.Auth;
 using MetaApi.Services.Cache;
@@ -36,6 +38,7 @@ namespace MetaApi.AppStart
                         
             _builder.Services.ConfigureCors();
             ConfigureDatabase(builder.Configuration);
+            AddInfrastructure();
             AddServices();
 
             builder.Services.AddControllers();
@@ -49,6 +52,11 @@ namespace MetaApi.AppStart
 
             _builder.Services.AddOptions<JwtConfig>()
                 .Bind(_builder.Configuration.GetSection(JwtConfig.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            _builder.Services.AddOptions<SmtpConfig>()
+                .Bind(_builder.Configuration.GetSection(SmtpConfig.SectionName))
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
@@ -70,6 +78,25 @@ namespace MetaApi.AppStart
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {virtualFitConfig.ApiToken}");
                 client.DefaultRequestHeaders.Add("Prefer", "wait");
             });            
+        }
+
+        private void AddInfrastructure()
+        {
+            _builder.Services.AddSingleton<IEmailSender>(provider =>
+            {
+                var smtpConfig = _builder.Configuration.GetSection(SmtpConfig.SectionName).Get<SmtpConfig>();
+
+                var configuration = provider.GetRequiredService<IConfiguration>();
+                var logger = provider.GetRequiredService<ILogger<EmailSender>>();
+
+                return new EmailSender(
+                    smtpConfig.Host,
+                    smtpConfig.Port,
+                    smtpConfig.Username,
+                    smtpConfig.Password,
+                    logger
+                );
+            });
         }
 
         private void AddServices()

@@ -1,6 +1,81 @@
-﻿
+﻿заюзать  cancellationToken в Task StartAsync(CancellationToken cancellationToken)
+
+выделить в отдельный ммикросервис функционал по сохраанению и получению ссылки на файл
+
+выделить в отдельный ммикросервис функционал с авторизацией
+
+и микросервис с основным функционалом примерка + ограничение на кол-во примерок
+
+FileCrcHostedService нужно как-то отделить от других серввисов. Возможно другие сервисы переедут
+в Core а этот тут останется
+
+на вход и выход в репозиторий должны поступать доменные объекты
+и мапинг внутри репозитория
+
+на вход и выход в сервис должны поступать дто объекты
+
+на вход контроллера должны поступать реквесты а на выходе респонс или дто
+
+в контроллере не нужно выполнять мапинг
+дто в доменную модель и наоборот происходит вннутри сервиса
+
+доменные объекты могут содержать логику
+Доменные модели часто содержат методы и правила, которые должны быть выполнены при создании или изменении объекта. Эти правила лучше всего соблюдать внутри сервиса, а не в контроллере.
+
+доменные модели луччше так описывать
+public class User
+{
+    public int Id { get; private set; }
+    public string Name { get; private set; }
+    public string Email { get; private set; }
+
+    public User(string name, string email)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Name cannot be empty.");
+        if (string.IsNullOrWhiteSpace(email))
+            throw new ArgumentException("Email cannot be empty.");
+
+        Name = name;
+        Email = email;
+    }
+
+    public void ChangeEmail(string newEmail)
+    {
+        if (string.IsNullOrWhiteSpace(newEmail))
+            throw new ArgumentException("Email cannot be empty.");
+
+        Email = newEmail;
+    }
+}
+
+а дто так
+public class UserDto
+{
+    public string Name { get; set; }
+    public string Email { get; set; }
+}
+
+public class UserFactory
+{
+    public static User CreateFromDto(UserDto userDto)
+    {
+        return new User(userDto.Name, userDto.Email);
+    }
+}
+var user = UserFactory.CreateFromDto(userDto);
 
 на верхнем уровне сделать 2 папки src, tests
+
+добавить интерфейс дляя добавления файлов    чтоб можно было подменить на амазон s3
+
+в Core не должно быть Entity сущностей
+только доменные объекты
+внутри метода TryOnClothesAsync создается FittingResultEntity
+вместо этого создать доменный объект FittingResult и смапить его в FittingResultEntity
+
+отрефачить метод в ReplicateClientService ProcessPredictionAsync
+название метода другое
 
 подумать куда добавить SystemTime и ISystemTime
 
