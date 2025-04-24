@@ -20,22 +20,22 @@ namespace MetaApi.Services.Cache
         }
 
         public async Task<FittingHistory[]> GetHistoryAsync(int accountId)
-        {
-            var cacheKey = $"fitting_history_{accountId}";
+        {            
+            var cacheKey = GetCacheKey(accountId);
 
             // 1. Проверяем memory cache
-            if (_memoryCache.TryGetValue(cacheKey, out FittingHistory[] memoryCached))
+            if (_memoryCache.TryGetValue(cacheKey, out FittingHistory[] cachedData))
             {
                 _logger.LogDebug("Memory cache hit for user {UserId}", accountId);
-                return memoryCached;
+                return cachedData;
             }
 
             // 2. Если нет в memory cache, идем в БД
             _logger.LogDebug("Loading history from DB for user {UserId}", accountId);
-            FittingHistory[] dbResults = await _repository.GetHistoryAsync(accountId);            
-            
-            // 3. Сохраняем в memory cache            
-            _memoryCache.Set(cacheKey, dbResults);
+            FittingHistory[] dbResults = await _repository.GetHistoryAsync(accountId);
+
+            //3.Сохраняем в memory cache
+            SetCache(cacheKey, dbResults);
 
             return dbResults;
         }
@@ -43,30 +43,15 @@ namespace MetaApi.Services.Cache
         public async Task<int> AddToHistoryAsync(FittingHistory item)
         {
             // 1. Сначала сохраняем в БД
-            int itemId = await _repository.AddToHistoryAsync(item);            
+            int itemId = await _repository.AddToHistoryAsync(item);
 
-            // 2. Пытаемся получить текущий кеш
-            var cacheKey = $"fitting_history_{item.AccountId}";            
-            if (_memoryCache.TryGetValue(cacheKey, out FittingHistory[] cachedHistory))
-            {
-                // 3. Если кеш существует - обновляем его
-                var updatedHistory = cachedHistory
-                    .Append(FittingHistory.Create(id: itemId,
-                                                  accountId: item.AccountId,
-                                                  garmentImgUrl: item.GarmentImgUrl,
-                                                  humanImgUrl: item.HumanImgUrl,
-                                                  resultImgUrl: item.ResultImgUrl))                      
-                    .ToArray();
-
-                _memoryCache.Set(cacheKey, updatedHistory);
-                _logger.LogDebug("Updated memory cache for user {UserId}", item.AccountId);
-            }
-            else
-            {
-                // 4. Если кеша нет - просто инвалидируем (при следующем GetHistory кеш заполнится)
-                _memoryCache.Remove(cacheKey);
-                _logger.LogDebug("Invalidated memory cache for user {UserId}", item.AccountId);
-            }
+            // Обновляем кэш
+            UpdateCacheAfterAddition(item.AccountId,
+                                     FittingHistory.Create(id: itemId,
+                                                           accountId: item.AccountId,
+                                                           garmentImgUrl: item.GarmentImgUrl,
+                                                           humanImgUrl: item.HumanImgUrl,
+                                                           resultImgUrl: item.ResultImgUrl));
 
             return itemId;
         }
@@ -76,29 +61,56 @@ namespace MetaApi.Services.Cache
             // 1. Находим и "удаляем" запись (помечаем IsDeleted)
             await _repository.DeleteAsync(fittingResultId, userId);
 
-            // 2. Обновляем кеш                        
-            var cacheKey = $"fitting_history_{userId}";            
-            await UpdateCacheAfterDeletion(userId, fittingResultId);
+            // 2. Обновляем кеш                                    
+            UpdateCacheAfterDeletion(userId, fittingResultId);
+        }        
+
+        #region Helper Methods
+
+        private string GetCacheKey(int userId) => $"fitting_history_{userId}";
+
+        private void SetCache(string cacheKey, FittingHistory[] data)
+        {
+            _memoryCache.Set(cacheKey, data);
+            _logger.LogDebug("Updated memory cache for key {CacheKey}", cacheKey);
         }
 
-        private async Task UpdateCacheAfterDeletion(int userId, int deletedId)
+        private void UpdateCacheAfterAddition(int userId, FittingHistory newItem)
         {
-            var cacheKey = $"fitting_history_{userId}";
+            var cacheKey = GetCacheKey(userId);
 
             if (_memoryCache.TryGetValue(cacheKey, out FittingHistory[] cachedData))
             {
-                var updatedData = cachedData
-                    .Where(x => x.Id != deletedId)
-                    .ToArray();
-
-                _memoryCache.Set(cacheKey, updatedData);
-                _logger.LogDebug("Cache updated after deletion for user {UserId}", userId);
+                var updatedData = cachedData.Append(newItem).ToArray();
+                SetCache(cacheKey, updatedData);
             }
             else
             {
-                // Если кеша нет - ничего не делаем, он загрузится при следующем запросе
+                InvalidateCache(cacheKey);
+            }
+        }
+
+        private void UpdateCacheAfterDeletion(int userId, int deletedId)
+        {
+            var cacheKey = GetCacheKey(userId);
+
+            if (_memoryCache.TryGetValue(cacheKey, out FittingHistory[] cachedData))
+            {
+                var updatedData = cachedData.Where(x => x.Id != deletedId).ToArray();
+                SetCache(cacheKey, updatedData);
+            }
+            else
+            {
                 _logger.LogDebug("No cache to update for user {UserId}", userId);
             }
         }
+
+        private void InvalidateCache(string cacheKey)
+        {
+            _memoryCache.Remove(cacheKey);
+            _logger.LogDebug("Invalidated memory cache for key {CacheKey}", cacheKey);
+        }
+
+        #endregion
     }
 }
