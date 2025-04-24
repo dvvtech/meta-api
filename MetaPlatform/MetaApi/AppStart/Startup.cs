@@ -3,6 +3,7 @@ using MetaApi.AppStart.Extensions;
 using MetaApi.Configuration;
 using MetaApi.Core.Configurations;
 using MetaApi.Core.Interfaces.Infrastructure;
+using MetaApi.Core.Interfaces.Repositories;
 using MetaApi.Services;
 using MetaApi.Services.Auth;
 using MetaApi.Services.Cache;

@@ -1,6 +1,6 @@
 ﻿using MetaApi.Configuration;
 using MetaApi.Core.Interfaces.Infrastructure;
-using MetaApi.SqlServer.Repositories;
+using MetaApi.Core.Interfaces.Repositories;
 using Microsoft.Extensions.Options;
 
 namespace MetaApi.Services.Auth

@@ -1,8 +1,8 @@
 ﻿using MetaApi.Core.Domain.Account;
 using MetaApi.Core.Interfaces.Infrastructure;
+using MetaApi.Core.Interfaces.Repositories;
 using MetaApi.Core.OperationResults;
 using MetaApi.Core.OperationResults.Base;
-using MetaApi.SqlServer.Repositories;
 
 namespace MetaApi.Services.Auth
 {

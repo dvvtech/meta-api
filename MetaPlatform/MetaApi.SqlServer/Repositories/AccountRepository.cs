@@ -1,25 +1,11 @@
 ﻿using MetaApi.Core.Domain.Account;
+using MetaApi.Core.Interfaces.Repositories;
 using MetaApi.SqlServer.Context;
 using MetaApi.SqlServer.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace MetaApi.SqlServer.Repositories
-{
-    public interface IAccountRepository
-    {
-        Task<Account?> GetById(int userId);
-
-        Task<Account?> GetByExternalId(string externalId);
-
-        Task<Account?> GetByRefreshToken(string refreshToken);        
-
-        Task<int> Add(Account user);
-
-        Task UpdateRefreshToken(Account accountEntity);
-
-        Task SaveChanges();
-    }
-
+{    
     public class AccountRepository : IAccountRepository
     {
         private readonly MetaDbContext _dbContext;

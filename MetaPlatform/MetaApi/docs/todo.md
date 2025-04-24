@@ -1,4 +1,6 @@
-﻿заюзать  cancellationToken в Task StartAsync(CancellationToken cancellationToken)
+﻿добавить интерфейс в AuthService
+
+заюзать  cancellationToken в Task StartAsync(CancellationToken cancellationToken)
 
 выделить в отдельный ммикросервис функционал по сохранению и получению ссылки на файл
 
