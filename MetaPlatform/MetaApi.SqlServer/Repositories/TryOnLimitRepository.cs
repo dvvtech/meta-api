@@ -1,17 +1,11 @@
 ﻿using MetaApi.Core.Domain.UserTryOnLimit;
+using MetaApi.Core.Interfaces.Repositories;
 using MetaApi.SqlServer.Context;
 using MetaApi.SqlServer.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace MetaApi.SqlServer.Repositories
-{
-    public interface ITryOnLimitRepository
-    {
-        Task<UserTryOnLimit> GetLimit(int userId);
-        Task AddLimit(UserTryOnLimit userTryOnLimitEntity);
-        Task UpdateLimit(UserTryOnLimit userTryOnLimitEntity);
-    }
-
+{    
     public class TryOnLimitRepository : ITryOnLimitRepository
     {
         private readonly MetaDbContext _dbContext;

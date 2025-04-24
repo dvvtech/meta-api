@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MetaApi.Core.Domain.UserTryOnLimit;
 
 namespace MetaApi.Core.Interfaces.Repositories
 {
-    //public interface ITryOnLimitRepository
-    //{
-    //    Task<UserTryOnLimitEntity> GetLimit(int userId);
-    //    Task AddLimit(UserTryOnLimitEntity userTryOnLimitEntity);
-    //    Task UpdateLimit(UserTryOnLimitEntity userTryOnLimitEntity);
-    //}
+    public interface ITryOnLimitRepository
+    {
+        Task<UserTryOnLimit> GetLimit(int userId);
+        Task AddLimit(UserTryOnLimit userTryOnLimitEntity);
+        Task UpdateLimit(UserTryOnLimit userTryOnLimitEntity);
+    }
 }

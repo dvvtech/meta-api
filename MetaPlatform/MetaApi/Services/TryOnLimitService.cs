@@ -1,7 +1,7 @@
 ﻿using MetaApi.Core.Domain.UserTryOnLimit;
 using MetaApi.Core.Interfaces.Infrastructure;
+using MetaApi.Core.Interfaces.Repositories;
 using MetaApi.Services.Interfaces;
-using MetaApi.SqlServer.Repositories;
 
 namespace MetaApi.Services
 {    

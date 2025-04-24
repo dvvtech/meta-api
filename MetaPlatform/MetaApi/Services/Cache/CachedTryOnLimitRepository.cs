@@ -1,5 +1,5 @@
 ﻿using MetaApi.Core.Domain.UserTryOnLimit;
-using MetaApi.SqlServer.Repositories;
+using MetaApi.Core.Interfaces.Repositories;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace MetaApi.Services.Cache
