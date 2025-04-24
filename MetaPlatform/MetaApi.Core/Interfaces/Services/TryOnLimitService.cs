@@ -1,4 +1,5 @@
-﻿namespace MetaApi.Services.Interfaces
+﻿
+namespace MetaApi.Core.Interfaces.Services
 {
     public interface ITryOnLimitService
     {

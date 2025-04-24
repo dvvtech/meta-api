@@ -1,7 +1,7 @@
 ﻿
-ITryOnLimitRepository должен возвращать доменный объект и в кеше хранится должны доменные объкты
 
-FittingHistoryRepository чтоб на вход и выход были доменные объекты по аналогии с AccountRepository
+Перенести сервисы из апи в core
+
 
 заюзать  cancellationToken в Task StartAsync(CancellationToken cancellationToken)
 

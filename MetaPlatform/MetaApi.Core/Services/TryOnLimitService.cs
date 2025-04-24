@@ -1,12 +1,12 @@
 ﻿using MetaApi.Core.Domain.UserTryOnLimit;
 using MetaApi.Core.Interfaces.Infrastructure;
 using MetaApi.Core.Interfaces.Repositories;
-using MetaApi.Services.Interfaces;
+using MetaApi.Core.Interfaces.Services;
 
-namespace MetaApi.Services
-{    
+namespace MetaApi.Core.Services
+{
     public class TryOnLimitService : ITryOnLimitService
-    {        
+    {
         private readonly ITryOnLimitRepository _repository;
         private readonly ISystemTime _systemTime;
 
@@ -84,7 +84,7 @@ namespace MetaApi.Services
             ResetLimitIfPeriodPassed(limit);
 
             return limit.MaxAttempts - limit.AttemptsUsed;
-        }        
+        }
 
         /// <summary>
         /// Сбрасывает счетчик, если прошел заданный период
@@ -116,11 +116,11 @@ namespace MetaApi.Services
                                               attemptsUsed: 0,
                                               lastResetTime: _systemTime.UtcNow,
                                               resetPeriod: TimeSpan.FromDays(1));
-                
+
                 await _repository.AddLimit(limit);
             }
 
             return limit;
         }
-    }    
+    }
 }

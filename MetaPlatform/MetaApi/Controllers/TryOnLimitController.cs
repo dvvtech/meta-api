@@ -1,7 +1,7 @@
-﻿using MetaApi.Core.OperationResults.Base;
+﻿using MetaApi.Core.Interfaces.Services;
+using MetaApi.Core.OperationResults.Base;
 using MetaApi.Extensions;
 using MetaApi.Models.VirtualFit;
-using MetaApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

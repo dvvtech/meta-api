@@ -1,4 +1,5 @@
 ﻿using MetaApi.Core.Interfaces.Repositories;
+using MetaApi.Core.Interfaces.Services;
 using MetaApi.Services.Interfaces;
 
 

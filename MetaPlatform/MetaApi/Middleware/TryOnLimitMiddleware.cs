@@ -1,4 +1,4 @@
-﻿using MetaApi.Services;
+﻿using MetaApi.Core.Interfaces.Services;
 using System.Security.Claims;
 
 namespace MetaApi.Middleware
@@ -12,7 +12,7 @@ namespace MetaApi.Middleware
             _next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, TryOnLimitService limitService)
+        public async Task InvokeAsync(HttpContext context, ITryOnLimitService limitService)
         {
             if (context.Request.Path.StartsWithSegments("/api/virtual-fit/try-on"))
             {
