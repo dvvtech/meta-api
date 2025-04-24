@@ -1,6 +1,6 @@
-﻿using MetaApi.Core.OperationResults.Base;
+﻿using MetaApi.Core.Domain.FittingHistory;
+using MetaApi.Core.OperationResults.Base;
 using MetaApi.Models.VirtualFit;
-using MetaApi.SqlServer.Entities.VirtualFit;
 
 namespace MetaApi.Services
 {
@@ -8,7 +8,7 @@ namespace MetaApi.Services
     {
         public async Task<Result<FittingHistoryResponse[]>> GetHistory(int userId)
         {
-            FittingResultEntity[] fittingResults = await _fittingHistoryRepository.GetHistoryAsync(userId);
+            FittingHistory[] fittingResults = await _fittingHistoryRepository.GetHistoryAsync(userId);
             var fittingHistories = fittingResults.Select(s => new FittingHistoryResponse
             {
                 Id = s.Id,

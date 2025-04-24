@@ -57,6 +57,7 @@ namespace MetaApi.SqlServer.Repositories
 
             await _dbContext.Accounts.AddAsync(newAccount);
             await _dbContext.SaveChangesAsync();
+
             return newAccount.Id;
         }
 

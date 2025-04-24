@@ -1,6 +1,4 @@
 ﻿
-using System.Runtime.InteropServices;
-
 namespace MetaApi.Core.Domain.Account
 {
     public class Account
@@ -38,10 +36,10 @@ namespace MetaApi.Core.Domain.Account
         }
 
         public static Account Create(string externalId,
-                        string userName,
-                        string jwtRefreshToken,
-                        AuthType authType,
-                        Role role)
+                                     string userName,
+                                     string jwtRefreshToken,
+                                     AuthType authType,
+                                     Role role)
         {
             return new Account(externalId, userName, jwtRefreshToken, authType, role);
         }

@@ -1,9 +1,9 @@
 ﻿using MetaApi.Core.OperationResults.Base;
 using MetaApi.Core.OperationResults;
 using MetaApi.Models.VirtualFit;
-using MetaApi.SqlServer.Entities.VirtualFit;
 using MetaApi.Consts;
 using MetaApi.Utilities;
+using MetaApi.Core.Domain.FittingHistory;
 
 namespace MetaApi.Services
 {
@@ -20,9 +20,9 @@ namespace MetaApi.Services
             {
                 var urlResult = await _fileService.UploadResultFileAsync(predictionResult.Value, host, request.HumanImg);
 
-                var fittingResultEntity = CreateFittingResultEntity(request, urlResult, userId);
+                var fittingHistory = CreateFittingHistory(request, urlResult, userId);
 
-                await _fittingHistoryRepository.AddToHistoryAsync(fittingResultEntity);
+                await _fittingHistoryRepository.AddToHistoryAsync(fittingHistory);
 
                 await _tryOnLimitService.DecrementTryOnLimitAsync(userId);
 
@@ -38,18 +38,15 @@ namespace MetaApi.Services
             }
         }        
 
-        private FittingResultEntity CreateFittingResultEntity(FittingRequest request, string urlResult, int userId)
+        private FittingHistory CreateFittingHistory(FittingRequest request, string urlResult, int userId)
         {
-            return new FittingResultEntity
-            {
-                GarmentImgUrl = ImageUrlHelper.GetUrl(request.GarmImg).Replace(FittingConstants.PADDING_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL)
+            return FittingHistory.Create(
+                accountId: userId,
+                garmentImgUrl: ImageUrlHelper.GetUrl(request.GarmImg).Replace(FittingConstants.PADDING_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL)
                                                                       .Replace(FittingConstants.FULLSIZE_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL),
-                HumanImgUrl = ImageUrlHelper.GetUrl(request.HumanImg).Replace(FittingConstants.PADDING_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL)
+                humanImgUrl: ImageUrlHelper.GetUrl(request.HumanImg).Replace(FittingConstants.PADDING_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL)
                                                                      .Replace(FittingConstants.FULLSIZE_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL),
-                ResultImgUrl = urlResult.Replace(FittingConstants.FULLSIZE_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL),
-                AccountId = userId,
-                CreatedUtcDate = DateTime.UtcNow
-            };
+                resultImgUrl: urlResult.Replace(FittingConstants.FULLSIZE_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL));            
         }
 
 

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace MetaApi.SqlServer.Entities.VirtualFit
 {
     public class FittingResultEntity
@@ -19,8 +14,6 @@ namespace MetaApi.SqlServer.Entities.VirtualFit
 
         public string ResultImgUrl { get; set; }
 
-        //public int PromocodeId { get; set; }
-
         public int AccountId { get; set; }
 
 
@@ -32,13 +25,9 @@ namespace MetaApi.SqlServer.Entities.VirtualFit
         public bool IsDeleted { get; set; }
 
         /// <summary>
-        /// Навигационное свойство на PromocodeEntity
+        /// Навигационное свойство на AccountEntity
         /// </summary>
         public AccountEntity Account { get; set; }
-
-        /// <summary>
-        /// Навигационное свойство на PromocodeEntity
-        /// </summary>
-        //public PromocodeEntity Promocode { get; set; }
+        
     }
 }

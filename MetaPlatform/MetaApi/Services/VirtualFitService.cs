@@ -1,5 +1,6 @@
-﻿using MetaApi.Services.Interfaces;
-using MetaApi.SqlServer.Repositories;
+﻿using MetaApi.Core.Interfaces.Repositories;
+using MetaApi.Services.Interfaces;
+
 
 namespace MetaApi.Services
 {    
