@@ -1,6 +1,6 @@
-﻿using MetaApi.Core.Interfaces.Infrastructure;
+﻿using MetaApi.Core.Domain.UserTryOnLimit;
+using MetaApi.Core.Interfaces.Infrastructure;
 using MetaApi.Services.Interfaces;
-using MetaApi.SqlServer.Entities;
 using MetaApi.SqlServer.Repositories;
 
 namespace MetaApi.Services
@@ -89,7 +89,7 @@ namespace MetaApi.Services
         /// <summary>
         /// Сбрасывает счетчик, если прошел заданный период
         /// </summary>
-        private void ResetLimitIfPeriodPassed(UserTryOnLimitEntity limit)
+        private void ResetLimitIfPeriodPassed(UserTryOnLimit limit)
         {
             var now = _systemTime.UtcNow;
             var timeSinceLastReset = now - limit.LastResetTime;
@@ -105,21 +105,18 @@ namespace MetaApi.Services
         /// <summary>
         /// Создает или получает лимит пользователя
         /// </summary>
-        private async Task<UserTryOnLimitEntity> GetOrCreateLimitAsync(int userId)
+        private async Task<UserTryOnLimit> GetOrCreateLimitAsync(int userId)
         {
             var limit = await _repository.GetLimit(userId);
 
             if (limit == null)
             {
-                limit = new UserTryOnLimitEntity
-                {
-                    AccountId = userId,
-                    MaxAttempts = 3, // Дефолтное значение (можно вынести в конфиг)
-                    AttemptsUsed = 0,
-                    LastResetTime = _systemTime.UtcNow,
-                    ResetPeriod = TimeSpan.FromDays(1) // Дефолтный период (1 день)
-                };
-
+                limit = UserTryOnLimit.Create(accountId: userId,
+                                              maxAttempts: 3, // Дефолтное значение (можно вынести в конфиг)
+                                              attemptsUsed: 0,
+                                              lastResetTime: _systemTime.UtcNow,
+                                              resetPeriod: TimeSpan.FromDays(1));
+                
                 await _repository.AddLimit(limit);
             }
 

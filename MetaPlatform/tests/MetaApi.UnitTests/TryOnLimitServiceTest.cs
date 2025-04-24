@@ -1,6 +1,6 @@
-﻿using MetaApi.Core.Interfaces.Infrastructure;
+﻿using MetaApi.Core.Domain.UserTryOnLimit;
+using MetaApi.Core.Interfaces.Infrastructure;
 using MetaApi.Services;
-using MetaApi.SqlServer.Entities;
 using MetaApi.SqlServer.Repositories;
 using Moq;
 
@@ -17,11 +17,11 @@ namespace MetaApi.UnitTests
 
             var mockRepository = new Mock<ITryOnLimitRepository>();
             mockRepository.Setup(r => r.GetLimit(It.IsAny<int>()))
-                          .ReturnsAsync(new UserTryOnLimitEntity
-                          {
-                              LastResetTime = new DateTime(2023, 10, 9, 12, 0, 0),
-                              ResetPeriod = TimeSpan.FromHours(24)
-                          });
+                          .ReturnsAsync(UserTryOnLimit.Create(accountId: 0,
+                                                              maxAttempts: 0,
+                                                              attemptsUsed: 0,
+                                                              lastResetTime: new DateTime(2023, 10, 9, 12, 0, 0),
+                                                              resetPeriod: TimeSpan.FromHours(24)));                          
 
             var service = new TryOnLimitService(mockRepository.Object, mockClock.Object);
 
