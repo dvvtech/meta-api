@@ -1,4 +1,4 @@
-﻿using MetaApi.Core.Time;
+﻿using MetaApi.Core.Interfaces.Infrastructure;
 using MetaApi.Services;
 using MetaApi.SqlServer.Entities;
 using MetaApi.SqlServer.Repositories;

@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{02EA681E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetaApi.UnitTests", "tests\MetaApi.UnitTests\MetaApi.UnitTests.csproj", "{5718AD37-711D-4416-BCF9-E4D4DF58B9ED}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Meta.Infrastructure", "Meta.Infrastructure\Meta.Infrastructure.csproj", "{445083D0-C1F7-428A-A18A-B93E33CBF543}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{5718AD37-711D-4416-BCF9-E4D4DF58B9ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5718AD37-711D-4416-BCF9-E4D4DF58B9ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5718AD37-711D-4416-BCF9-E4D4DF58B9ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{445083D0-C1F7-428A-A18A-B93E33CBF543}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{445083D0-C1F7-428A-A18A-B93E33CBF543}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{445083D0-C1F7-428A-A18A-B93E33CBF543}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{445083D0-C1F7-428A-A18A-B93E33CBF543}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

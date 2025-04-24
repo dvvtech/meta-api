@@ -1,10 +1,8 @@
-﻿using MetaApi.AppStart.Extensions;
+﻿using Meta.Infrastructure;
+using MetaApi.AppStart.Extensions;
 using MetaApi.Configuration;
-using MetaApi.Core;
 using MetaApi.Core.Configurations;
-using MetaApi.Core.Interfaces;
-using MetaApi.Core.Time;
-using MetaApi.Infrastructure;
+using MetaApi.Core.Interfaces.Infrastructure;
 using MetaApi.Services;
 using MetaApi.Services.Auth;
 using MetaApi.Services.Cache;
@@ -97,6 +95,8 @@ namespace MetaApi.AppStart
                     logger
                 );
             });
+
+            _builder.Services.AddSingleton<IJwtProvider, JwtProvider>();
         }
 
         private void AddServices()
@@ -129,8 +129,7 @@ namespace MetaApi.AppStart
             });
 
             _builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-
-            _builder.Services.AddSingleton<JwtProvider>();            
+                        
             _builder.Services.AddScoped<AuthService>();
             _builder.Services.AddScoped<VkAuthService>();
             _builder.Services.AddScoped<GoogleAuthService>();                  

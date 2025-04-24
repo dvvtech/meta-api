@@ -1,11 +1,6 @@
 ﻿using MetaApi.Core.OperationResults.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace MetaApi.Core.Interfaces
+namespace MetaApi.Core.Interfaces.Infrastructure
 {
     public interface IEmailSender
     {

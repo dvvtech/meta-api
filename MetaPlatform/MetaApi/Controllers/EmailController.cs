@@ -1,4 +1,4 @@
-﻿using MetaApi.Core.Interfaces;
+﻿using MetaApi.Core.Interfaces.Infrastructure;
 using MetaApi.Models.Email;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;

@@ -1,4 +1,4 @@
-﻿using MetaApi.Core;
+﻿using MetaApi.Core.Interfaces.Infrastructure;
 using MetaApi.Core.OperationResults;
 using MetaApi.Core.OperationResults.Base;
 using MetaApi.SqlServer.Entities;
@@ -9,10 +9,10 @@ namespace MetaApi.Services.Auth
     public class AuthService
     {        
         private readonly IAccountRepository _accountRepository;
-        private readonly JwtProvider _jwtProvider;
+        private readonly IJwtProvider _jwtProvider;
 
         public AuthService(IAccountRepository accountRepository,
-                           JwtProvider jwtProvider)
+                           IJwtProvider jwtProvider)
         {            
             _accountRepository = accountRepository;
             _jwtProvider = jwtProvider;

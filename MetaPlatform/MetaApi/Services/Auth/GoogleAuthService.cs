@@ -1,5 +1,5 @@
 ﻿using MetaApi.Configuration;
-using MetaApi.Core;
+using MetaApi.Core.Interfaces.Infrastructure;
 using MetaApi.SqlServer.Repositories;
 using Microsoft.Extensions.Options;
 
@@ -8,13 +8,13 @@ namespace MetaApi.Services.Auth
     public partial class GoogleAuthService
     {
         private readonly GoogleAuthConfig _authConfig;        
-        private readonly JwtProvider _jwtProvider;
+        private readonly IJwtProvider _jwtProvider;
         private readonly IAccountRepository _accountRepository;
         private readonly ILogger<GoogleAuthService> _logger;
 
         public GoogleAuthService(IOptions<GoogleAuthConfig> authConfig,
                                  IAccountRepository accountRepository,                                 
-                                 JwtProvider jwtProvider,
+                                 IJwtProvider jwtProvider,
                                  ILogger<GoogleAuthService> logger)
         {
             _authConfig = authConfig.Value;

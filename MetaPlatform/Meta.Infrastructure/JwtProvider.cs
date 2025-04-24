@@ -1,5 +1,6 @@
 ﻿using MetaApi.Core.Configurations;
 using MetaApi.Core.Domain.User;
+using MetaApi.Core.Interfaces.Infrastructure;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -7,9 +8,9 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace MetaApi.Core
+namespace Meta.Infrastructure
 {
-    public class JwtProvider
+    public class JwtProvider : IJwtProvider
     {
         private readonly JwtConfig _options;
 
@@ -24,7 +25,7 @@ namespace MetaApi.Core
         /// <param name="user"></param>
         /// <returns></returns>
         public string GenerateToken(string userName, int accountId)
-        {            
+        {
             var claims = new[]
             {
                 new Claim(ClaimTypes.Name, userName),

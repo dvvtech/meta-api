@@ -1,10 +1,11 @@
-﻿using MetaApi.Core.Interfaces;
-using MetaApi.Core.OperationResults;
+﻿using MetaApi.Core.OperationResults;
 using MetaApi.Core.OperationResults.Base;
 using MimeKit;
 using MailKit.Net.Smtp;
+using Microsoft.Extensions.Logging;
+using MetaApi.Core.Interfaces.Infrastructure;
 
-namespace MetaApi.Infrastructure
+namespace Meta.Infrastructure
 {
     public class EmailSender : IEmailSender
     {

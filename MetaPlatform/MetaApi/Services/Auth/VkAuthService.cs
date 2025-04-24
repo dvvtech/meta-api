@@ -1,5 +1,5 @@
 ﻿using MetaApi.Configuration;
-using MetaApi.Core;
+using MetaApi.Core.Interfaces.Infrastructure;
 using MetaApi.SqlServer.Repositories;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -10,7 +10,7 @@ namespace MetaApi.Services
     public partial class VkAuthService
     {        
         private readonly IMemoryCache _cache;        
-        private readonly JwtProvider _jwtProvider;
+        private readonly IJwtProvider _jwtProvider;
         private readonly ILogger<VkAuthService> _logger;
         private readonly VkAuthConfig _authConfig;
         private readonly IAccountRepository _accountRepository;
@@ -18,7 +18,7 @@ namespace MetaApi.Services
         public VkAuthService(IMemoryCache cache,
                              ILogger<VkAuthService> logger,                             
                              IAccountRepository accountRepository,
-                             JwtProvider jwtProvider,
+                             IJwtProvider jwtProvider,
                              IOptions<VkAuthConfig> authConfig)
         {
             _cache = cache;
