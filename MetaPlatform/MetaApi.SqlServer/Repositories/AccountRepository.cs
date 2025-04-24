@@ -1,4 +1,5 @@
-﻿using MetaApi.SqlServer.Context;
+﻿using MetaApi.Core.Domain.Account;
+using MetaApi.SqlServer.Context;
 using MetaApi.SqlServer.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,15 +7,15 @@ namespace MetaApi.SqlServer.Repositories
 {
     public interface IAccountRepository
     {
-        Task<AccountEntity?> GetById(int userId);
+        Task<Account?> GetById(int userId);
 
-        Task<AccountEntity?> GetByExternalId(string externalId);
+        Task<Account?> GetByExternalId(string externalId);
 
-        Task<AccountEntity?> GetByRefreshToken(string refreshToken);        
+        Task<Account?> GetByRefreshToken(string refreshToken);        
 
-        Task<int> Add(AccountEntity user);
+        Task<int> Add(Account user);
 
-        Task UpdateRefreshToken(AccountEntity accountEntity);
+        Task UpdateRefreshToken(Account accountEntity);
 
         Task SaveChanges();
     }
@@ -28,35 +29,52 @@ namespace MetaApi.SqlServer.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<AccountEntity?> GetById(int userId)
+        public async Task<Account?> GetById(int userId)
         {
-            return await _dbContext.Accounts
-                                   .AsNoTracking()
-                                   .FirstOrDefaultAsync(user => user.Id == userId);
+            var accountEntity = await _dbContext.Accounts
+                                                .AsNoTracking()
+                                                .FirstOrDefaultAsync(user => user.Id == userId);
+
+            return accountEntity == null ? null : CreateAccountFromEntity(accountEntity);
         }
 
-        public async Task<AccountEntity?> GetByExternalId(string externalId)
+        public async Task<Account?> GetByExternalId(string externalId)
         {
-            return await _dbContext.Accounts
-                                   .AsNoTracking()                                       
-                                   .FirstOrDefaultAsync(user => user.ExternalId == externalId);            
+            var accountEntity = await _dbContext.Accounts
+                                                .AsNoTracking()                                       
+                                                .FirstOrDefaultAsync(user => user.ExternalId == externalId);
+
+            return accountEntity == null ? null : CreateAccountFromEntity(accountEntity);
         }
 
-        public async Task<AccountEntity?> GetByRefreshToken(string refreshToken)
+        public async Task<Account?> GetByRefreshToken(string refreshToken)
         {
-            return await _dbContext.Accounts
-                                   .AsNoTracking()
-                                   .FirstOrDefaultAsync(x => x.JwtRefreshToken == refreshToken);            
+            var accountEntity = await _dbContext.Accounts
+                                                .AsNoTracking()
+                                                .FirstOrDefaultAsync(x => x.JwtRefreshToken == refreshToken);
+
+            return accountEntity == null ? null : CreateAccountFromEntity(accountEntity);
         }
 
-        public async Task<int> Add(AccountEntity user)
+        public async Task<int> Add(Account account)
         {
-            await _dbContext.Accounts.AddAsync(user);
+            var newAccount = new AccountEntity
+            {
+                ExternalId = account.ExternalId,
+                UserName = account.UserName,
+                JwtRefreshToken = account.JwtRefreshToken,
+                AuthType = (AuthTypeEntity)account.AuthType,
+                Role = (RoleEntity)account.Role,
+                CreatedUtcDate = DateTime.UtcNow,
+                UpdateUtcDate = DateTime.UtcNow
+            };
+
+            await _dbContext.Accounts.AddAsync(newAccount);
             await _dbContext.SaveChangesAsync();
-            return user.Id;
+            return newAccount.Id;
         }
 
-        public async Task UpdateRefreshToken(AccountEntity accountEntity)
+        public async Task UpdateRefreshToken(Account accountEntity)
         {
             await _dbContext.Accounts
                                     .Where(updateUser => updateUser.Id == accountEntity.Id)
@@ -68,6 +86,17 @@ namespace MetaApi.SqlServer.Repositories
         public async Task SaveChanges()
         {
             await _dbContext.SaveChangesAsync();
+        }
+
+        private Account CreateAccountFromEntity(AccountEntity accountEntity)
+        {
+            return Account.Create(                
+                accountEntity.ExternalId,
+                accountEntity.UserName,
+                accountEntity.JwtRefreshToken,
+                (AuthType)accountEntity.AuthType,
+                (Role)accountEntity.Role                               
+            );
         }
     }
 }
