@@ -15,7 +15,7 @@ namespace MetaApi.Services
         private readonly ILogger<ReplicateClientService> _logger;
         private const string PredictionModelVersion = "0513734a452173b8173e907e3a59d19a36266e55b48528559432bd21c7d7e985";
         private const int MaxRetries = 15;
-        private const int RetryDelayMilliseconds = 2000;
+        private const int RetryDelayMilliseconds = 1500;
 
         public ReplicateClientService(HttpClient httpClient,
                                       ILogger<ReplicateClientService> logger)

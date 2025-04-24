@@ -1,5 +1,7 @@
 ﻿добавить интерфейс в AuthService
 
+FittingHistoryRepository чтоб на вход и выход были доменные объекты по аналогии с AccountRepository
+
 заюзать  cancellationToken в Task StartAsync(CancellationToken cancellationToken)
 
 выделить в отдельный ммикросервис функционал по сохранению и получению ссылки на файл

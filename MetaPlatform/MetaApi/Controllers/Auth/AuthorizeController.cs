@@ -1,7 +1,7 @@
 ﻿using MetaApi.Core.OperationResults.Base;
 using MetaApi.Extensions;
 using MetaApi.Models.Auth;
-using MetaApi.Services.Auth;
+using MetaApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,10 +11,10 @@ namespace MetaApi.Controllers.Auth
     [ApiController]
     public class AuthorizeController : ControllerBase
     {
-        private readonly AuthService _authService;
+        private readonly IAuthService _authService;
         private readonly ILogger<AuthorizeController> _logger;        
 
-        public AuthorizeController(AuthService authService, ILogger<AuthorizeController> logger)
+        public AuthorizeController(IAuthService authService, ILogger<AuthorizeController> logger)
         {
             _authService = authService;
             _logger = logger;            

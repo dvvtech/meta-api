@@ -131,7 +131,7 @@ namespace MetaApi.AppStart
 
             _builder.Services.AddScoped<IAccountRepository, AccountRepository>();
                         
-            _builder.Services.AddScoped<AuthService>();
+            _builder.Services.AddScoped<IAuthService, AuthService>();
             _builder.Services.AddScoped<VkAuthService>();
             _builder.Services.AddScoped<GoogleAuthService>();                  
             

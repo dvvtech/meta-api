@@ -3,10 +3,11 @@ using MetaApi.Core.Interfaces.Infrastructure;
 using MetaApi.Core.Interfaces.Repositories;
 using MetaApi.Core.OperationResults;
 using MetaApi.Core.OperationResults.Base;
+using MetaApi.Services.Interfaces;
 
 namespace MetaApi.Services.Auth
-{
-    public class AuthService
+{    
+    public class AuthService : IAuthService
     {        
         private readonly IAccountRepository _accountRepository;
         private readonly IJwtProvider _jwtProvider;
