@@ -21,7 +21,7 @@ namespace MetaApi.Services.Cache
 
         public async Task<UserTryOnLimitEntity> GetLimit(int userId)
         {
-            var cacheKey = $"try_on_limit_{userId}";
+            var cacheKey = GetCacheKey(userId);
 
             // 1. Проверяем memory cache
             if (_memoryCache.TryGetValue(cacheKey, out UserTryOnLimitEntity cachedLimit))
@@ -37,28 +37,44 @@ namespace MetaApi.Services.Cache
             if (limitEntity != null)
             {
                 // 3. Сохраняем в memory cache
-                _memoryCache.Set(cacheKey, limitEntity);
-                return limitEntity;
+                SetCache(cacheKey, limitEntity);                
             }
 
-            return null;
+            return limitEntity;
         }
 
         public async Task AddLimit(UserTryOnLimitEntity userTryOnLimitEntity)
         {
-            await _repository.AddLimit(userTryOnLimitEntity);            
+            await _repository.AddLimit(userTryOnLimitEntity);
 
-            //Сохраняем в memory cache
-            var cacheKey = $"try_on_limit_{userTryOnLimitEntity.Account}";
-            _memoryCache.Set(cacheKey, userTryOnLimitEntity);
+            // Сохраняем в memory cache
+            UpdateCache(userTryOnLimitEntity.AccountId, userTryOnLimitEntity);
         }
 
         public async Task UpdateLimit(UserTryOnLimitEntity userTryOnLimitEntity)
         {
             await _repository.UpdateLimit(userTryOnLimitEntity);
 
-            var cacheKey = $"try_on_limit_{userTryOnLimitEntity.AccountId}";
-            _memoryCache.Set(cacheKey, userTryOnLimitEntity);            
+            // Обновляем кэш
+            UpdateCache(userTryOnLimitEntity.AccountId, userTryOnLimitEntity);
         }
+
+        #region Helper Methods
+
+        private string GetCacheKey(int userId) => $"try_on_limit_{userId}";
+
+        private void SetCache(string cacheKey, UserTryOnLimitEntity data)
+        {
+            _memoryCache.Set(cacheKey, data);
+            _logger.LogDebug("Updated memory cache for key {CacheKey}", cacheKey);
+        }
+
+        private void UpdateCache(int userId, UserTryOnLimitEntity data)
+        {
+            var cacheKey = GetCacheKey(userId);
+            SetCache(cacheKey, data);
+        }
+
+        #endregion
     }
 }
