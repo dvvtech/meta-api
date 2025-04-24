@@ -4,6 +4,7 @@ using MetaApi.Core.OperationResults.Base;
 using Microsoft.AspNetCore.Authorization;
 using MetaApi.Extensions;
 using MetaApi.Services.Interfaces;
+using MetaApi.Core.Domain.FittingHistory;
 
 namespace MetaApi.Controllers
 {
@@ -40,7 +41,16 @@ namespace MetaApi.Controllers
                 return BadRequest(userIdResult.Error);
             }
 
-            Result<FittingResultResponse> resultFit = await _virtualFitService.TryOnClothesAsync(request, Request.Host.Value, userIdResult.Value);                      
+            var fittingData = new FittingData
+            {
+                GarmImg = request.GarmImg,
+                HumanImg = request.HumanImg,
+                Category = request.Category,
+                AccountId = userIdResult.Value,
+                Host = Request.Host.Value
+            };
+
+            Result<FittingResultResponse> resultFit = await _virtualFitService.TryOnClothesAsync(fittingData);                      
             if (resultFit.IsFailure)
             {
                 _logger.LogError($"try-on failed: {resultFit.Error.Description}");

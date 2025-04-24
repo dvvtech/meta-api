@@ -6,6 +6,7 @@ using System.Text.Json;
 using MetaApi.Core.OperationResults.Base;
 using MetaApi.Core.OperationResults;
 using MetaApi.Services.Interfaces;
+using MetaApi.Core.Domain.FittingHistory;
 
 namespace MetaApi.Services
 {    
@@ -24,11 +25,11 @@ namespace MetaApi.Services
             _logger = logger;
         }
         
-        public async Task<Result<string>> ProcessPredictionAsync(FittingRequest request)
+        public async Task<Result<string>> ProcessPredictionAsync(FittingData data)
         {            
             try
             {
-                var predictionRequest = CreatePredictionRequest(request);
+                var predictionRequest = CreatePredictionRequest(data);
                 var jsonContent = SerializeToJson(predictionRequest);
                 var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
@@ -48,7 +49,7 @@ namespace MetaApi.Services
             }
         }
 
-        private PredictionRequest CreatePredictionRequest(FittingRequest request)
+        private PredictionRequest CreatePredictionRequest(FittingData data)
         {            
             return new PredictionRequest
             {
@@ -58,10 +59,10 @@ namespace MetaApi.Services
                     Crop = false,
                     Seed = 42,
                     Steps = 30,
-                    Category = request.Category,
+                    Category = data.Category,
                     ForceDc = false,
-                    GarmImg = ImageUrlHelper.GetUrl(request.GarmImg),
-                    HumanImg = ImageUrlHelper.GetUrl(request.HumanImg),
+                    GarmImg = ImageUrlHelper.GetUrl(data.GarmImg),
+                    HumanImg = ImageUrlHelper.GetUrl(data.HumanImg),
                     MaskOnly = false,
                     GarmentDes = ""
                 }

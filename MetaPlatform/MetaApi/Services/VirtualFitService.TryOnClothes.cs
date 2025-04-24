@@ -12,24 +12,24 @@ namespace MetaApi.Services
         /// <summary>
         /// Примерка одежды
         /// </summary>
-        public async Task<Result<FittingResultResponse>> TryOnClothesAsync(FittingRequest request, string host, int userId)
+        public async Task<Result<FittingResultResponse>> TryOnClothesAsync(FittingData fittingData)
         {            
-            Result<string> predictionResult = await _replicateClientService.ProcessPredictionAsync(request);
+            Result<string> predictionResult = await _replicateClientService.ProcessPredictionAsync(fittingData);
 
             if (predictionResult.IsSuccess)
             {
-                var urlResult = await _fileService.UploadResultFileAsync(predictionResult.Value, host, request.HumanImg);
+                string urlResult = await _fileService.UploadResultFileAsync(predictionResult.Value, fittingData.Host, fittingData.HumanImg);
 
-                var fittingHistory = CreateFittingHistory(request, urlResult, userId);
+                FittingHistory fittingHistory = CreateFittingHistory(fittingData, urlResult);
 
                 await _fittingHistoryRepository.AddToHistoryAsync(fittingHistory);
 
-                await _tryOnLimitService.DecrementTryOnLimitAsync(userId);
+                await _tryOnLimitService.DecrementTryOnLimitAsync(fittingData.AccountId);
 
                 return Result<FittingResultResponse>.Success(new FittingResultResponse
                 {
                     Url = urlResult ?? string.Empty,
-                    RemainingUsage = await _tryOnLimitService.GetRemainingUsage(userId)
+                    RemainingUsage = await _tryOnLimitService.GetRemainingUsage(fittingData.AccountId)
                 });
             }
             else
@@ -38,13 +38,13 @@ namespace MetaApi.Services
             }
         }        
 
-        private FittingHistory CreateFittingHistory(FittingRequest request, string urlResult, int userId)
+        private FittingHistory CreateFittingHistory(FittingData data, string urlResult)
         {
             return FittingHistory.Create(
-                accountId: userId,
-                garmentImgUrl: ImageUrlHelper.GetUrl(request.GarmImg).Replace(FittingConstants.PADDING_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL)
+                accountId: data.AccountId,
+                garmentImgUrl: ImageUrlHelper.GetUrl(data.GarmImg).Replace(FittingConstants.PADDING_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL)
                                                                       .Replace(FittingConstants.FULLSIZE_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL),
-                humanImgUrl: ImageUrlHelper.GetUrl(request.HumanImg).Replace(FittingConstants.PADDING_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL)
+                humanImgUrl: ImageUrlHelper.GetUrl(data.HumanImg).Replace(FittingConstants.PADDING_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL)
                                                                      .Replace(FittingConstants.FULLSIZE_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL),
                 resultImgUrl: urlResult.Replace(FittingConstants.FULLSIZE_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL));            
         }

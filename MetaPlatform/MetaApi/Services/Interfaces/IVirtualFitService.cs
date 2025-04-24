@@ -1,4 +1,5 @@
-﻿using MetaApi.Core.OperationResults.Base;
+﻿using MetaApi.Core.Domain.FittingHistory;
+using MetaApi.Core.OperationResults.Base;
 using MetaApi.Models.VirtualFit;
 
 namespace MetaApi.Services.Interfaces
@@ -9,6 +10,6 @@ namespace MetaApi.Services.Interfaces
 
         Task<Result<FittingHistoryResponse[]>> GetHistory(int userId);
 
-        Task<Result<FittingResultResponse>> TryOnClothesAsync(FittingRequest request, string host, int userId);
+        Task<Result<FittingResultResponse>> TryOnClothesAsync(FittingData fittingData);
     }
 }

@@ -1,10 +1,10 @@
-﻿using MetaApi.Core.OperationResults.Base;
-using MetaApi.Models.VirtualFit;
+﻿using MetaApi.Core.Domain.FittingHistory;
+using MetaApi.Core.OperationResults.Base;
 
 namespace MetaApi.Services.Interfaces
 {
     public interface IReplicateClientService
     {
-        Task<Result<string>> ProcessPredictionAsync(FittingRequest request);
+        Task<Result<string>> ProcessPredictionAsync(FittingData request);
     }
 }
