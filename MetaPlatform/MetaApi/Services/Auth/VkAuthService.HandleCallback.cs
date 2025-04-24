@@ -1,4 +1,4 @@
-﻿using MetaApi.SqlServer.Entities;
+﻿using MetaApi.Core.Domain.Account;
 using Microsoft.Extensions.Caching.Memory;
 using System.Text.Json;
 
@@ -29,28 +29,23 @@ namespace MetaApi.Services
                 string refreshToken = _jwtProvider.GenerateRefreshToken();
                 string externalId = tokenResponse.UserId.ToString();
 
-                AccountEntity accountEntity = await _accountRepository.GetByExternalId(externalId);
-                if (accountEntity == null)
+                Account account = await _accountRepository.GetByExternalId(externalId);
+                if (account == null)
                 {
-                    var newUserEntity = new AccountEntity
-                    {
-                        ExternalId = externalId,
-                        UserName = userName,
-                        JwtRefreshToken = refreshToken,
-                        AuthType = AuthTypeEntity.Vk,
-                        Role = RoleEntity.User,
-                        CreatedUtcDate = DateTime.UtcNow,
-                        UpdateUtcDate = DateTime.UtcNow
-                    };
+                    var newUserEntity = Account.Create(externalId: externalId,
+                                                       userName: userName,
+                                                       jwtRefreshToken: refreshToken,
+                                                       authType: AuthType.Vk,
+                                                       role: Role.User);                    
 
                     int accountId = await _accountRepository.Add(newUserEntity);
                     accessToken = _jwtProvider.GenerateToken(userName, accountId);
                 }
                 else
                 {
-                    accessToken = _jwtProvider.GenerateToken(userName, accountEntity.Id);
-                    accountEntity.JwtRefreshToken = refreshToken;
-                    await _accountRepository.UpdateRefreshToken(accountEntity);
+                    accessToken = _jwtProvider.GenerateToken(userName, account.Id);
+                    account.JwtRefreshToken = refreshToken;
+                    await _accountRepository.UpdateRefreshToken(account);
                 }
 
                 return new MetaApi.Models.Auth.TokenResponse

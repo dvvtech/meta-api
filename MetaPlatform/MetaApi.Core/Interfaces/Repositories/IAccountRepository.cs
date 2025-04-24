@@ -4,12 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MetaApi.Core.Domain.User
+namespace MetaApi.Core.Interfaces.Repositories
 {
-    public enum Role
-    {
-        None = 0,
-        User = 1,
-        Admin = 2,
-    }
+    //interface IAccountRepository
+    //{
+    //}
 }

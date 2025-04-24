@@ -1,5 +1,5 @@
 ﻿using MetaApi.Core.Configurations;
-using MetaApi.Core.Domain.User;
+using MetaApi.Core.Domain.Account;
 using MetaApi.Core.Interfaces.Infrastructure;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;

@@ -1,7 +1,7 @@
-﻿using MetaApi.Core.Interfaces.Infrastructure;
+﻿using MetaApi.Core.Domain.Account;
+using MetaApi.Core.Interfaces.Infrastructure;
 using MetaApi.Core.OperationResults;
 using MetaApi.Core.OperationResults.Base;
-using MetaApi.SqlServer.Entities;
 using MetaApi.SqlServer.Repositories;
 
 namespace MetaApi.Services.Auth
@@ -20,21 +20,21 @@ namespace MetaApi.Services.Auth
 
         public async Task<Result> LogoutAsync(int userId)
         {
-            AccountEntity userEntity = await _accountRepository.GetById(userId);            
-            if (userEntity is null)
+            Account account = await _accountRepository.GetById(userId);            
+            if (account is null)
             {
                 return Result.Failure(UserErrors.UserNotFound("logout:"));
             }
 
-            userEntity.JwtRefreshToken = string.Empty;
-            await _accountRepository.UpdateRefreshToken(userEntity);
+            account.JwtRefreshToken = string.Empty;
+            await _accountRepository.UpdateRefreshToken(account);
 
             return Result.Success();
         }
 
         public async Task<Result<MetaApi.Models.Auth.TokenResponse>> RefreshTokenAsync(string refreshToken)
         {
-            AccountEntity? account = await _accountRepository.GetByRefreshToken(refreshToken);
+            Account? account = await _accountRepository.GetByRefreshToken(refreshToken);
             if (account is null)
             {
                 return Result<MetaApi.Models.Auth.TokenResponse>.Failure(UserErrors.UserNotFound("refresh token:"));

@@ -1,7 +1,7 @@
 ﻿using Google.Apis.Auth.OAuth2.Flows;
 using System.Net.Http.Headers;
 using MetaApi.Models.Auth;
-using MetaApi.SqlServer.Entities;
+using MetaApi.Core.Domain.Account;
 
 namespace MetaApi.Services.Auth
 {
@@ -29,28 +29,23 @@ namespace MetaApi.Services.Auth
                 string accessToken = string.Empty;
                 string refreshToken = _jwtProvider.GenerateRefreshToken();
                 
-                AccountEntity accountEntity = await _accountRepository.GetByExternalId(userInfo.Sub);                
-                if (accountEntity == null)
+                Account account = await _accountRepository.GetByExternalId(userInfo.Sub);                
+                if (account == null)
                 {
-                    var newUserEntity = new AccountEntity
-                    {
-                        ExternalId = userInfo.Sub,
-                        UserName = userInfo.GivenName,
-                        JwtRefreshToken = refreshToken,
-                        AuthType = AuthTypeEntity.Google,
-                        Role = RoleEntity.User,
-                        CreatedUtcDate = DateTime.UtcNow,
-                        UpdateUtcDate = DateTime.UtcNow
-                    };
-
+                    var newUserEntity = Account.Create(externalId: userInfo.Sub,
+                                                       userName: userInfo.GivenName,
+                                                       jwtRefreshToken: refreshToken,
+                                                       authType: AuthType.Google,
+                                                       role: Role.User);
+                    
                     int accountId = await _accountRepository.Add(newUserEntity);
                     accessToken = _jwtProvider.GenerateToken(userInfo.GivenName, accountId);
                 }
                 else
                 {
-                    accessToken = _jwtProvider.GenerateToken(userInfo.GivenName, accountEntity.Id);
-                    accountEntity.JwtRefreshToken = refreshToken;                    
-                    await _accountRepository.UpdateRefreshToken(accountEntity);
+                    accessToken = _jwtProvider.GenerateToken(userInfo.GivenName, account.Id);
+                    account.JwtRefreshToken = refreshToken;                    
+                    await _accountRepository.UpdateRefreshToken(account);
                 }
 
                 return new MetaApi.Models.Auth.TokenResponse
