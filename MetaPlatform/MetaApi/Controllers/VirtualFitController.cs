@@ -92,13 +92,21 @@ namespace MetaApi.Controllers
                 return BadRequest(userIdResult.Error);
             }
             
-            Result<FittingHistoryResponse[]> fittingResults = await _virtualFitService.GetHistory(userIdResult.Value);
+            Result<FittingHistory[]> fittingResults = await _virtualFitService.GetHistory(userIdResult.Value);
             if (fittingResults.IsFailure)
             {
                 return BadRequest(new { description = fittingResults.Error.Description });
             }
 
-            return Ok(fittingResults.Value);
+            var fittingHistories = fittingResults.Value.Select(s => new FittingHistoryResponse
+            {
+                Id = s.Id,
+                GarmentImgUrl = s.GarmentImgUrl,
+                HumanImgUrl = s.HumanImgUrl,
+                ResultImgUrl = s.ResultImgUrl,
+            }).ToArray();
+
+            return Ok(fittingHistories);
         }
 
         [HttpGet("test3")]
