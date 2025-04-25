@@ -12,7 +12,7 @@ namespace MetaApi.Services
         /// <summary>
         /// Примерка одежды
         /// </summary>
-        public async Task<Result<FittingResultResponse>> TryOnClothesAsync(FittingData fittingData)
+        public async Task<Result<(string ResultImageUrl, int RemainingUsage)>> TryOnClothesAsync(FittingData fittingData)
         {            
             Result<string> predictionResult = await _replicateClientService.ProcessPredictionAsync(fittingData);
 
@@ -26,15 +26,15 @@ namespace MetaApi.Services
 
                 await _tryOnLimitService.DecrementTryOnLimitAsync(fittingData.AccountId);
 
-                return Result<FittingResultResponse>.Success(new FittingResultResponse
-                {
-                    Url = urlResult ?? string.Empty,
-                    RemainingUsage = await _tryOnLimitService.GetRemainingUsage(fittingData.AccountId)
-                });
+                return Result<(string ResultImageUrl, int RemainingUsage)>.Success(
+                (
+                    urlResult ?? string.Empty,
+                    await _tryOnLimitService.GetRemainingUsage(fittingData.AccountId)
+                ));
             }
             else
             {                
-                return Result<FittingResultResponse>.Failure(VirtualFitError.VirtualFitServiceError("Something went wrong"));
+                return Result<(string ResultImageUrl, int RemainingUsage)>.Failure(VirtualFitError.VirtualFitServiceError("Something went wrong"));
             }
         }        
 

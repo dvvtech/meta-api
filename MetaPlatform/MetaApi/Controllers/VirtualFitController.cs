@@ -50,7 +50,7 @@ namespace MetaApi.Controllers
                 Host = Request.Host.Value
             };
 
-            Result<FittingResultResponse> resultFit = await _virtualFitService.TryOnClothesAsync(fittingData);                      
+            Result<(string ResultImageUrl, int RemainingUsage)> resultFit = await _virtualFitService.TryOnClothesAsync(fittingData);                      
             if (resultFit.IsFailure)
             {
                 _logger.LogError($"try-on failed: {resultFit.Error.Description}");
@@ -65,7 +65,7 @@ namespace MetaApi.Controllers
                 }
             }
 
-            return Ok(resultFit.Value);            
+            return Ok(new FittingResultResponse { Url = resultFit.Value.ResultImageUrl, RemainingUsage = resultFit.Value.RemainingUsage });            
         }
 
         [HttpDelete("history"), Authorize]        
