@@ -6,7 +6,7 @@ namespace MetaApi.Services.Interfaces
 {
     public interface IVirtualFitService
     {
-        Task Delete(FittingDeleteRequest request, int userId);
+        Task Delete(int fittingResultId, int userId);
 
         Task<Result<FittingHistoryResponse[]>> GetHistory(int userId);
 

@@ -4,9 +4,9 @@ namespace MetaApi.Services
 {
     public partial class VirtualFitService
     {
-        public async Task Delete(FittingDeleteRequest request, int userId)
+        public async Task Delete(int fittingResultId, int userId)
         {
-            await _fittingHistoryRepository.DeleteAsync(request.FittingResultId, userId);     
+            await _fittingHistoryRepository.DeleteAsync(fittingResultId, userId);     
         }
     }
 }

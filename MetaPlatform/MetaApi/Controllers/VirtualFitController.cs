@@ -77,7 +77,7 @@ namespace MetaApi.Controllers
                 return BadRequest(userIdResult.Error);
             }
 
-            await _virtualFitService.Delete(request, userIdResult.Value);
+            await _virtualFitService.Delete(request.FittingResultId, userIdResult.Value);
             return Ok();
         }
 
