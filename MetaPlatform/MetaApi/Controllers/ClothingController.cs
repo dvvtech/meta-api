@@ -18,10 +18,19 @@ namespace MetaApi.Controllers
 
         // Получить коллекцию одежды
         [HttpGet, Authorize]
-        public IActionResult GetClothingCollection()
+        public ActionResult<ClothingCollectionResponse> GetClothingCollection()
         {
             var collection = _fileService.GetClothingCollection(Request.Host.Value);
-            return Ok(collection);
+
+            var clothingResult = new ClothingCollectionResponse
+            { 
+                ManСlothingItems = collection.ManСlothingItems.Select(item => new ClothingItemDto { Link = item.Link}).ToArray(),
+                WomanСlothingItems = collection.WomanСlothingItems.Select(item => new ClothingItemDto { Link = item.Link }).ToArray(),
+                Man = collection.Man.Select(item => new ClothingItemDto { Link = item.Link }).ToArray(),
+                Woman = collection.Woman.Select(item => new ClothingItemDto { Link = item.Link }).ToArray(),
+            };
+
+            return Ok(clothingResult);
         }
 
         // Загрузить файл в коллекцию

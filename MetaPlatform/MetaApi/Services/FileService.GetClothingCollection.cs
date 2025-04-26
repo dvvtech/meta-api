@@ -1,4 +1,5 @@
-﻿using MetaApi.Models.VirtualFit;
+﻿using MetaApi.Core.Domain.Clothing;
+using MetaApi.Models.VirtualFit;
 
 namespace MetaApi.Services
 {    

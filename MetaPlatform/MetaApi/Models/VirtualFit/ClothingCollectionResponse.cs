@@ -1,30 +1,30 @@
 ﻿namespace MetaApi.Models.VirtualFit
 {
-    public class ClothingCollection
+    public class ClothingCollectionResponse
     {
         /// <summary>
         /// Фото мужской одежды
         /// </summary>
-        public ClothingItem[] ManСlothingItems { get; set; }
+        public ClothingItemDto[] ManСlothingItems { get; set; }
 
         /// <summary>
         /// Фото женской одежды
         /// </summary>
-        public ClothingItem[] WomanСlothingItems { get; set; }
+        public ClothingItemDto[] WomanСlothingItems { get; set; }
 
         /// <summary>
         /// Фото мужчин в одежде
         /// </summary>
-        public ClothingItem[] Man { get; set; }
+        public ClothingItemDto[] Man { get; set; }
 
         /// <summary>
         /// Фото женщин в одежде
         /// </summary>
-        public ClothingItem[] Woman { get; set; }
+        public ClothingItemDto[] Woman { get; set; }
     }
 
-    public class ClothingItem
-    {       
+    public class ClothingItemDto
+    {
         public string Link { get; init; }
     }
 }
