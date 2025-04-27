@@ -4,7 +4,7 @@ namespace MetaApi.Services
 {
     public partial class FileService : IFileService
     {
-        private readonly FileCrcHostedService _fileCrcService;
+        private readonly ICrcFileProvider _crcFileProvider;
         private readonly ImageService _imageService;
         private readonly IHttpClientFactory _httpClientFactory;        
         private readonly ILogger<FileService> _logger;
@@ -16,7 +16,7 @@ namespace MetaApi.Services
                            ILogger<FileService> logger,
                            string webRootPath)
         {
-            _fileCrcService = fileCrcService;
+            _crcFileProvider = fileCrcService;
             _imageService = imageService;
             _httpClientFactory = httpClientFactory;            
             _logger = logger;
@@ -25,7 +25,7 @@ namespace MetaApi.Services
 
         public int GetCount()
         {
-            return _fileCrcService.FileCrcDictionary.Count;
+            return _crcFileProvider.FileCrcDictionary.Count;
         } 
     }
 }

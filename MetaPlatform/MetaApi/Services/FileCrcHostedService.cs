@@ -1,11 +1,11 @@
-﻿using MetaApi.Consts;
-using MetaApi.Models.VirtualFit;
+﻿using MetaApi.Models.VirtualFit;
+using MetaApi.Services.Interfaces;
 using System.Collections.Concurrent;
 using System.Security.Cryptography;
 
 namespace MetaApi.Services
-{
-    public class FileCrcHostedService : IHostedService
+{    
+    public class FileCrcHostedService : IHostedService, ICrcFileProvider
     {
         private readonly string _uploadsFolderPath;
         //private readonly string _resultFolderPath;

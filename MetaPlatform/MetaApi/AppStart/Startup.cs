@@ -135,10 +135,10 @@ namespace MetaApi.AppStart
                         
             _builder.Services.AddScoped<IAuthService, AuthService>();
             _builder.Services.AddScoped<VkAuthService>();
-            _builder.Services.AddScoped<GoogleAuthService>();                  
-            
-            _builder.Services.AddSingleton<FileCrcHostedService>();
-            _builder.Services.AddHostedService(provider => provider.GetService<FileCrcHostedService>());
+            _builder.Services.AddScoped<GoogleAuthService>();
+
+            _builder.Services.AddSingleton<ICrcFileProvider, FileCrcHostedService>();
+            _builder.Services.AddHostedService(provider => provider.GetService<ICrcFileProvider>() as FileCrcHostedService);            
         }
     }
 }

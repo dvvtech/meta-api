@@ -24,7 +24,7 @@ namespace MetaApi.Services
             string fileCrc = await CalculateCrcAsync(file);
 
             // Проверка существования файла
-            if (fileType == FileType.Upload && _fileCrcService.FileCrcDictionary.TryGetValue(fileCrc, out var existingFileName))
+            if (fileType == FileType.Upload && _crcFileProvider.FileCrcDictionary.TryGetValue(fileCrc, out var existingFileName))
             {
                 _logger.LogInformation($"{existingFileName} get from cache");
                 return GenerateFileUrl(existingFileName, fileType, host);
@@ -41,7 +41,7 @@ namespace MetaApi.Services
             await ResizeAndSaveFile(file, uploadsPath, uniqueFileName, imageRatio);
 
             // Добавление CRC в словарь
-            _fileCrcService.AddFileCrc(fileCrc, lastFileName);
+            _crcFileProvider.AddFileCrc(fileCrc, lastFileName);
 
             // Генерация публичной ссылки
             return GenerateFileUrl(lastFileName, fileType, host);
