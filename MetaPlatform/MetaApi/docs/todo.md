@@ -2,6 +2,7 @@
 
 Перенести сервисы из апи в core
 
+добавить админ панель для добавления новых фото
 
 заюзать  cancellationToken в Task StartAsync(CancellationToken cancellationToken)
 

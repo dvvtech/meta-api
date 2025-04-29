@@ -39,6 +39,7 @@ namespace MetaApi.SqlServer.Configurations
             builder.HasMany(p => p.FittingResults)
                 .WithOne(f => f.Account)
                 .HasForeignKey(f => f.AccountId)
+                //.IsRequired()
                 .OnDelete(DeleteBehavior.Cascade); // Удаление связанных данных
 
 
