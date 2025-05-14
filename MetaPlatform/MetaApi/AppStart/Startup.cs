@@ -65,7 +65,9 @@ namespace MetaApi.AppStart
             if (_jwtConf == null)
             {
                 throw new InvalidOperationException("JWT configuration section is missing or invalid");
-            }            
+            }
+
+            _builder.Services.Configure<GoogleRecaptchaConfig>(_builder.Configuration.GetSection(GoogleRecaptchaConfig.SectionName));
         }
 
         private void ConfigureClientAPI()
