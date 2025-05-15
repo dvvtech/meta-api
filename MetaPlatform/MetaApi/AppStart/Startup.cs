@@ -124,7 +124,7 @@ namespace MetaApi.AppStart
             _builder.Services.AddScoped<ImageService>();
             _builder.Services.AddScoped<IFileService, FileService>(serviceProvider =>
             {
-                var fileCrcHostedService = serviceProvider.GetRequiredService<FileCrcHostedService>();
+                var fileCrcHostedService = serviceProvider.GetRequiredService<ICrcFileProvider>();
                 var imageService = serviceProvider.GetRequiredService<ImageService>();
                 var httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
                 var logger = serviceProvider.GetRequiredService<ILogger<FileService>>();

@@ -35,7 +35,10 @@
             }
             else
             {
-                app.UseCors(AllowSpecificOriginPolicy);
+                //т.к. 2 домена используют апи (virtual-fit.one, oxford-ap.com) то делаю без ограничений CORS
+
+                app.UseCors(AllowAllPolicy);
+                //app.UseCors(AllowSpecificOriginPolicy);
             }
         }
     }

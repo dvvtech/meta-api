@@ -10,7 +10,7 @@ namespace MetaApi.Services
         private readonly ILogger<FileService> _logger;
         private readonly string _webRootPath;
 
-        public FileService(FileCrcHostedService fileCrcService,
+        public FileService(ICrcFileProvider fileCrcService,
                            ImageService imageService,
                            IHttpClientFactory httpClientFactory,                           
                            ILogger<FileService> logger,
