@@ -12,7 +12,7 @@
                 options.AddPolicy(AllowSpecificOriginPolicy,
                     policy =>
                     {
-                        policy.WithOrigins("https://virtual-fit.one")
+                        policy.WithOrigins("https://virtual-fit.one", "https://oxford-ap.com")
                               .AllowAnyHeader()
                               .AllowAnyMethod();
                     });
@@ -35,10 +35,10 @@
             }
             else
             {
-                //т.к. 2 домена используют апи (virtual-fit.one, oxford-ap.com) то делаю без ограничений CORS
+                //почему-то это не работает
 
-                app.UseCors(AllowAllPolicy);
-                //app.UseCors(AllowSpecificOriginPolicy);
+                //app.UseCors(AllowAllPolicy);
+                app.UseCors(AllowSpecificOriginPolicy);
             }
         }
     }
