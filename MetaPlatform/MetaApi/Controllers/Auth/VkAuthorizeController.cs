@@ -7,10 +7,9 @@ namespace MetaApi.Controllers
     [Route("api/vk-auth")]
     [ApiController]
     public class VkAuthorizeController : ControllerBase
-    {
-        private readonly ILogger<VkAuthorizeController> _logger;
-
+    {        
         private readonly VkAuthService _authService;
+        private readonly ILogger<VkAuthorizeController> _logger;
 
         public VkAuthorizeController(VkAuthService authService,
                                      ILogger<VkAuthorizeController> logger)

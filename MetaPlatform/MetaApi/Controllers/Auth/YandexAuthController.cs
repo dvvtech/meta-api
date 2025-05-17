@@ -18,7 +18,7 @@ namespace MetaApi.Controllers.Auth
         public IActionResult GetAuthUrl()
         {
             var url = _yandexAuthService.GenerateAuthUrl();
-            return Ok(new { Url = url });
+            return Ok(url);
         }
 
         [HttpGet("callback")]
@@ -30,7 +30,8 @@ namespace MetaApi.Controllers.Auth
                 return BadRequest("Failed to authenticate with Yandex");
             }
 
-            return Ok(tokenResponse);
+            //Перенаправляем пользователя на фронтенд
+            return Redirect($"https://virtual-fit.one?accessToken={tokenResponse.AccessToken}&refreshToken={tokenResponse.RefreshToken}");
         }
     }
 }
