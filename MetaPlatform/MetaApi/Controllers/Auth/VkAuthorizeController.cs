@@ -12,10 +12,11 @@ namespace MetaApi.Controllers
 
         private readonly VkAuthService _authService;
 
-        public VkAuthorizeController(ILogger<VkAuthorizeController> logger, VkAuthService authService)
-        {
-            _logger = logger;
+        public VkAuthorizeController(VkAuthService authService,
+                                     ILogger<VkAuthorizeController> logger)
+        {            
             _authService = authService;
+            _logger = logger;
         }        
 
         /// <summary>

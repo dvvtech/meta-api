@@ -1,6 +1,7 @@
 ﻿using Meta.Infrastructure;
 using MetaApi.AppStart.Extensions;
 using MetaApi.Configuration;
+using MetaApi.Configuration.Auth;
 using MetaApi.Core.Configurations;
 using MetaApi.Core.Interfaces.Infrastructure;
 using MetaApi.Core.Interfaces.Repositories;
@@ -49,7 +50,8 @@ namespace MetaApi.AppStart
         {
             _builder.Services.Configure<VirtualFitConfig>(_builder.Configuration.GetSection(VirtualFitConfig.SectionName));
             _builder.Services.Configure<GoogleAuthConfig>(_builder.Configuration.GetSection(GoogleAuthConfig.SectionName));
-            _builder.Services.Configure<VkAuthConfig>(_builder.Configuration.GetSection(VkAuthConfig.SectionName));            
+            _builder.Services.Configure<VkAuthConfig>(_builder.Configuration.GetSection(VkAuthConfig.SectionName));
+            _builder.Services.Configure<YandexAuthConfig>(_builder.Configuration.GetSection(YandexAuthConfig.SectionName));
 
             _builder.Services.AddOptions<JwtConfig>()
                 .Bind(_builder.Configuration.GetSection(JwtConfig.SectionName))
@@ -138,6 +140,7 @@ namespace MetaApi.AppStart
             _builder.Services.AddScoped<IAuthService, AuthService>();
             _builder.Services.AddScoped<VkAuthService>();
             _builder.Services.AddScoped<GoogleAuthService>();
+            _builder.Services.AddScoped<YandexAuthService>();
 
             _builder.Services.AddSingleton<ICrcFileProvider, FileCrcHostedService>();
             _builder.Services.AddHostedService(provider => provider.GetService<ICrcFileProvider>() as FileCrcHostedService);            

@@ -1,4 +1,4 @@
-﻿using MetaApi.Configuration;
+﻿using MetaApi.Configuration.Auth;
 using MetaApi.Core.Interfaces.Infrastructure;
 using MetaApi.Core.Interfaces.Repositories;
 using Microsoft.Extensions.Options;

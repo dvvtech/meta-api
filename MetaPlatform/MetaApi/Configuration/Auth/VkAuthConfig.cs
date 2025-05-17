@@ -1,4 +1,4 @@
-﻿namespace MetaApi.Configuration
+﻿namespace MetaApi.Configuration.Auth
 {
     public class VkAuthConfig
     {

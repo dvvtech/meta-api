@@ -5,6 +5,7 @@ namespace MetaApi.Core.Domain.Account
     {
         Unknown,
         Vk,
-        Google
+        Google,
+        Yandex
     }
 }
