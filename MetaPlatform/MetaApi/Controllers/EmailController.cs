@@ -8,26 +8,30 @@ using System.Text.Json;
 
 namespace MetaApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/email")]
     [ApiController]
     public class EmailController : ControllerBase
     {
         private readonly IEmailSender _emailSender;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly string _secreteKey;
+        private readonly ILogger<EmailController> _logger;
 
         public EmailController(IEmailSender emailSender,
                                IHttpClientFactory httpClientFactory,
-                               IOptions<GoogleRecaptchaConfig> options)
+                               IOptions<GoogleRecaptchaConfig> options,
+                               ILogger<EmailController> logger)
         {
             _emailSender = emailSender;
             _httpClientFactory = httpClientFactory;
             _secreteKey = options.Value.SecretKey;
+            _logger = logger;
         }
 
         [HttpPost("send")]
         public async Task<IActionResult> SendEmail([FromBody] SendEmailRequest request)
         {
+            _logger.LogInformation("SE1");
             // Проверяем входные данные
             if (string.IsNullOrWhiteSpace(request.Body))
             {
@@ -37,8 +41,11 @@ namespace MetaApi.Controllers
             var recaptchaValid = await ValidateRecaptcha(request.RecaptchaToken);
             if (!recaptchaValid)
             {
+                _logger.LogInformation("captcha not valid");
                 return BadRequest("reCAPTCHA validation failed.");
             }
+
+            _logger.LogInformation("SE2");
 
             StringBuilder sb = new StringBuilder();
             sb.AppendLine($"Name: {request.Name}");
@@ -47,6 +54,7 @@ namespace MetaApi.Controllers
             sb.AppendLine($"Body: {request.Body}");
 
             var res = await _emailSender.SendEmail("dvv153m@gmail.com", request.Subject, sb.ToString());
+            _logger.LogInformation("SE3");
             return Ok();
         }
 

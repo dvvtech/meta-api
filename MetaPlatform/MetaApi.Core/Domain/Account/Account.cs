@@ -35,6 +35,21 @@ namespace MetaApi.Core.Domain.Account
             Role = role;
         }
 
+        private Account(int id,
+                        string externalId,
+                        string userName,
+                        string jwtRefreshToken,
+                        AuthType authType,
+                        Role role)
+        {
+            Id = id;
+            ExternalId = externalId;
+            UserName = userName;
+            JwtRefreshToken = jwtRefreshToken;
+            AuthType = authType;
+            Role = role;
+        }
+
         public static Account Create(string externalId,
                                      string userName,
                                      string jwtRefreshToken,
@@ -42,6 +57,16 @@ namespace MetaApi.Core.Domain.Account
                                      Role role)
         {
             return new Account(externalId, userName, jwtRefreshToken, authType, role);
+        }
+
+        public static Account Create(int id,
+                                     string externalId,
+                                     string userName,
+                                     string jwtRefreshToken,
+                                     AuthType authType,
+                                     Role role)
+        {
+            return new Account(id, externalId, userName, jwtRefreshToken, authType, role);
         }
     }
 }

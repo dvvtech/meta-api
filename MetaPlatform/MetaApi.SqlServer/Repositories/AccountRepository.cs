@@ -77,7 +77,7 @@ namespace MetaApi.SqlServer.Repositories
 
         private Account CreateAccountFromEntity(AccountEntity accountEntity)
         {
-            return Account.Create(                
+            return Account.Create(accountEntity.Id,                
                 accountEntity.ExternalId,
                 accountEntity.UserName,
                 accountEntity.JwtRefreshToken,
