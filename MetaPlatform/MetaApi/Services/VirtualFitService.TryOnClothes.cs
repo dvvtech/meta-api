@@ -18,6 +18,8 @@ namespace MetaApi.Services
             
             if (predictionResult.IsSuccess)
             {
+                _logger.LogInformation("Prediction success");
+
                 string urlResult = await _fileService.UploadResultFileAsync(predictionResult.Value, fittingData.Host, fittingData.HumanImg);
                 
                 FittingHistory fittingHistory = CreateFittingHistory(fittingData, urlResult);
@@ -33,7 +35,8 @@ namespace MetaApi.Services
                 ));
             }
             else
-            {                
+            {
+                _logger.LogInformation($"Error description: {predictionResult.Error.Description}");
                 return Result<(string ResultImageUrl, int RemainingUsage)>.Failure(VirtualFitError.VirtualFitServiceError("Something went wrong"));
             }
         }        
