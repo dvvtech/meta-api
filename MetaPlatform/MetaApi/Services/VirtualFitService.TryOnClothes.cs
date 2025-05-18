@@ -13,13 +13,13 @@ namespace MetaApi.Services
         /// Примерка одежды
         /// </summary>
         public async Task<Result<(string ResultImageUrl, int RemainingUsage)>> TryOnClothesAsync(FittingData fittingData)
-        {            
+        {
             Result<string> predictionResult = await _replicateClientService.ProcessPredictionAsync(fittingData);
-
+            
             if (predictionResult.IsSuccess)
             {
                 string urlResult = await _fileService.UploadResultFileAsync(predictionResult.Value, fittingData.Host, fittingData.HumanImg);
-
+                
                 FittingHistory fittingHistory = CreateFittingHistory(fittingData, urlResult);
 
                 await _fittingHistoryRepository.AddToHistoryAsync(fittingHistory);
@@ -52,11 +52,11 @@ namespace MetaApi.Services
 
         public async Task<Result<FittingResultResponse>> TryOnClothesFakeAsync(FittingRequest request)
         {            
-            await Task.Delay(5000);
+            await Task.Delay(30000);
 
             return Result<FittingResultResponse>.Success(new FittingResultResponse
             {
-                Url = "https://a30944-8332.x.d-f.pw/result/d211d593-59b4-497b-8368-8d13b14f8dc1.jpg",
+                Url = "https://a33140-9deb.k.d-f.pw/woman/8c4d8641-2373-4e0b-a6a9-64f76a584e47_t.png",
                 RemainingUsage = 3
             });
         }
