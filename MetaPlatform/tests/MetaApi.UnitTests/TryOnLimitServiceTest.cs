@@ -23,7 +23,7 @@ namespace MetaApi.UnitTests
                                                               lastResetTime: new DateTime(2023, 10, 9, 12, 0, 0),
                                                               resetPeriod: TimeSpan.FromHours(24)));                          
 
-            var service = new TryOnLimitService(mockRepository.Object, mockClock.Object);
+            var service = new TryOnLimitService(mockRepository.Object, mockClock.Object, null);
 
             // Act
             var result = await service.GetTimeUntilLimitResetAsync(1);

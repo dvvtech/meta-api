@@ -8,16 +8,19 @@ namespace MetaApi.Controllers.Auth
     public class YandexAuthController : ControllerBase
     {
         private readonly YandexAuthService _yandexAuthService;
+        private readonly ILogger<YandexAuthController> _logger;
 
-        public YandexAuthController(YandexAuthService yandexAuthService)
+        public YandexAuthController(YandexAuthService yandexAuthService,
+                                    ILogger<YandexAuthController> logger)
         {
             _yandexAuthService = yandexAuthService;
+            _logger = logger;
         }
 
-        [HttpGet("auth-url")]
+        [HttpGet]
         public IActionResult GetAuthUrl()
         {
-            var url = _yandexAuthService.GenerateAuthUrl();
+            var url = _yandexAuthService.GenerateAuthUrl();            
             return Ok(url);
         }
 

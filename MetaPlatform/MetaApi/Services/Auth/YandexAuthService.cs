@@ -81,6 +81,8 @@ namespace MetaApi.Services.Auth
                     await _accountRepository.UpdateRefreshToken(account);
                 }
 
+                _logger.LogInformation($"Success register user with naame: {userInfo?.Login}");
+
                 return new TokenResponse
                 {
                     AccessToken = accessToken,
