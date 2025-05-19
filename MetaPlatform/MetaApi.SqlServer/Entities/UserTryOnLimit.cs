@@ -26,6 +26,11 @@ namespace MetaApi.SqlServer.Entities
         public int AttemptsUsed { get; set; }
 
         /// <summary>
+        /// Общее кол-во попыток
+        /// </summary>
+        public int TotalAttemptsUsed { get; set; }
+
+        /// <summary>
         /// Время последнего сброса
         /// </summary>
         public DateTime LastResetTime { get; set; }

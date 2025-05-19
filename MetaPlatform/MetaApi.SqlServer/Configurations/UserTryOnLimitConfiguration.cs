@@ -28,6 +28,10 @@ namespace MetaApi.SqlServer.Configurations
                    .IsRequired()
                    .HasDefaultValue(0);
 
+            builder.Property(x => x.TotalAttemptsUsed)
+                   .IsRequired()
+                   .HasDefaultValue(0);
+
             builder.Property(x => x.LastResetTime)
                    .IsRequired()
                    .HasColumnType("datetime2");

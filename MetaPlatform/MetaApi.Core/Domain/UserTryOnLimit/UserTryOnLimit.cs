@@ -21,6 +21,11 @@ namespace MetaApi.Core.Domain.UserTryOnLimit
         public int AttemptsUsed { get; set; }
 
         /// <summary>
+        /// Общее кол-во попыток
+        /// </summary>
+        public int TotalAttemptsUsed { get; set; }
+
+        /// <summary>
         /// Время последнего сброса
         /// </summary>
         public DateTime LastResetTime { get; set; }
@@ -39,7 +44,7 @@ namespace MetaApi.Core.Domain.UserTryOnLimit
             ResetPeriod = resetPeriod;
         }
 
-        private UserTryOnLimit(int id, int accountId, int maxAttempts, int attemptsUsed, DateTime lastResetTime, TimeSpan resetPeriod)
+        private UserTryOnLimit(int id, int accountId, int maxAttempts, int attemptsUsed, int totalAttemptsUsed, DateTime lastResetTime, TimeSpan resetPeriod)
         {
             Id = id;
             AccountId = accountId;
@@ -54,9 +59,9 @@ namespace MetaApi.Core.Domain.UserTryOnLimit
             return new UserTryOnLimit(accountId, maxAttempts, attemptsUsed, lastResetTime, resetPeriod);
         }
 
-        public static UserTryOnLimit Create(int id, int accountId, int maxAttempts, int attemptsUsed, DateTime lastResetTime, TimeSpan resetPeriod)
+        public static UserTryOnLimit Create(int id, int accountId, int maxAttempts, int attemptsUsed, int totalAttemptsUsed, DateTime lastResetTime, TimeSpan resetPeriod)
         {
-            return new UserTryOnLimit(id, accountId, maxAttempts, attemptsUsed, lastResetTime, resetPeriod);
+            return new UserTryOnLimit(id, accountId, maxAttempts, attemptsUsed, totalAttemptsUsed, lastResetTime, resetPeriod);
         }
     }
 }

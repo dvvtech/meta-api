@@ -25,10 +25,11 @@ namespace MetaApi.AppStart.Extensions
         public static void ApplyRateLimit(this WebApplication app)
         {            
             app.UseRateLimiter();
-            app.UseEndpoints(endpoints =>
+            app.MapControllers().RequireRateLimiting(LimitPolicyName);
+            /*app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers().RequireRateLimiting(LimitPolicyName); 
-            });
+            });*/
         }
     }
 }

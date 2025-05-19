@@ -28,7 +28,8 @@ namespace MetaApi.SqlServer.Repositories
             {
                 AccountId = limit.AccountId,
                 MaxAttempts = limit.MaxAttempts,
-                AttemptsUsed = limit.AttemptsUsed,
+                AttemptsUsed = limit.AttemptsUsed,  
+                TotalAttemptsUsed = 0,
                 LastResetTime = limit.LastResetTime,
                 ResetPeriod = limit.ResetPeriod
             };
@@ -43,6 +44,7 @@ namespace MetaApi.SqlServer.Repositories
                                             .ExecuteUpdateAsync(limit => limit
                                                 .SetProperty(p => p.MaxAttempts, userTryOnLimit.MaxAttempts)
                                                 .SetProperty(p => p.AttemptsUsed, userTryOnLimit.AttemptsUsed)
+                                                .SetProperty(p => p.TotalAttemptsUsed, userTryOnLimit.TotalAttemptsUsed)
                                                 .SetProperty(p => p.LastResetTime, userTryOnLimit.LastResetTime)
                                                 .SetProperty(p => p.ResetPeriod, userTryOnLimit.ResetPeriod));
             await _dbContext.SaveChangesAsync();
@@ -54,6 +56,7 @@ namespace MetaApi.SqlServer.Repositories
                                          entity.AccountId,
                                          entity.MaxAttempts,
                                          entity.AttemptsUsed,
+                                         entity.TotalAttemptsUsed,
                                          entity.LastResetTime,
                                          entity.ResetPeriod);
         }

@@ -32,19 +32,19 @@ app.ApplyCors();
 
 app.UseRouting();
 app.UseAuthorization();
-app.ApplyRateLimit();
 
 app.ApplyMigrations();
 
 app.ApplyAllHealthChecks();
 
-// Ваш кастомный middleware
 app.UseMiddleware<TryOnLimitMiddleware>();
 
 // Добавление поддержки статических файлов
 app.UseStaticFiles();
 
-app.MapControllers();
+app.ApplyRateLimit();
+
+//app.MapControllers();
 
 OnApplicationStartLogAddresses(app);
 

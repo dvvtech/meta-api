@@ -2,6 +2,7 @@
 using MetaApi.Core.Interfaces.Infrastructure;
 using MetaApi.Core.Interfaces.Repositories;
 using MetaApi.Core.Interfaces.Services;
+using Microsoft.Extensions.Logging;
 
 namespace MetaApi.Core.Services
 {
@@ -9,11 +10,15 @@ namespace MetaApi.Core.Services
     {
         private readonly ITryOnLimitRepository _repository;
         private readonly ISystemTime _systemTime;
+        private readonly ILogger<TryOnLimitService> _logger;
 
-        public TryOnLimitService(ITryOnLimitRepository cache, ISystemTime systemTime)
+        public TryOnLimitService(ITryOnLimitRepository cache,
+                                 ISystemTime systemTime,
+                                 ILogger<TryOnLimitService> logger)
         {
             _repository = cache;
             _systemTime = systemTime;
+            _logger = logger;
         }
 
         public async Task<int> GetRemainingUsage(int userId)
@@ -54,7 +59,7 @@ namespace MetaApi.Core.Services
         /// Проверяет, может ли пользователь совершить попытку
         /// </summary>
         public async Task<bool> CanUserTryOnAsync(int userId)
-        {
+        {            
             var limit = await GetOrCreateLimitAsync(userId);
             ResetLimitIfPeriodPassed(limit);
 
@@ -70,6 +75,7 @@ namespace MetaApi.Core.Services
             ResetLimitIfPeriodPassed(limit);
 
             limit.AttemptsUsed++;
+            limit.TotalAttemptsUsed++;
             limit.LastResetTime = _systemTime.UtcNow;
 
             await _repository.UpdateLimit(limit);
