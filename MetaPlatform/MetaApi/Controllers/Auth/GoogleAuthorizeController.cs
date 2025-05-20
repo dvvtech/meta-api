@@ -31,7 +31,9 @@ namespace MetaApi.Controllers
             var tokenResponse = await _authService.HandleCallback(code);
             _logger.LogInformation("Callback2");
             //Перенаправляем пользователя на фронтенд
-            return Redirect($"https://virtual-fit.one?accessToken={tokenResponse.AccessToken}&refreshToken={tokenResponse.RefreshToken}");
+            return Redirect($"https://virtual-fit.one?" +
+                            $"accessToken={Uri.EscapeDataString(tokenResponse.AccessToken)}&" +
+                            $"refreshToken={Uri.EscapeDataString(tokenResponse.RefreshToken)}");
             //return Redirect($"https://localhost:7105/connect/?accessToken={tokenResponse.AccessToken}&refreshToken={tokenResponse.RefreshToken}");            
         }
     }

@@ -41,7 +41,9 @@ namespace MetaApi.Controllers.Auth
             }
 
             //Перенаправляем пользователя на фронтенд
-            return Redirect($"https://virtual-fit.one?accessToken={tokenResponse.AccessToken}&refreshToken={tokenResponse.RefreshToken}");
+            return Redirect($"https://virtual-fit.one?" +
+                            $"accessToken={Uri.EscapeDataString(tokenResponse.AccessToken)}&" +
+                            $"refreshToken={Uri.EscapeDataString(tokenResponse.RefreshToken)}");
         }
     }
 }

@@ -14,7 +14,8 @@ namespace MetaApi.Controllers.Auth
         private readonly IAuthService _authService;
         private readonly ILogger<AuthorizeController> _logger;        
 
-        public AuthorizeController(IAuthService authService, ILogger<AuthorizeController> logger)
+        public AuthorizeController(IAuthService authService, 
+                                   ILogger<AuthorizeController> logger)
         {
             _authService = authService;
             _logger = logger;            
@@ -41,9 +42,12 @@ namespace MetaApi.Controllers.Auth
         [HttpPost("refresh-token")]
         public async Task<ActionResult<Models.Auth.TokenResponse>> RefreshToken(RefreshTokenRequest request)
         {
-            Result<MetaApi.Models.Auth.TokenResponse> tokenResult = await _authService.RefreshTokenAsync(request.RefreshToken);
+            _logger.LogInformation($" RefreshToken {request.RefreshToken}");
+
+            Result<TokenResponse> tokenResult = await _authService.RefreshTokenAsync(request.RefreshToken);
             if (tokenResult.IsFailure)
             {
+                _logger.LogInformation($"Failed to refresh token {tokenResult.Error.Description}");
                 return BadRequest("Failed to refresh token");
             }
 
