@@ -27,6 +27,8 @@ namespace MetaApi.Controllers.Auth
         [HttpGet("callback")]
         public async Task<IActionResult> Callback([FromQuery] string code)
         {
+            _logger.LogInformation($"YandexAuth callback code: {code}");
+
             var tokenResponse = await _yandexAuthService.HandleCallback(code);
             if (tokenResponse == null)
             {

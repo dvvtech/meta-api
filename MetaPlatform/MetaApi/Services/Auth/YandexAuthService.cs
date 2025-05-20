@@ -73,15 +73,17 @@ namespace MetaApi.Services.Auth
 
                     int accountId = await _accountRepository.Add(newUserEntity);
                     accessToken = _jwtProvider.GenerateToken(newUserEntity.UserName, accountId);
+
+                    _logger.LogInformation($"Success register user with naame: {userInfo?.Login}");
                 }
                 else
                 {
                     accessToken = _jwtProvider.GenerateToken(account.UserName, account.Id);
                     account.JwtRefreshToken = refreshToken;
                     await _accountRepository.UpdateRefreshToken(account);
-                }
 
-                _logger.LogInformation($"Success register user with naame: {userInfo?.Login}");
+                    _logger.LogInformation($"Success yandex auth with naame: {userInfo?.Login}");
+                }                
 
                 return new TokenResponse
                 {
