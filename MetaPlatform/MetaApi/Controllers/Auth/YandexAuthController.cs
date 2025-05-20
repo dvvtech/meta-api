@@ -29,6 +29,11 @@ namespace MetaApi.Controllers.Auth
         {
             _logger.LogInformation($"YandexAuth callback code: {code}");
 
+            if (string.IsNullOrEmpty(code))
+            {
+                return BadRequest("Code is required");
+            }
+
             var tokenResponse = await _yandexAuthService.HandleCallback(code);
             if (tokenResponse == null)
             {

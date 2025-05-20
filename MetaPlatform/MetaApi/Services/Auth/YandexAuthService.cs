@@ -2,6 +2,7 @@
 using MetaApi.Core.Domain.Account;
 using MetaApi.Core.Interfaces.Infrastructure;
 using MetaApi.Core.Interfaces.Repositories;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
 using System.Text.Json.Serialization;
@@ -10,16 +11,19 @@ namespace MetaApi.Services.Auth
 {
     public partial class YandexAuthService
     {
+        private readonly IMemoryCache _cache;
         private readonly YandexAuthConfig _authConfig;
         private readonly IJwtProvider _jwtProvider;
         private readonly IAccountRepository _accountRepository;
         private readonly ILogger<YandexAuthService> _logger;
 
-        public YandexAuthService(IOptions<YandexAuthConfig> authConfig,
-                                IAccountRepository accountRepository,
-                                IJwtProvider jwtProvider,
-                                ILogger<YandexAuthService> logger)
+        public YandexAuthService(IMemoryCache cache,
+                                 IOptions<YandexAuthConfig> authConfig,
+                                 IAccountRepository accountRepository,
+                                 IJwtProvider jwtProvider,
+                                 ILogger<YandexAuthService> logger)
         {
+            _cache = cache;
             _authConfig = authConfig.Value;
             _accountRepository = accountRepository;
             _jwtProvider = jwtProvider;
@@ -48,55 +52,91 @@ namespace MetaApi.Services.Auth
         /// </summary>
         public async Task<TokenResponse> HandleCallback(string code)
         {
-            try
+            // Ключ для кеша
+            var cacheKey = $"yandex_auth_{code}";
+
+            // Если задача уже есть в кеше, возвращаем её (await дождётся её завершения)
+            if (_cache.TryGetValue(cacheKey, out Task<TokenResponse> ongoingTask))
             {
-                // Получаем access token от Яндекс
-                var tokenResponse = await ExchangeCodeForToken(code);
+                return await ongoingTask;
+            }
 
-                // Получаем информацию о пользователе
-                var userInfo = await GetUserInfo(tokenResponse.AccessToken);
+            // Создаём новую задачу, но пока не запускаем её
+            var taskCompletionSource = new TaskCompletionSource<TokenResponse>();
 
-                string accessToken = string.Empty;
-                string refreshToken = _jwtProvider.GenerateRefreshToken();
+            // Помещаем задачу в кеш (если другой поток уже добавил задачу, берём её)
+            ongoingTask = _cache.GetOrCreate(cacheKey, entry =>
+            {
+                entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(5)); // Кешируем на 5 минут
+                return taskCompletionSource.Task;
+            });
 
-                // Ищем или создаем пользователя в нашей системе
-                Account account = await _accountRepository.GetByExternalId(userInfo.Id);
-
-                if (account == null)
+            // Если это первый вызов (taskCompletionSource ещё не завершён), обрабатываем запрос
+            if (ongoingTask == taskCompletionSource.Task)
+            {
+                _logger.LogInformation("Auth proccess");
+                try
                 {
-                    var newUserEntity = Account.Create(
-                        externalId: userInfo.Id,
-                        userName: userInfo.Login ?? userInfo.DefaultEmail,
-                        jwtRefreshToken: refreshToken,
-                        authType: AuthType.Yandex,
-                        role: Role.User);
-
-                    int accountId = await _accountRepository.Add(newUserEntity);
-                    accessToken = _jwtProvider.GenerateToken(newUserEntity.UserName, accountId);
-
-                    _logger.LogInformation($"Success register user with naame: {userInfo?.Login}");
+                    var result = await ProcessAuthCallback(code);
+                    taskCompletionSource.SetResult(result); // Уведомляем все ожидающие запросы
+                    return result;
                 }
-                else
+                catch (Exception ex)
                 {
-                    accessToken = _jwtProvider.GenerateToken(account.UserName, account.Id);
-                    account.JwtRefreshToken = refreshToken;
-                    await _accountRepository.UpdateRefreshToken(account);
-
-                    _logger.LogInformation($"Success yandex auth with naame: {userInfo?.Login}");
-                }                
-
-                return new TokenResponse
-                {
-                    AccessToken = accessToken,
-                    RefreshToken = refreshToken
-                };
+                    _cache.Remove(cacheKey); // Удаляем из кеша в случае ошибки
+                    taskCompletionSource.SetException(ex); // Пробрасываем ошибку всем ожидающим
+                    throw;
+                }
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Yandex auth callback error");
-                return null;
-            }
+
+            // Если задача уже была в кеше, просто ждём её
+            return await ongoingTask;
         }
+
+        private async Task<TokenResponse> ProcessAuthCallback(string code)
+        {
+            // Получаем access token от Яндекс
+            var tokenResponse = await ExchangeCodeForToken(code);
+
+            // Получаем информацию о пользователе
+            var userInfo = await GetUserInfo(tokenResponse.AccessToken);
+
+            string accessToken = string.Empty;
+            string refreshToken = _jwtProvider.GenerateRefreshToken();
+
+            // Ищем или создаем пользователя в нашей системе
+            Account account = await _accountRepository.GetByExternalId(userInfo.Id);
+
+            if (account == null)
+            {
+                var newUserEntity = Account.Create(
+                    externalId: userInfo.Id,
+                    userName: userInfo.Login ?? userInfo.DefaultEmail,
+                    jwtRefreshToken: refreshToken,
+                    authType: AuthType.Yandex,
+                    role: Role.User);
+
+                int accountId = await _accountRepository.Add(newUserEntity);
+                accessToken = _jwtProvider.GenerateToken(newUserEntity.UserName, accountId);
+
+                _logger.LogInformation($"Success register user with name: {userInfo?.Login}");
+            }
+            else
+            {
+                accessToken = _jwtProvider.GenerateToken(account.UserName, account.Id);
+                account.JwtRefreshToken = refreshToken;
+                await _accountRepository.UpdateRefreshToken(account);
+
+                _logger.LogInformation($"Success yandex auth with name: {userInfo?.Login}");
+            }
+
+            return new TokenResponse
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
+            };
+        }
+
 
         private async Task<YandexTokenResponse> ExchangeCodeForToken(string code)
         {
