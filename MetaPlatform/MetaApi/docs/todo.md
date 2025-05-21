@@ -1,4 +1,6 @@
 ﻿
+заменить эту строку return Redirect($"https://virtual-fit.one?accessToken={tokenResponse.AccessToken}&refreshToken={tokenResponse.RefreshToken}");
+на то чтобы в кукисах передавать (Куки (HttpOnly, Secure) )
 
 Перенести сервисы из апи в core
 
