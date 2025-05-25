@@ -13,6 +13,7 @@
                     policy =>
                     {
                         policy.WithOrigins("https://virtual-fit.one", "https://oxford-ap.com")
+                              //.AllowCredentials() // Разрешить куки
                               .AllowAnyHeader()
                               .AllowAnyMethod();
                     });
@@ -20,8 +21,9 @@
                 options.AddPolicy(AllowAllPolicy, policy =>
                 {
                     policy.AllowAnyOrigin()  // Разрешить любой источник
-                       .AllowAnyMethod()  // Разрешить любые HTTP-методы (GET, POST, PUT и т. д.)
-                       .AllowAnyHeader(); // Разрешить любые заголовки
+                          //.AllowCredentials() // Разрешить куки
+                          .AllowAnyMethod()  // Разрешить любые HTTP-методы (GET, POST, PUT и т. д.)
+                          .AllowAnyHeader(); // Разрешить любые заголовки
                 });
 
             });
@@ -34,9 +36,7 @@
                 app.UseCors(AllowAllPolicy);
             }
             else
-            {
-                //почему-то это не работает
-
+            {                
                 //app.UseCors(AllowAllPolicy);
                 app.UseCors(AllowSpecificOriginPolicy);
             }

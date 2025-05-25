@@ -26,14 +26,34 @@ namespace MetaApi.Controllers
 
         [HttpGet("callback")]
         public async Task<IActionResult> Callback(string code)
-        {
-            _logger.LogInformation("Callback1");
+        {            
             var tokenResponse = await _authService.HandleCallback(code);
-            _logger.LogInformation("Callback2");
+
+            // Устанавливаем куки с токенами
+            /*Response.Cookies.Append("access_token", tokenResponse.AccessToken, new CookieOptions
+            {
+                HttpOnly = true, // Защита от XSS
+                Secure = true,    // Только HTTPS
+                SameSite = SameSiteMode.Strict, // Защита от CSRF
+                Expires = DateTime.UtcNow.AddHours(1) // Время жизни access-токена
+            });
+
+            Response.Cookies.Append("refresh_token", tokenResponse.RefreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddDays(7) // Время жизни refresh-токена
+            });
+
+            // Редирект на фронтенд
+            return Redirect("https://virtual-fit.one");*/
+
             //Перенаправляем пользователя на фронтенд
             return Redirect($"https://virtual-fit.one?" +
                             $"accessToken={Uri.EscapeDataString(tokenResponse.AccessToken)}&" +
                             $"refreshToken={Uri.EscapeDataString(tokenResponse.RefreshToken)}");
+
             //return Redirect($"https://localhost:7105/connect/?accessToken={tokenResponse.AccessToken}&refreshToken={tokenResponse.RefreshToken}");            
         }
     }
