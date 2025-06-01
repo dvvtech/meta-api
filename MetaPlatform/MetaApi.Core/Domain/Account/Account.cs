@@ -11,6 +11,9 @@ namespace MetaApi.Core.Domain.Account
         public string ExternalId { get; set; }
 
         public string UserName { get; set; }
+
+        public string Email { get; set; }
+
         public string JwtRefreshToken { get; set; }
 
         public AuthType AuthType { get; set; }
@@ -24,12 +27,14 @@ namespace MetaApi.Core.Domain.Account
 
         private Account(string externalId,
                         string userName,
+                        string email,
                         string jwtRefreshToken,
                         AuthType authType,
                         Role role)
         {            
             ExternalId = externalId;
             UserName = userName;
+            Email = email;
             JwtRefreshToken = jwtRefreshToken;
             AuthType = authType;
             Role = role;
@@ -38,6 +43,7 @@ namespace MetaApi.Core.Domain.Account
         private Account(int id,
                         string externalId,
                         string userName,
+                        string email, 
                         string jwtRefreshToken,
                         AuthType authType,
                         Role role)
@@ -45,6 +51,7 @@ namespace MetaApi.Core.Domain.Account
             Id = id;
             ExternalId = externalId;
             UserName = userName;
+            Email = email;
             JwtRefreshToken = jwtRefreshToken;
             AuthType = authType;
             Role = role;
@@ -52,21 +59,23 @@ namespace MetaApi.Core.Domain.Account
 
         public static Account Create(string externalId,
                                      string userName,
+                                     string email,
                                      string jwtRefreshToken,
                                      AuthType authType,
                                      Role role)
         {
-            return new Account(externalId, userName, jwtRefreshToken, authType, role);
+            return new Account(externalId, userName, email, jwtRefreshToken, authType, role);
         }
 
         public static Account Create(int id,
                                      string externalId,
                                      string userName,
+                                     string email,
                                      string jwtRefreshToken,
                                      AuthType authType,
                                      Role role)
         {
-            return new Account(id, externalId, userName, jwtRefreshToken, authType, role);
+            return new Account(id, externalId, userName, email, jwtRefreshToken, authType, role);
         }
     }
 }

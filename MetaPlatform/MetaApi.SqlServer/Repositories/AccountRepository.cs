@@ -48,6 +48,7 @@ namespace MetaApi.SqlServer.Repositories
             {
                 ExternalId = account.ExternalId,
                 UserName = account.UserName,
+                Email = account.Email,
                 JwtRefreshToken = account.JwtRefreshToken,
                 AuthType = (AuthTypeEntity)account.AuthType,
                 Role = (RoleEntity)account.Role,
@@ -80,6 +81,7 @@ namespace MetaApi.SqlServer.Repositories
             return Account.Create(accountEntity.Id,                
                 accountEntity.ExternalId,
                 accountEntity.UserName,
+                accountEntity.Email,
                 accountEntity.JwtRefreshToken,
                 (AuthType)accountEntity.AuthType,
                 (Role)accountEntity.Role                               

@@ -67,7 +67,8 @@ namespace MetaApi.Services.Auth
             {
                 var newUserEntity = Account.Create(
                     externalId: userInfo.Id,
-                    userName: userInfo.Login ?? userInfo.DefaultEmail,
+                    userName: userInfo.Login ?? "",
+                    email: userInfo.DefaultEmail,
                     jwtRefreshToken: refreshToken,
                     authType: AuthType.Yandex,
                     role: Role.User);

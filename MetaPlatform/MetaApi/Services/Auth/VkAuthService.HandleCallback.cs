@@ -34,6 +34,7 @@ namespace MetaApi.Services
                 {
                     var newUserEntity = Account.Create(externalId: externalId,
                                                        userName: userName,
+                                                       email: "",
                                                        jwtRefreshToken: refreshToken,
                                                        authType: AuthType.Vk,
                                                        role: Role.User);                    

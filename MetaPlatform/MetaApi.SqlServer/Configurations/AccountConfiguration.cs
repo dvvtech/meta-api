@@ -15,6 +15,9 @@ namespace MetaApi.SqlServer.Configurations
             builder.Property(x => x.UserName)
                    .HasMaxLength(512);
 
+            builder.Property(x => x.Email)
+                   .HasMaxLength(256);
+
             builder.Property(x => x.ExternalId)
                    .HasMaxLength(256);                                      
 

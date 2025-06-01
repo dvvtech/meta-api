@@ -1,6 +1,7 @@
 ﻿using MetaApi.Core.Domain.FittingHistory;
 using MetaApi.Core.Interfaces.Repositories;
 using MetaApi.Core.Interfaces.Services;
+using Microsoft.Extensions.Logging;
 
 
 namespace MetaApi.Core.Services
@@ -10,14 +11,17 @@ namespace MetaApi.Core.Services
         private readonly IFittingHistoryRepository _fittingHistoryRepository;
         private readonly ITryOnLimitService _tryOnLimitService;
         private readonly IAccountRepository _accountRepository;
+        private readonly ILogger<ProfileService> _logger;
 
         public ProfileService(IFittingHistoryRepository fittingHistoryRepository,
                               ITryOnLimitService tryOnLimitService,
-                              IAccountRepository accountRepository)
+                              IAccountRepository accountRepository,
+                              ILogger<ProfileService> logger)
         {
             _fittingHistoryRepository = fittingHistoryRepository;
             _tryOnLimitService = tryOnLimitService;
             _accountRepository = accountRepository;
+            _logger = logger;
         }
 
         public async Task<FittingProfile> GetProfile(int userId)
@@ -31,10 +35,13 @@ namespace MetaApi.Core.Services
 
             var account = await _accountRepository.GetById(userId);
 
+            _logger.LogInformation($"accountId: {account.Id}");
+            _logger.LogInformation($"email: {account.Email}");
+
             var fittingProfile = new FittingProfile
             {
                 Name = account.UserName,
-                Email = "qwe@er.ru",
+                Email = account.Email,
                 CountFittingToday = limitToday,
                 TotalAttemptsUsed = limit.TotalAttemptsUsed.ToString(),
                 LastFittingDate = dateOfLastFitting.ToString()
