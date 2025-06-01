@@ -34,17 +34,16 @@ namespace MetaApi.Core.Services
             DateTime dateOfLastFitting = await _fittingHistoryRepository.GetDateOfLastFittingAsync(userId);
 
             var account = await _accountRepository.GetById(userId);
-
+            
             _logger.LogInformation($"accountId: {account.Id}");
-            _logger.LogInformation($"email: {account.Email}");
-
+            
             var fittingProfile = new FittingProfile
             {
-                Name = account.UserName,
+                Name = $"{account.UserName} ({account.AuthType.ToString()})",
                 Email = account.Email,
                 CountFittingToday = limitToday,
                 TotalAttemptsUsed = limit.TotalAttemptsUsed.ToString(),
-                LastFittingDate = dateOfLastFitting.ToString()
+                LastFittingDate = dateOfLastFitting.ToString(),                
             };
 
             return fittingProfile;
