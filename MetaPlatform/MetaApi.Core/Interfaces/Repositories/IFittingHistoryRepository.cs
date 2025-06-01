@@ -7,5 +7,7 @@ namespace MetaApi.Core.Interfaces.Repositories
         Task<FittingHistory[]> GetHistoryAsync(int userId);
         Task<int> AddToHistoryAsync(FittingHistory entity);
         Task DeleteAsync(int fittingResultId, int userId);
+
+        Task<DateTime> GetDateOfLastFittingAsync(int userId);
     }
 }

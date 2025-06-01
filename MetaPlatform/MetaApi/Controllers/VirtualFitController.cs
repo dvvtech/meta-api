@@ -109,6 +109,20 @@ namespace MetaApi.Controllers
             return Ok(fittingHistories);
         }
 
+        [HttpPost("profile"), Authorize]
+        public async Task<ActionResult<FittingProfile>> GetProfile()
+        {
+            Result<int> userIdResult = this.GetCurrentUserId();
+            if (userIdResult.IsFailure)
+            {
+                return BadRequest(userIdResult.Error);
+            }
+
+            FittingProfile res = await _virtualFitService.GetProfile(userIdResult.Value);
+
+            return Ok(res);
+        }
+
         [HttpGet("test3")]
         public IResult Test()
         {

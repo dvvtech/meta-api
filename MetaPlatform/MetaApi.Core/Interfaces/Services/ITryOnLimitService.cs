@@ -1,4 +1,6 @@
 ﻿
+using MetaApi.Core.Domain.UserTryOnLimit;
+
 namespace MetaApi.Core.Interfaces.Services
 {
     public interface ITryOnLimitService
@@ -12,5 +14,7 @@ namespace MetaApi.Core.Interfaces.Services
         Task DecrementTryOnLimitAsync(int userId);
 
         Task<int> GetRemainingTriesAsync(int userId);
+
+        Task<UserTryOnLimit> GetLimit(int userId);
     }
 }

@@ -63,7 +63,12 @@ namespace MetaApi.Services.Cache
 
             // 2. Обновляем кеш                                    
             UpdateCacheAfterDeletion(userId, fittingResultId);
-        }        
+        }
+
+        public async Task<DateTime> GetDateOfLastFittingAsync(int userId)
+        {
+            return await _repository.GetDateOfLastFittingAsync(userId);            
+        }
 
         #region Helper Methods
 

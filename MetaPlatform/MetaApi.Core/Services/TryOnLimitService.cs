@@ -92,6 +92,13 @@ namespace MetaApi.Core.Services
             return limit.MaxAttempts - limit.AttemptsUsed;
         }
 
+        public async Task<UserTryOnLimit> GetLimit(int userId)
+        {            
+            var limit = await GetOrCreateLimitAsync(userId);
+            ResetLimitIfPeriodPassed(limit);
+            return limit;
+        }
+
         /// <summary>
         /// Сбрасывает счетчик, если прошел заданный период
         /// </summary>

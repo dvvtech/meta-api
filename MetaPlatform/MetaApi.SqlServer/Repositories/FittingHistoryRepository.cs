@@ -27,6 +27,19 @@ namespace MetaApi.SqlServer.Repositories
                                                  .ToArrayAsync();                                                             
         }
 
+        public async Task<DateTime> GetDateOfLastFittingAsync(int userId)
+        {
+            var lastFitting = await _dbContext.FittingResult.AsNoTracking()
+                                                            .Where(result => result.AccountId == userId && !result.IsDeleted)
+                                                            .OrderByDescending(result => result.CreatedUtcDate) // Сортируем по дате в обратном порядке
+                                                            .FirstOrDefaultAsync(); // Берем первую запись (самую новую)
+
+            if (lastFitting != null)
+                return lastFitting.CreatedUtcDate;
+            else
+                return DateTime.MinValue;
+        }
+
         public async Task<int> AddToHistoryAsync(FittingHistory item)
         {
             var newFittingHistory = new FittingResultEntity
