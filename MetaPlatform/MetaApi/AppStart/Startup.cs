@@ -109,7 +109,7 @@ namespace MetaApi.AppStart
         private void AddServices()
         {
             //храним временные данные для авторизации vk и кешируем бд в кеше памяти
-            _builder.Services.AddMemoryCache();
+            _builder.Services.AddMemoryCache();                        
 
             _builder.Services.AddScoped<IFittingHistoryRepository, FittingHistoryRepository>();
             _builder.Services.Decorate<IFittingHistoryRepository, CachedFittingHistoryRepository>();            
@@ -122,6 +122,7 @@ namespace MetaApi.AppStart
             _builder.Services.AddScoped<ISystemTime, SystemTime>();
             _builder.Services.AddScoped<ITryOnLimitService, TryOnLimitService>();
             _builder.Services.AddScoped<IVirtualFitService, VirtualFitService>();
+            _builder.Services.AddScoped<IProfileService, ProfileService>();
 
             _builder.Services.AddScoped<ImageService>();
             _builder.Services.AddScoped<IFileService, FileService>(serviceProvider =>
