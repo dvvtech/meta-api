@@ -50,6 +50,7 @@ namespace MetaApi.Core.Domain.UserTryOnLimit
             AccountId = accountId;
             MaxAttempts = maxAttempts;
             AttemptsUsed = attemptsUsed;
+            TotalAttemptsUsed = totalAttemptsUsed;
             LastResetTime = lastResetTime;
             ResetPeriod = resetPeriod;
         }

@@ -43,14 +43,10 @@ namespace MetaApi.Core.Services
                 Email = account.Email,
                 CountFittingToday = limitToday,
                 TotalAttemptsUsed = limit.TotalAttemptsUsed.ToString(),
-                LastFittingDate = dateOfLastFitting.ToString(),                
+                LastFittingDate = dateOfLastFitting.ToString("dd MM yyyy HH:mm:ss"),                
             };
 
             return fittingProfile;
-
-            //IAccountRepository.Get(userId)
-            //Name
-            //Email
         }
     }
 }
