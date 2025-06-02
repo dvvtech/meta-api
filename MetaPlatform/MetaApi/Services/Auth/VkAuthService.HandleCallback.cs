@@ -24,6 +24,7 @@ namespace MetaApi.Services
                 TokenResponse tokenResponse = await ExchangeCodeForToken(code, codeVerifier, deviceId);
 
                 string userName = await GetUserName(tokenResponse.AccessToken, tokenResponse.RefreshToken, deviceId);
+                string userEmail = tokenResponse.Email ?? "";
 
                 string accessToken = string.Empty;
                 string refreshToken = _jwtProvider.GenerateRefreshToken();
@@ -34,7 +35,7 @@ namespace MetaApi.Services
                 {
                     var newUserEntity = Account.Create(externalId: externalId,
                                                        userName: userName,
-                                                       email: "",
+                                                       email: userEmail,
                                                        jwtRefreshToken: refreshToken,
                                                        authType: AuthType.Vk,
                                                        role: Role.User);                    

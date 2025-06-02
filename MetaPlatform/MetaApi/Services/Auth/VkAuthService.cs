@@ -57,6 +57,9 @@ namespace MetaApi.Services
         [JsonPropertyName("user_id")]
         public long UserId { get; set; }
 
+        [JsonPropertyName("email")]
+        public string Email { get; set; }
+
         [JsonPropertyName("state")]
         public string State { get; set; }
 

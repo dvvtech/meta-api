@@ -40,7 +40,8 @@ namespace MetaApi.SqlServer.Entities
     {
         Unknown,
         Vk,
-        Google
+        Google,
+        Yandex
     }
 
     public enum RoleEntity
