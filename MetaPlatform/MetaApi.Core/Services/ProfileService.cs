@@ -32,6 +32,11 @@ namespace MetaApi.Core.Services
             var totalAttemptsUsed = limit.TotalAttemptsUsed;
 
             DateTime dateOfLastFitting = await _fittingHistoryRepository.GetDateOfLastFittingAsync(userId);
+            var dateOfLastFittingFormat = dateOfLastFitting.ToString("dd MM yyyy HH:mm:ss");
+            if (dateOfLastFitting == DateTime.MaxValue)
+            {
+                dateOfLastFittingFormat = "-";
+            }
 
             var account = await _accountRepository.GetById(userId);
             
@@ -43,7 +48,7 @@ namespace MetaApi.Core.Services
                 Email = account.Email,
                 CountFittingToday = limitToday,
                 TotalAttemptsUsed = limit.TotalAttemptsUsed.ToString(),
-                LastFittingDate = dateOfLastFitting.ToString("dd MM yyyy HH:mm:ss"),                
+                LastFittingDate = dateOfLastFittingFormat,                
             };
 
             return fittingProfile;
