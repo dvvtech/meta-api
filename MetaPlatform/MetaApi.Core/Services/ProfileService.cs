@@ -33,7 +33,7 @@ namespace MetaApi.Core.Services
 
             DateTime dateOfLastFitting = await _fittingHistoryRepository.GetDateOfLastFittingAsync(userId);
             var dateOfLastFittingFormat = dateOfLastFitting.ToString("dd MM yyyy HH:mm:ss");
-            if (dateOfLastFitting == DateTime.MaxValue)
+            if (dateOfLastFitting == DateTime.MinValue)
             {
                 dateOfLastFittingFormat = "-";
             }

@@ -15,3 +15,4 @@ Todo
 госуслуги
 tinkof Id
 сбер id
+alfa id
