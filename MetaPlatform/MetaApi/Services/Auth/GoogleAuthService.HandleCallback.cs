@@ -63,10 +63,9 @@ namespace MetaApi.Services.Auth
         }
 
         public async Task<GoogleUserInfo> GetUserInfo(string accessToken)
-        {
-            var httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-            var response = await httpClient.GetAsync("https://www.googleapis.com/oauth2/v3/userinfo");
+        {            
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            var response = await _httpClient.GetAsync("https://www.googleapis.com/oauth2/v3/userinfo");
             response.EnsureSuccessStatusCode();
             var userInfo = await response.Content.ReadFromJsonAsync<GoogleUserInfo>();
             return userInfo;

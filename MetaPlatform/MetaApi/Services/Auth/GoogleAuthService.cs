@@ -10,16 +10,19 @@ namespace MetaApi.Services.Auth
         private readonly GoogleAuthConfig _authConfig;        
         private readonly IJwtProvider _jwtProvider;
         private readonly IAccountRepository _accountRepository;
+        private readonly HttpClient _httpClient;
         private readonly ILogger<GoogleAuthService> _logger;
 
         public GoogleAuthService(IOptions<GoogleAuthConfig> authConfig,
                                  IAccountRepository accountRepository,                                 
                                  IJwtProvider jwtProvider,
+                                 HttpClient httpClient,
                                  ILogger<GoogleAuthService> logger)
         {
             _authConfig = authConfig.Value;
             _accountRepository = accountRepository;            
             _jwtProvider = jwtProvider;
+            _httpClient = httpClient;
             _logger = logger;
         }        
     }

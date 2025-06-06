@@ -114,11 +114,10 @@ namespace MetaApi.Services.Auth
         }
 
         private async Task<YandexUserInfo> GetUserInfo(string accessToken)
-        {
-            using var httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("OAuth", accessToken);
+        {            
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("OAuth", accessToken);
 
-            var response = await httpClient.GetAsync("https://login.yandex.ru/info?format=json");
+            var response = await _httpClient.GetAsync("https://login.yandex.ru/info?format=json");
             response.EnsureSuccessStatusCode();
 
             return await response.Content.ReadFromJsonAsync<YandexUserInfo>();

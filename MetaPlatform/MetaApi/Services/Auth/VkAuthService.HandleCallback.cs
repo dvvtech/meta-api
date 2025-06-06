@@ -64,8 +64,7 @@ namespace MetaApi.Services
         }
 
         private async Task<TokenResponse> ExchangeCodeForToken(string code, string codeVerifier, string deviceId)
-        {            
-            var client = new HttpClient();
+        {                        
             var requestContent = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>("client_id", _authConfig.ClientId),
@@ -76,7 +75,7 @@ namespace MetaApi.Services
                 new KeyValuePair<string, string>("device_id", deviceId)
             });
 
-            var response = await client.PostAsync("https://id.vk.com/oauth2/auth", requestContent);
+            var response = await _httpClient.PostAsync("https://id.vk.com/oauth2/auth", requestContent);
             var responseContent = await response.Content.ReadAsStringAsync();
 
             // Проверяем, есть ли ошибка в ответе
@@ -96,14 +95,13 @@ namespace MetaApi.Services
 
         public async Task<string> GetUserName(string accessToken, string refreshToken, string deviceId)
         {
-            string ApiUrl = "https://api.vk.com/method/";
-
-            var client = new HttpClient();
-            var requestUrl = $"{ApiUrl}users.get?access_token={accessToken}&v=5.131";
+            string apiUrl = "https://api.vk.com/method/";
+            
+            var requestUrl = $"{apiUrl}users.get?access_token={accessToken}&v=5.131";
 
             try
             {
-                var response = await client.GetStringAsync(requestUrl);
+                var response = await _httpClient.GetStringAsync(requestUrl);
                 _logger.LogInformation($"user response: {response}");
 
                 if (response.Contains("\"error\""))

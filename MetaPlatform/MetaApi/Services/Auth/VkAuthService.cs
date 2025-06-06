@@ -13,18 +13,21 @@ namespace MetaApi.Services
         private readonly IJwtProvider _jwtProvider;
         private readonly ILogger<VkAuthService> _logger;
         private readonly VkAuthConfig _authConfig;
+        private readonly HttpClient _httpClient;
         private readonly IAccountRepository _accountRepository;
 
         public VkAuthService(IMemoryCache cache,
                              ILogger<VkAuthService> logger,                             
                              IAccountRepository accountRepository,
                              IJwtProvider jwtProvider,
+                             HttpClient httpClient,
                              IOptions<VkAuthConfig> authConfig)
         {
             _cache = cache;
             _logger = logger;            
             _jwtProvider = jwtProvider;
             _authConfig = authConfig.Value;
+            _httpClient = httpClient;
             _accountRepository = accountRepository;
         }                        
     }
