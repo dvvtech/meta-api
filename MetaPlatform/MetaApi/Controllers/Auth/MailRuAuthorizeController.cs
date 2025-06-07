@@ -36,7 +36,7 @@ namespace MetaApi.Controllers.Auth
         {
             try
             {
-                if (!string.IsNullOrEmpty(code))
+                if (string.IsNullOrEmpty(code))
                 {
                     return BadRequest("Mail.ru auth: Code is required");
                     //throw new Exception($"Mail.ru auth error: {error}, description: {error_description}");
