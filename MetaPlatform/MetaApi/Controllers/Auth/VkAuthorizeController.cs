@@ -1,4 +1,5 @@
-﻿using MetaApi.Services;
+﻿using MetaApi.Models.Auth;
+using MetaApi.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MetaApi.Controllers
@@ -38,8 +39,7 @@ namespace MetaApi.Controllers
                                                   [FromQuery] string state,
                                                   [FromQuery] string ext_id,
                                                   [FromQuery] string type)
-        {
-            _logger.LogInformation("Callback7");
+        {            
             /*_logger.LogInformation($"callback code: {code} {Environment.NewLine}" +
                                     $"expires_in: {expires_in}  {Environment.NewLine}" +
                                     $"device_id: {device_id}  {Environment.NewLine}" +
@@ -49,8 +49,7 @@ namespace MetaApi.Controllers
 
             try
             {
-                MetaApi.Models.Auth.TokenResponse tokenResponse = await _authService.HandleCallback(code, state, device_id);
-                _logger.LogInformation("Callback8");                
+                TokenResponse tokenResponse = await _authService.HandleCallback(code, state, device_id);                                
                 //Перенаправляем пользователя на фронтенд
                 return Redirect($"https://virtual-fit.one?" +
                                 $"accessToken={Uri.EscapeDataString(tokenResponse.AccessToken)}&" +
