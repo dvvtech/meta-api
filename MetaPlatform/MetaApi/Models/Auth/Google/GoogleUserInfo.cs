@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace MetaApi.Models.Auth
+namespace MetaApi.Models.Auth.Google
 {
     public class GoogleUserInfo
     {

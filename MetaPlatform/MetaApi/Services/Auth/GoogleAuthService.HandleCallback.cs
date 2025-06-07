@@ -2,6 +2,7 @@
 using System.Net.Http.Headers;
 using MetaApi.Models.Auth;
 using MetaApi.Core.Domain.Account;
+using MetaApi.Models.Auth.Google;
 
 namespace MetaApi.Services.Auth
 {
