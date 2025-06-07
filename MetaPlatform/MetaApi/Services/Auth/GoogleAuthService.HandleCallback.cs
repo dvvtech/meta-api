@@ -12,7 +12,7 @@ namespace MetaApi.Services.Auth
         /// </summary>
         /// <param name="code"></param>
         /// <returns></returns>
-        public async Task<MetaApi.Models.Auth.TokenResponse> HandleCallback(string code)
+        public async Task<TokenResponse> HandleCallback(string code)
         {
             try
             {

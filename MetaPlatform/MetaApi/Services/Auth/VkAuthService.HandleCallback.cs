@@ -1,4 +1,5 @@
 ﻿using MetaApi.Core.Domain.Account;
+using MetaApi.Models.Auth;
 using MetaApi.Models.Auth.Vk;
 using Microsoft.Extensions.Caching.Memory;
 using System.Text.Json;
@@ -7,7 +8,7 @@ namespace MetaApi.Services
 {
     public partial class VkAuthService
     {
-        public async Task<MetaApi.Models.Auth.TokenResponse> HandleCallback(string code, string state, string deviceId)
+        public async Task<TokenResponse> HandleCallback(string code, string state, string deviceId)
         {
             try
             {

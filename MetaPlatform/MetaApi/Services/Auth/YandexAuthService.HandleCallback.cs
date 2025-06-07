@@ -1,4 +1,5 @@
 ﻿using MetaApi.Core.Domain.Account;
+using MetaApi.Models.Auth;
 using MetaApi.Models.Auth.Yandex;
 using Microsoft.Extensions.Caching.Memory;
 using System.Net.Http.Headers;
@@ -7,7 +8,7 @@ namespace MetaApi.Services.Auth
 {
     public partial class YandexAuthService
     {        
-        public async Task<MetaApi.Models.Auth.TokenResponse> HandleCallback(string code)
+        public async Task<TokenResponse> HandleCallback(string code)
         {
             // Ключ для кеша
             var cacheKey = $"yandex_auth_{code}";
