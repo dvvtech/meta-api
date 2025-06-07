@@ -2,7 +2,7 @@
 
 namespace MetaApi.Models.Auth.Vk
 {
-    public class TokenResponse
+    public class VkTokenResponse
     {
         [JsonPropertyName("refresh_token")]
         public string RefreshToken { get; set; }

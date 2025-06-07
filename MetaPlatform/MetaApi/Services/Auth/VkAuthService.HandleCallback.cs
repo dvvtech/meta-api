@@ -22,7 +22,7 @@ namespace MetaApi.Services
                                        $"device_id: {deviceId}  {Environment.NewLine}");
 
                 // Обмениваем код на токен
-                TokenResponse tokenResponse = await ExchangeCodeForToken(code, codeVerifier, deviceId);
+                VkTokenResponse tokenResponse = await ExchangeCodeForToken(code, codeVerifier, deviceId);
 
                 string userName = await GetUserName(tokenResponse.AccessToken, tokenResponse.RefreshToken, deviceId);
                 string userEmail = tokenResponse.Email ?? "";
@@ -64,7 +64,7 @@ namespace MetaApi.Services
             }
         }
 
-        private async Task<TokenResponse> ExchangeCodeForToken(string code, string codeVerifier, string deviceId)
+        private async Task<VkTokenResponse> ExchangeCodeForToken(string code, string codeVerifier, string deviceId)
         {                        
             var requestContent = new FormUrlEncodedContent(new[]
             {
@@ -89,7 +89,7 @@ namespace MetaApi.Services
             _logger.LogInformation("token info:" + responseContent);
 
             // Парсим ответ и извлекаем access_token
-            var tokenResponse = JsonSerializer.Deserialize<TokenResponse>(responseContent);
+            var tokenResponse = JsonSerializer.Deserialize<VkTokenResponse>(responseContent);
 
             return tokenResponse;
         }
