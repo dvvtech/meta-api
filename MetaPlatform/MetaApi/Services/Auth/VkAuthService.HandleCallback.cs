@@ -1,4 +1,5 @@
 ﻿using MetaApi.Core.Domain.Account;
+using MetaApi.Models.Auth.Vk;
 using Microsoft.Extensions.Caching.Memory;
 using System.Text.Json;
 
