@@ -21,5 +21,8 @@ namespace MetaApi.Models.Auth.Mail
 
         [JsonPropertyName("locale")]
         public string Locale { get; set; }
+
+        [JsonPropertyName("id")]
+        public string ExternalId { get; set; }
     }
 }

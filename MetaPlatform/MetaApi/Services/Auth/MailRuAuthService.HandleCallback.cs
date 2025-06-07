@@ -11,28 +11,27 @@ namespace MetaApi.Services.Auth
         public async Task<TokenResponse> HandleCallback(string code, string state)
         {
             try
-            {
+            {                
                 // Извлекаем code_verifier из кэша по state
                 if (!_cache.TryGetValue(state, out string codeVerifier))
                 {
                     throw new Exception("Invalid or expired state");
                 }
-
+                
                 // Обмениваем код на токен
                 MailRuTokenResponse tokenResponse = await ExchangeCodeForToken(code);
-
+                
                 // Получаем информацию о пользователе
                 MailRuUserInfo userInfo = await GetUserInfo(tokenResponse.AccessToken);
-
+                
                 string accessToken = string.Empty;
                 string refreshToken = _jwtProvider.GenerateRefreshToken();
-                string externalId = userInfo.Email; // Используем email как externalId
-
-                Account account = await _accountRepository.GetByExternalId(externalId);
+                
+                Account account = await _accountRepository.GetByExternalId(userInfo.ExternalId);
                 if (account == null)
                 {
                     var newUserEntity = Account.Create(
-                        externalId: externalId,
+                        externalId: userInfo.ExternalId,
                         userName: userInfo.Name,
                         email: userInfo.Email,
                         jwtRefreshToken: refreshToken,
@@ -48,7 +47,7 @@ namespace MetaApi.Services.Auth
                     account.JwtRefreshToken = refreshToken;
                     await _accountRepository.UpdateRefreshToken(account);
                 }
-
+                
                 return new TokenResponse
                 {
                     AccessToken = accessToken,
@@ -66,12 +65,15 @@ namespace MetaApi.Services.Auth
         {
             var requestContent = new FormUrlEncodedContent(new[]
             {
-            new KeyValuePair<string, string>("client_id", _authConfig.ClientId),
-            new KeyValuePair<string, string>("client_secret", _authConfig.ClientSecret),
-            new KeyValuePair<string, string>("grant_type", "authorization_code"),
-            new KeyValuePair<string, string>("code", code),
-            new KeyValuePair<string, string>("redirect_uri", _authConfig.RedirectUrl)
-        });
+                new KeyValuePair<string, string>("client_id", _authConfig.ClientId),
+                new KeyValuePair<string, string>("client_secret", _authConfig.ClientSecret),
+                new KeyValuePair<string, string>("grant_type", "authorization_code"),
+                new KeyValuePair<string, string>("code", code),
+                new KeyValuePair<string, string>("redirect_uri", _authConfig.RedirectUrl)
+            });
+
+            // Добавляем User-Agent
+            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Virtual-fit/1.0 (MailRu OAuth Client)");
 
             var response = await _httpClient.PostAsync("https://oauth.mail.ru/token", requestContent);
             var responseContent = await response.Content.ReadAsStringAsync();
