@@ -21,6 +21,8 @@ namespace MetaApi.Controllers
         [HttpGet]
         public IActionResult Authorize()
         {
+            _logger.LogInformation("google authorize");
+
             var authUrl = _authService.GenerateAuthUrl();            
             return Ok(authUrl);            
         }

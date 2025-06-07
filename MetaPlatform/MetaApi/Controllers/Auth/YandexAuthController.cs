@@ -21,8 +21,10 @@ namespace MetaApi.Controllers.Auth
         [HttpGet]
         public IActionResult GetAuthUrl()
         {
-            var url = _yandexAuthService.GenerateAuthUrl();            
-            return Ok(url);
+            _logger.LogInformation("yandex authorize");
+
+            var authUrl = _yandexAuthService.GenerateAuthUrl();            
+            return Ok(authUrl);
         }
 
         [HttpGet("callback")]

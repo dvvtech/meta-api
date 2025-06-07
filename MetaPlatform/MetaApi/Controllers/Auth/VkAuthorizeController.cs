@@ -25,7 +25,7 @@ namespace MetaApi.Controllers
         [HttpGet]
         public IActionResult Authorize()
         {
-            _logger.LogInformation("authorize");
+            _logger.LogInformation("vk authorize");
 
             var authUrl = _authService.GenerateAuthUrl();            
             return Ok(authUrl);            
