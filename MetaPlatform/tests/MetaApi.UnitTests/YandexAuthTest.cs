@@ -1,11 +1,5 @@
-﻿using MetaApi.Configuration.Auth;
-using MetaApi.Services.Auth;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using MetaApi.Models.Auth.Yandex;
 using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MetaApi.UnitTests
 {
