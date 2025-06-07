@@ -34,7 +34,7 @@ namespace MetaApi.Controllers.Auth
             {
                 if (string.IsNullOrEmpty(code))
                 {
-                    return BadRequest("Code is required");
+                    return BadRequest("Yandex auth: Code is required");
                 }
 
                 TokenResponse tokenResponse = await _yandexAuthService.HandleCallback(code);
@@ -50,7 +50,7 @@ namespace MetaApi.Controllers.Auth
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Yandex auth Exception: {ex.Message}");
+                _logger.LogError($"Yandex auth exception: {ex.Message}");
                 return BadRequest(ex.Message);
             }
         }

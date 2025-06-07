@@ -44,7 +44,7 @@ namespace MetaApi.Controllers
             {
                 if (string.IsNullOrEmpty(code))
                 {
-                    return BadRequest("Code is required");
+                    return BadRequest("Vk auth: Code is required");
                 }
 
                 TokenResponse tokenResponse = await _authService.HandleCallback(code, state, device_id);                                
@@ -55,7 +55,7 @@ namespace MetaApi.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Vk auth Exception: {ex.Message}");
+                _logger.LogError($"Vk auth exception: {ex.Message}");
                 return BadRequest(ex.Message);
             }            
         }

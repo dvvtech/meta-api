@@ -35,7 +35,7 @@ namespace MetaApi.Controllers
             {
                 if (string.IsNullOrEmpty(code))
                 {
-                    return BadRequest("Code is required");
+                    return BadRequest("Google auth: Code is required");
                 }
 
                 TokenResponse tokenResponse = await _authService.HandleCallback(code);
@@ -47,7 +47,7 @@ namespace MetaApi.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Google auth Exception: {ex.Message}");
+                _logger.LogError($"Google auth exception: {ex.Message}");
                 return BadRequest(ex.Message);
             }
         }
