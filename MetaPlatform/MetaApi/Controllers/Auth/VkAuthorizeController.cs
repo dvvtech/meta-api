@@ -1,5 +1,4 @@
 ﻿using MetaApi.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MetaApi.Controllers
@@ -62,25 +61,5 @@ namespace MetaApi.Controllers
                 return BadRequest(ex.Message);
             }            
         }
-
-        [Authorize]
-        [HttpGet("test")]
-        public async Task<IActionResult> Test(string token)
-        {
-            _logger.LogInformation("test");
-
-            /*bool res = await _authService.ValidateToken(token, "", "");
-            if (res)
-            {
-                return Ok();
-            }
-            else
-            {
-                return BadRequest();
-            }*/
-            return Ok("return");
-        }
-
     }
-
 }
