@@ -1,4 +1,5 @@
 ﻿using MetaApi.Models.Auth;
+using MetaApi.Services.Auth;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MetaApi.Controllers.Auth

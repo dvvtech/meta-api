@@ -52,6 +52,7 @@ namespace MetaApi.AppStart
             _builder.Services.Configure<GoogleAuthConfig>(_builder.Configuration.GetSection(GoogleAuthConfig.SectionName));
             _builder.Services.Configure<VkAuthConfig>(_builder.Configuration.GetSection(VkAuthConfig.SectionName));
             _builder.Services.Configure<YandexAuthConfig>(_builder.Configuration.GetSection(YandexAuthConfig.SectionName));
+            _builder.Services.Configure<MailRuAuthConfig>(_builder.Configuration.GetSection(MailRuAuthConfig.SectionName));
 
             _builder.Services.AddOptions<JwtConfig>()
                 .Bind(_builder.Configuration.GetSection(JwtConfig.SectionName))
@@ -142,6 +143,7 @@ namespace MetaApi.AppStart
             _builder.Services.AddScoped<VkAuthService>();
             _builder.Services.AddScoped<GoogleAuthService>();
             _builder.Services.AddScoped<YandexAuthService>();
+            _builder.Services.AddScoped<MailRuAuthService>();
 
             _builder.Services.AddSingleton<ICrcFileProvider, FileCrcHostedService>();
             _builder.Services.AddHostedService(provider => provider.GetService<ICrcFileProvider>() as FileCrcHostedService);            

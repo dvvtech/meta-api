@@ -9,6 +9,8 @@ namespace MetaApi.Core.Domain.Account
 
         Google,
 
-        Yandex
+        Yandex,
+
+        MailRu
     }
 }
