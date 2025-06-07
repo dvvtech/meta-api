@@ -1,4 +1,5 @@
 ﻿using MetaApi.Core.Domain.Account;
+using MetaApi.Models.Auth.Yandex;
 using Microsoft.Extensions.Caching.Memory;
 using System.Net.Http.Headers;
 
