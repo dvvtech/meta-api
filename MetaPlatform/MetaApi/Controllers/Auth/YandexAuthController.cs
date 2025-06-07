@@ -1,4 +1,5 @@
-﻿using MetaApi.Services.Auth;
+﻿using MetaApi.Models.Auth;
+using MetaApi.Services.Auth;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MetaApi.Controllers.Auth
@@ -26,15 +27,13 @@ namespace MetaApi.Controllers.Auth
 
         [HttpGet("callback")]
         public async Task<IActionResult> Callback([FromQuery] string code)
-        {
-            _logger.LogInformation($"YandexAuth callback code: {code}");
-
+        {            
             if (string.IsNullOrEmpty(code))
             {
                 return BadRequest("Code is required");
             }
 
-            var tokenResponse = await _yandexAuthService.HandleCallback(code);
+            TokenResponse tokenResponse = await _yandexAuthService.HandleCallback(code);
             if (tokenResponse == null)
             {
                 return BadRequest("Failed to authenticate with Yandex");

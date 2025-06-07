@@ -39,14 +39,7 @@ namespace MetaApi.Controllers
                                                   [FromQuery] string state,
                                                   [FromQuery] string ext_id,
                                                   [FromQuery] string type)
-        {            
-            /*_logger.LogInformation($"callback code: {code} {Environment.NewLine}" +
-                                    $"expires_in: {expires_in}  {Environment.NewLine}" +
-                                    $"device_id: {device_id}  {Environment.NewLine}" +
-                                    $"state: {state}  {Environment.NewLine}" +
-                                    $"ext_id: {ext_id}  {Environment.NewLine}" +
-                                    $"type: {type}  {Environment.NewLine}");*/
-
+        {                        
             try
             {
                 TokenResponse tokenResponse = await _authService.HandleCallback(code, state, device_id);                                
