@@ -1,5 +1,6 @@
 ﻿using MetaApi.Models.Auth;
 using MetaApi.Services.Auth;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MetaApi.Controllers
@@ -30,12 +31,25 @@ namespace MetaApi.Controllers
         [HttpGet("callback")]
         public async Task<IActionResult> Callback(string code)
         {
-            TokenResponse tokenResponse = await _authService.HandleCallback(code);
+            try
+            {
+                if (string.IsNullOrEmpty(code))
+                {
+                    return BadRequest("Code is required");
+                }
 
-            //Перенаправляем пользователя на фронтенд
-            return Redirect($"https://virtual-fit.one?" +
-                            $"accessToken={Uri.EscapeDataString(tokenResponse.AccessToken)}&" +
-                            $"refreshToken={Uri.EscapeDataString(tokenResponse.RefreshToken)}");                     
+                TokenResponse tokenResponse = await _authService.HandleCallback(code);
+
+                //Перенаправляем пользователя на фронтенд
+                return Redirect($"https://virtual-fit.one?" +
+                                $"accessToken={Uri.EscapeDataString(tokenResponse.AccessToken)}&" +
+                                $"refreshToken={Uri.EscapeDataString(tokenResponse.RefreshToken)}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Google auth Exception: {ex.Message}");
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

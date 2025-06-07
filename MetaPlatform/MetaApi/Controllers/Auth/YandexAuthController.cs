@@ -29,22 +29,30 @@ namespace MetaApi.Controllers.Auth
 
         [HttpGet("callback")]
         public async Task<IActionResult> Callback([FromQuery] string code)
-        {            
-            if (string.IsNullOrEmpty(code))
+        {
+            try
             {
-                return BadRequest("Code is required");
-            }
+                if (string.IsNullOrEmpty(code))
+                {
+                    return BadRequest("Code is required");
+                }
 
-            TokenResponse tokenResponse = await _yandexAuthService.HandleCallback(code);
-            if (tokenResponse == null)
+                TokenResponse tokenResponse = await _yandexAuthService.HandleCallback(code);
+                if (tokenResponse == null)
+                {
+                    return BadRequest("Failed to authenticate with Yandex");
+                }
+
+                //Перенаправляем пользователя на фронтенд
+                return Redirect($"https://virtual-fit.one?" +
+                                $"accessToken={Uri.EscapeDataString(tokenResponse.AccessToken)}&" +
+                                $"refreshToken={Uri.EscapeDataString(tokenResponse.RefreshToken)}");
+            }
+            catch (Exception ex)
             {
-                return BadRequest("Failed to authenticate with Yandex");
+                _logger.LogError($"Yandex auth Exception: {ex.Message}");
+                return BadRequest(ex.Message);
             }
-
-            //Перенаправляем пользователя на фронтенд
-            return Redirect($"https://virtual-fit.one?" +
-                            $"accessToken={Uri.EscapeDataString(tokenResponse.AccessToken)}&" +
-                            $"refreshToken={Uri.EscapeDataString(tokenResponse.RefreshToken)}");
         }
     }
 }

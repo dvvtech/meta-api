@@ -42,6 +42,11 @@ namespace MetaApi.Controllers
         {                        
             try
             {
+                if (string.IsNullOrEmpty(code))
+                {
+                    return BadRequest("Code is required");
+                }
+
                 TokenResponse tokenResponse = await _authService.HandleCallback(code, state, device_id);                                
                 //Перенаправляем пользователя на фронтенд
                 return Redirect($"https://virtual-fit.one?" +
@@ -50,6 +55,7 @@ namespace MetaApi.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError($"Vk auth Exception: {ex.Message}");
                 return BadRequest(ex.Message);
             }            
         }
