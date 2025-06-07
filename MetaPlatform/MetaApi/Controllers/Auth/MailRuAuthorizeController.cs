@@ -32,13 +32,11 @@ namespace MetaApi.Controllers.Auth
 
         [HttpGet("callback")]
         public async Task<IActionResult> Callback([FromQuery] string code,
-                                                  [FromQuery] string state,
-                                                  [FromQuery] string error,
-                                                  [FromQuery] string error_description)
+                                                  [FromQuery] string state)
         {
             try
             {
-                if (!string.IsNullOrEmpty(error))
+                if (!string.IsNullOrEmpty(code))
                 {
                     return BadRequest("Mail.ru auth: Code is required");
                     //throw new Exception($"Mail.ru auth error: {error}, description: {error_description}");
