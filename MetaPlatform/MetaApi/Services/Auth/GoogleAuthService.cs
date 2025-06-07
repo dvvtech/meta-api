@@ -27,7 +27,7 @@ namespace MetaApi.Services.Auth
         }        
     }
 
-    public class TokenResponse
+    /*public class TokenResponse
     {
         public Guid UserId { get; set; }
 
@@ -40,5 +40,5 @@ namespace MetaApi.Services.Auth
         public string IdToken { get; set; }
 
         public DateTime IssuedUtc { get; set; }
-    }
+    }*/
 }

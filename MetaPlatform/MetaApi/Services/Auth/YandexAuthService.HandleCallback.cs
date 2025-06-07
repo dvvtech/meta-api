@@ -6,19 +6,19 @@ namespace MetaApi.Services.Auth
 {
     public partial class YandexAuthService
     {        
-        public async Task<TokenResponse> HandleCallback(string code)
+        public async Task<MetaApi.Models.Auth.TokenResponse> HandleCallback(string code)
         {
             // Ключ для кеша
             var cacheKey = $"yandex_auth_{code}";
 
             // Если задача уже есть в кеше, возвращаем её (await дождётся её завершения)
-            if (_cache.TryGetValue(cacheKey, out Task<TokenResponse> ongoingTask))
+            if (_cache.TryGetValue(cacheKey, out Task<MetaApi.Models.Auth.TokenResponse> ongoingTask))
             {
                 return await ongoingTask;
             }
 
             // Создаём новую задачу, но пока не запускаем её
-            var taskCompletionSource = new TaskCompletionSource<TokenResponse>();
+            var taskCompletionSource = new TaskCompletionSource<MetaApi.Models.Auth.TokenResponse>();
 
             // Помещаем задачу в кеш (если другой поток уже добавил задачу, берём её)
             ongoingTask = _cache.GetOrCreate(cacheKey, entry =>
@@ -49,7 +49,7 @@ namespace MetaApi.Services.Auth
             return await ongoingTask;
         }
 
-        private async Task<TokenResponse> ProcessAuthCallback(string code)
+        private async Task<MetaApi.Models.Auth.TokenResponse> ProcessAuthCallback(string code)
         {
             // Получаем access token от Яндекс
             var tokenResponse = await ExchangeCodeForToken(code);
@@ -87,7 +87,7 @@ namespace MetaApi.Services.Auth
                 _logger.LogInformation($"Success yandex auth with name: {userInfo?.Login}");
             }
 
-            return new TokenResponse
+            return new MetaApi.Models.Auth.TokenResponse
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken
