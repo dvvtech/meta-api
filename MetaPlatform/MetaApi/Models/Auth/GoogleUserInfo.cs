@@ -4,7 +4,11 @@ namespace MetaApi.Models.Auth
 {
     public class GoogleUserInfo
     {
-        public string Sub { get; set; } // Уникальный идентификатор пользователя
+        /// <summary>
+        /// Уникальный идентификатор пользователя
+        /// </summary>
+        public string Sub { get; set; }
+
         public string Email { get; set; }
 
         /// <summary>
