@@ -12,5 +12,7 @@
         public string Body { get; set; }
 
         public string RecaptchaToken { get; set; }
+
+        public int Type { get; set; }
     }
 }

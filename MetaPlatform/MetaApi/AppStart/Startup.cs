@@ -110,7 +110,9 @@ namespace MetaApi.AppStart
         private void AddServices()
         {
             //храним временные данные для авторизации vk и кешируем бд в кеше памяти
-            _builder.Services.AddMemoryCache();                        
+            _builder.Services.AddMemoryCache();
+
+            _builder.Services.AddScoped<IEmailBodyGenerator, EmailBodyGenerator>();
 
             _builder.Services.AddScoped<IFittingHistoryRepository, FittingHistoryRepository>();
             _builder.Services.Decorate<IFittingHistoryRepository, CachedFittingHistoryRepository>();            

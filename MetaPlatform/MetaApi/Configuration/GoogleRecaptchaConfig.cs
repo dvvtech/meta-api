@@ -4,6 +4,8 @@
     {
         public const string SectionName = "GoogleRecaptcha";
 
-        public string SecretKey { get; init; }
+        public string SecretKeyForOxfordAp { get; init; }
+
+        public string SecretKeyForYashelCenter { get; init; }
     }
 }
