@@ -12,7 +12,7 @@
                 options.AddPolicy(AllowSpecificOriginPolicy,
                     policy =>
                     {
-                        policy.WithOrigins("https://virtual-fit.one", "https://oxford-ap.com")
+                        policy.WithOrigins("https://virtual-fit.one", "https://oxford-ap.com", "https://yashel.center")
                               //.AllowCredentials() // Разрешить куки
                               .AllowAnyHeader()
                               .AllowAnyMethod();
