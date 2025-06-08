@@ -27,13 +27,13 @@ namespace MetaApi.Controllers
             _emailSender = emailSender;
             _httpClientFactory = httpClientFactory;
             _recaptchaOptions = recaptchaOptions;
+            _emailBodyGenerator = emailBodyGenerator;
             _logger = logger;
         }
 
         [HttpPost("send")]
         public async Task<IActionResult> SendEmail([FromBody] SendEmailRequest request)
-        {
-            _logger.LogInformation("SE1");
+        {            
             // Проверяем входные данные
             if (string.IsNullOrWhiteSpace(request.Body))
             {
@@ -54,12 +54,9 @@ namespace MetaApi.Controllers
                 return BadRequest("reCAPTCHA validation failed.");
             }
 
-            _logger.LogInformation("SE2");
-
             var emailBody = _emailBodyGenerator.GenerateEmailBody(request);
 
-            var res = await _emailSender.SendEmail("dvv153m@gmail.com", request.Subject, emailBody);
-            _logger.LogInformation("SE3");
+            var res = await _emailSender.SendEmail("dvv153m@gmail.com", request.Subject, emailBody);            
             return Ok();
         }
 
