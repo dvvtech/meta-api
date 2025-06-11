@@ -44,6 +44,7 @@ namespace MetaApi.Controllers
             {
                 1 => _recaptchaOptions.Value.SecretKeyForOxfordAp,
                 2 => _recaptchaOptions.Value.SecretKeyForYashelCenter,
+                3 => _recaptchaOptions.Value.SecretKeyForPingmetasks,
                 _ => throw new ArgumentException("Invalid Type")
             };
 

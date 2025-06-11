@@ -12,6 +12,7 @@ namespace MetaApi.Services
             {
                 1 => GenerateBodyForOxfordAp(request),
                 2 => GenerateTypeFromYashelCenter(request),
+                3 => GenerateTypeFromPingmetasks(request),
                 _ => GenerateDefaultBody(request)
             };
         }
@@ -19,22 +20,30 @@ namespace MetaApi.Services
         private string GenerateBodyForOxfordAp(SendEmailRequest request)
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"<h3>Contact Form https://oxford-ap.com/</h3>");
-            sb.AppendLine($"<p><strong>Name:</strong> {request.Name}</p>");
-            sb.AppendLine($"<p><strong>Surname:</strong> {request.Surname}</p>");
-            sb.AppendLine($"<p><strong>Email:</strong> {request.FromEmail}</p>");
-            sb.AppendLine($"<p><strong>Message:</strong></p><p>{request.Body}</p>");
+            sb.AppendLine($"Contact Form https://oxford-ap.com/");
+            sb.AppendLine($"Name: {request.Name}");
+            sb.AppendLine($"Surname: {request.Surname}");
+            sb.AppendLine($"Email: {request.FromEmail}");
+            sb.AppendLine($"Message: {request.Body}");
             return sb.ToString();
         }
 
         private string GenerateTypeFromYashelCenter(SendEmailRequest request)
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"<h3>Contact Form https://yashel.center/</h3>");
-            sb.AppendLine($"<p><strong>Name:</strong> {request.Name}</p>");
-            sb.AppendLine($"<p><strong>Surname:</strong> {request.Surname}</p>");
-            sb.AppendLine($"<p><strong>Email:</strong> {request.FromEmail}</p>");
-            sb.AppendLine($"<p><strong>Message:</strong></p><p>{request.Body}</p>");
+            sb.AppendLine($"Contact Form https://yashel.center/");
+            sb.AppendLine($"Name: {request.Name}");
+            sb.AppendLine($"Surname: {request.Surname}");
+            sb.AppendLine($"Email: {request.FromEmail}");
+            sb.AppendLine($"Message: {request.Body}");
+            return sb.ToString();
+        }
+
+        private string GenerateTypeFromPingmetasks(SendEmailRequest request)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"Ping Me Tasks");            
+            sb.AppendLine($"email: {request.FromEmail}</p>");
             return sb.ToString();
         }
 
