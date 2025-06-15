@@ -42,7 +42,8 @@ namespace MetaApi.SqlServer.Entities
         Vk,
         Google,
         Yandex,
-        MailRu
+        MailRu,
+        GazpromId
     }
 
     public enum RoleEntity

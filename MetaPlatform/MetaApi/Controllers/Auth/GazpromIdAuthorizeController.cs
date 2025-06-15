@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MetaApi.Services.Auth;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MetaApi.Controllers.Auth
 {
@@ -10,7 +11,7 @@ namespace MetaApi.Controllers.Auth
         private readonly ILogger<GazpromIdAuthorizeController> _logger;
 
         public GazpromIdAuthorizeController(GazpromIdAuthService authService,
-                                          ILogger<GazpromIdAuthorizeController> logger)
+                                            ILogger<GazpromIdAuthorizeController> logger)
         {
             _authService = authService;
             _logger = logger;

@@ -11,6 +11,8 @@ namespace MetaApi.Core.Domain.Account
 
         Yandex,
 
-        MailRu
+        MailRu,
+
+        GazpromId
     }
 }

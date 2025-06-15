@@ -2,6 +2,8 @@
 {
     public class GazpromIdAuthConfig
     {
+        public const string SectionName = "GazpromAuth";
+
         public string ClientId { get; init; }
         public string ClientSecret { get; init; }
         public string RedirectUrl { get; init; }
