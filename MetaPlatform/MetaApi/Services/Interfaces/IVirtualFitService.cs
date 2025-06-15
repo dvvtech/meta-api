@@ -9,7 +9,7 @@ namespace MetaApi.Services.Interfaces
 
         Task<Result<FittingHistory[]>> GetHistory(int userId);
 
-        Task<Result<FittingHistory[]>> GetExamples(int userId, string host);
+        Task<Result<FittingHistory[]>> GetExamples(string host);
 
         Task<Result<(string ResultImageUrl, int RemainingUsage)>> TryOnClothesAsync(FittingData fittingData);
         

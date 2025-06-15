@@ -109,18 +109,16 @@ namespace MetaApi.Controllers
             return Ok(fittingHistories);
         }
 
+        /// <summary>
+        /// Примеры примерок для незарегестрированных пользователей
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("examples")]
         public async Task<ActionResult<FittingHistoryResponse[]>> GetExamples()
         {
             _logger.LogInformation("GetExamples");
 
-            Result<int> userIdResult = this.GetCurrentUserId();
-            if (userIdResult.IsFailure)
-            {
-                return BadRequest(userIdResult.Error);
-            }
-
-            Result<FittingHistory[]> fittingResults = await _virtualFitService.GetExamples(userIdResult.Value, Request.Host.Value);
+            Result<FittingHistory[]> fittingResults = await _virtualFitService.GetExamples(Request.Host.Value);
             if (fittingResults.IsFailure)
             {
                 return BadRequest(new { description = fittingResults.Error.Description });
