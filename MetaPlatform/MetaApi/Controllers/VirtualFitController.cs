@@ -107,7 +107,35 @@ namespace MetaApi.Controllers
             }).ToArray();
 
             return Ok(fittingHistories);
-        }        
+        }
+
+        [HttpGet("examples")]
+        public async Task<ActionResult<FittingHistoryResponse[]>> GetExamples()
+        {
+            _logger.LogInformation("GetExamples");
+
+            Result<int> userIdResult = this.GetCurrentUserId();
+            if (userIdResult.IsFailure)
+            {
+                return BadRequest(userIdResult.Error);
+            }
+
+            Result<FittingHistory[]> fittingResults = await _virtualFitService.GetExamples(userIdResult.Value, Request.Host.Value);
+            if (fittingResults.IsFailure)
+            {
+                return BadRequest(new { description = fittingResults.Error.Description });
+            }
+
+            var fittingExamples = fittingResults.Value.Select(s => new FittingHistoryResponse
+            {
+                Id = s.Id,
+                GarmentImgUrl = s.GarmentImgUrl,
+                HumanImgUrl = s.HumanImgUrl,
+                ResultImgUrl = s.ResultImgUrl,
+            }).ToArray();
+
+            return Ok(fittingExamples);
+        }
 
         [HttpGet("test3")]
         public IResult Test()

@@ -15,6 +15,7 @@ https://o2.mail.ru/app/edit/41f8c74b720b4dd18d13828e53d4dd41/
 
 Todo
 добавить авторизацию через телеграмм
+газпром Id
 госуслуги
 tinkof Id
 сбер id
