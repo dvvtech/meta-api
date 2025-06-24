@@ -6,7 +6,7 @@ namespace MetaApi.Services.Cache
 {
     public class CachedTryOnLimitRepository : ITryOnLimitRepository
     {
-        private readonly ITryOnLimitRepository _repository;
+        private readonly ITryOnLimitRepository _innerRepository;
         private readonly IMemoryCache _memoryCache;
         private readonly ILogger<CachedTryOnLimitRepository> _logger;
 
@@ -14,7 +14,7 @@ namespace MetaApi.Services.Cache
                                           IMemoryCache memoryCache,
                                           ILogger<CachedTryOnLimitRepository> logger)
         {
-            _repository = repository;
+            _innerRepository = repository;
             _memoryCache = memoryCache;
             _logger = logger;
         }
@@ -33,7 +33,7 @@ namespace MetaApi.Services.Cache
             // 2. Если нет в memory cache, идем в БД
             _logger.LogDebug("Loading limit from DB for user {UserId}", userId);
             
-            var limitEntity = await _repository.GetLimit(userId);
+            var limitEntity = await _innerRepository.GetLimit(userId);
             if (limitEntity != null)
             {
                 // 3. Сохраняем в memory cache
@@ -45,7 +45,7 @@ namespace MetaApi.Services.Cache
 
         public async Task AddLimit(UserTryOnLimit userTryOnLimitEntity)
         {
-            await _repository.AddLimit(userTryOnLimitEntity);
+            await _innerRepository.AddLimit(userTryOnLimitEntity);
 
             // Сохраняем в memory cache
             UpdateCache(userTryOnLimitEntity.AccountId, userTryOnLimitEntity);
@@ -53,7 +53,7 @@ namespace MetaApi.Services.Cache
 
         public async Task UpdateLimit(UserTryOnLimit userTryOnLimitEntity)
         {
-            await _repository.UpdateLimit(userTryOnLimitEntity);
+            await _innerRepository.UpdateLimit(userTryOnLimitEntity);
 
             // Обновляем кэш
             UpdateCache(userTryOnLimitEntity.AccountId, userTryOnLimitEntity);

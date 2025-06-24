@@ -6,7 +6,7 @@ namespace MetaApi.Services.Cache
 {
     public class CachedFittingHistoryRepository : IFittingHistoryRepository
     {
-        private readonly IFittingHistoryRepository _repository;
+        private readonly IFittingHistoryRepository _innerRepository;
         private readonly IMemoryCache _memoryCache;
         private readonly ILogger<CachedFittingHistoryRepository> _logger;
         
@@ -14,7 +14,7 @@ namespace MetaApi.Services.Cache
                                               IMemoryCache memoryCache,
                                               ILogger<CachedFittingHistoryRepository> logger)
         {
-            _repository = repository;
+            _innerRepository = repository;
             _memoryCache = memoryCache;
             _logger = logger;
         }
@@ -32,7 +32,7 @@ namespace MetaApi.Services.Cache
 
             // 2. Если нет в memory cache, идем в БД
             _logger.LogDebug("Loading history from DB for user {UserId}", accountId);
-            FittingHistory[] dbResults = await _repository.GetHistoryAsync(accountId);
+            FittingHistory[] dbResults = await _innerRepository.GetHistoryAsync(accountId);
 
             //3.Сохраняем в memory cache
             SetCache(cacheKey, dbResults);
@@ -43,7 +43,7 @@ namespace MetaApi.Services.Cache
         public async Task<int> AddToHistoryAsync(FittingHistory item)
         {
             // 1. Сначала сохраняем в БД
-            int itemId = await _repository.AddToHistoryAsync(item);
+            int itemId = await _innerRepository.AddToHistoryAsync(item);
 
             // Обновляем кэш
             UpdateCacheAfterAddition(item.AccountId,
@@ -59,7 +59,7 @@ namespace MetaApi.Services.Cache
         public async Task DeleteAsync(int fittingResultId, int userId)
         {
             // 1. Находим и "удаляем" запись (помечаем IsDeleted)
-            await _repository.DeleteAsync(fittingResultId, userId);
+            await _innerRepository.DeleteAsync(fittingResultId, userId);
 
             // 2. Обновляем кеш                                    
             UpdateCacheAfterDeletion(userId, fittingResultId);
@@ -67,7 +67,7 @@ namespace MetaApi.Services.Cache
 
         public async Task<DateTime> GetDateOfLastFittingAsync(int userId)
         {
-            return await _repository.GetDateOfLastFittingAsync(userId);            
+            return await _innerRepository.GetDateOfLastFittingAsync(userId);            
         }
 
         #region Helper Methods
