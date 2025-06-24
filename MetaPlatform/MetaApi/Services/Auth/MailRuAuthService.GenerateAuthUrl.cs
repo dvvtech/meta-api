@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 
 namespace MetaApi.Services.Auth
@@ -11,9 +10,6 @@ namespace MetaApi.Services.Auth
             var state = GenerateRandomString(32);
             var codeVerifier = GenerateCodeVerifier();
             var codeChallenge = GenerateCodeChallenge(codeVerifier);
-
-            // Сохраняем code_verifier в кэше по state
-            _cache.Set(state, codeVerifier, TimeSpan.FromMinutes(5));
 
             var authUrl = $"https://oauth.mail.ru/login?" +
                          $"client_id={_authConfig.ClientId}&" +

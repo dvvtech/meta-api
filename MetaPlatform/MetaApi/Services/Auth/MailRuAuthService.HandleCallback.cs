@@ -1,7 +1,6 @@
 ﻿using MetaApi.Core.Domain.Account;
 using MetaApi.Models.Auth;
 using MetaApi.Models.Auth.Mail;
-using Microsoft.Extensions.Caching.Memory;
 using System.Text.Json;
 
 namespace MetaApi.Services.Auth
@@ -11,13 +10,7 @@ namespace MetaApi.Services.Auth
         public async Task<TokenResponse> HandleCallback(string code, string state)
         {
             try
-            {                
-                // Извлекаем code_verifier из кэша по state
-                if (!_cache.TryGetValue(state, out string codeVerifier))
-                {
-                    throw new Exception("Invalid or expired state");
-                }
-                
+            {                                
                 // Обмениваем код на токен
                 MailRuTokenResponse tokenResponse = await ExchangeCodeForToken(code);
                 
