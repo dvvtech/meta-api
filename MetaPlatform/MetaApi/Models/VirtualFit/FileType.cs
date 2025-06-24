@@ -17,7 +17,9 @@
 
         Result = 6,
 
-        Examples = 7
+        Examples = 7,
+
+        Other = 8
     }
 
     public static class FileTypeExtensions
@@ -37,6 +39,7 @@
                 FileType.Upload => "uploads",
                 FileType.Result => "result",
                 FileType.Examples => "examples",
+                FileType.Other => "other",
                 _ => "unknown" // По умолчанию, если FileType не определён
             };
         }
