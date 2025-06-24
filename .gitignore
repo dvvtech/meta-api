@@ -398,3 +398,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/MetaPlatform/MetaApi/appsettings.json
+/MetaPlatform/MetaApi/appsettings.Development.json
+/MetaPlatform/MetaApi/appsettings.Prod.json
