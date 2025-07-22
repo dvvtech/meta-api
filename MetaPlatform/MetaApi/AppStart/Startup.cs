@@ -8,6 +8,8 @@ using MetaApi.Core.Interfaces.Repositories;
 using MetaApi.Core.Interfaces.Services;
 using MetaApi.Core.Services;
 using MetaApi.Services;
+using MetaApi.Services.AiClients;
+using MetaApi.Services.AiClients.Base;
 using MetaApi.Services.Auth;
 using MetaApi.Services.Cache;
 using MetaApi.Services.Interfaces;
@@ -54,6 +56,7 @@ namespace MetaApi.AppStart
             _builder.Services.Configure<YandexAuthConfig>(_builder.Configuration.GetSection(YandexAuthConfig.SectionName));
             _builder.Services.Configure<MailRuAuthConfig>(_builder.Configuration.GetSection(MailRuAuthConfig.SectionName));
             _builder.Services.Configure<GazpromIdAuthConfig>(_builder.Configuration.GetSection(GazpromIdAuthConfig.SectionName));
+            _builder.Services.Configure<AiClientConfig>(_builder.Configuration.GetSection(AiClientConfig.SectionName));
 
             _builder.Services.AddOptions<JwtConfig>()
                 .Bind(_builder.Configuration.GetSection(JwtConfig.SectionName))
@@ -84,7 +87,17 @@ namespace MetaApi.AppStart
                 client.Timeout = TimeSpan.FromSeconds(45); // Таймаут запроса
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {virtualFitConfig.ApiToken}");
                 client.DefaultRequestHeaders.Add("Prefer", "wait");
-            });            
+            });
+
+            _builder.Services.AddHttpClient<IAiClient, ChatGptAiClient>((serviceProvider, client) =>
+            {
+                var aiClientConfig = _builder.Configuration.GetSection(VirtualFitConfig.SectionName).Get<AiClientConfig>();
+
+                client.BaseAddress = new Uri("https://api.openai.com/v1/chat/completions");
+                client.Timeout = TimeSpan.FromSeconds(35); // Таймаут запроса
+                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {aiClientConfig.OpenAiApiKey}");
+                //client.DefaultRequestHeaders.Add("Prefer", "wait");
+            });
         }
 
         private void AddInfrastructure()
