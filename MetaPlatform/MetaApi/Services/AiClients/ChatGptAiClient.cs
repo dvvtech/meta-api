@@ -9,7 +9,7 @@ namespace MetaApi.Services.AiClients
         private readonly HttpClient _httpClient;        
         private readonly string _apiKey;
         private readonly string _model;
-        //private readonly string _apiUrl;
+        private readonly string _apiUrl;
 
         public ChatGptAiClient(HttpClient httpClient,
                                string apiKey,
@@ -18,7 +18,7 @@ namespace MetaApi.Services.AiClients
             _httpClient = httpClient;
             _apiKey = apiKey;
             _model = model;
-            //_apiUrl = "https://api.openai.com/v1/chat/completions";
+            _apiUrl = "https://api.openai.com/v1/chat/completions";
             //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_apiKey}");
         }
 
