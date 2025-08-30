@@ -3,7 +3,7 @@ using MetaApi.Core.OperationResults.Base;
 
 namespace MetaApi.Services.Interfaces
 {
-    public interface IReplicateClientService
+    public interface IReplicateVirtualFitApiClient
     {
         Task<Result<string>> ProcessPredictionAsync(FittingData request);
     }

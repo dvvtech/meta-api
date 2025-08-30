@@ -8,18 +8,22 @@ using MetaApi.Core.OperationResults;
 using MetaApi.Services.Interfaces;
 using MetaApi.Core.Domain.FittingHistory;
 
-namespace MetaApi.Services
-{    
-    public class ReplicateClientService : IReplicateClientService
+namespace MetaApi.Services.AiClients.Replicate
+{
+    /// <summary>
+    /// Модель https://replicate.com/cuuupid/idm-vton
+    /// </summary>
+    public class ReplicateVirtualFitApiClient : IReplicateVirtualFitApiClient
     {
         private readonly HttpClient _httpClient;
-        private readonly ILogger<ReplicateClientService> _logger;
+        private readonly ILogger<ReplicateVirtualFitApiClient> _logger;
         private const string PredictionModelVersion = "0513734a452173b8173e907e3a59d19a36266e55b48528559432bd21c7d7e985";
         private const int MaxRetries = 15;
         private const int RetryDelayMilliseconds = 1500;
 
-        public ReplicateClientService(HttpClient httpClient,
-                                      ILogger<ReplicateClientService> logger)
+        public ReplicateVirtualFitApiClient(
+            HttpClient httpClient,
+            ILogger<ReplicateVirtualFitApiClient> logger)
         {
             _httpClient = httpClient;
             _logger = logger;

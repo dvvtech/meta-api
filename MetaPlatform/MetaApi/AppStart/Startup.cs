@@ -10,6 +10,7 @@ using MetaApi.Core.Services;
 using MetaApi.Services;
 using MetaApi.Services.AiClients;
 using MetaApi.Services.AiClients.Base;
+using MetaApi.Services.AiClients.Replicate;
 using MetaApi.Services.Auth;
 using MetaApi.Services.Cache;
 using MetaApi.Services.Interfaces;
@@ -79,7 +80,7 @@ namespace MetaApi.AppStart
 
         private void ConfigureClientAPI()
         {
-            _builder.Services.AddHttpClient<IReplicateClientService, ReplicateClientService>((serviceProvider, client) =>
+            _builder.Services.AddHttpClient<IReplicateVirtualFitApiClient, ReplicateVirtualFitApiClient>((serviceProvider, client) =>
             {
                 var virtualFitConfig = _builder.Configuration.GetSection(VirtualFitConfig.SectionName).Get<VirtualFitConfig>();
 
