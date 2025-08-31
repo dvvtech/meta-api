@@ -1,5 +1,6 @@
 ﻿using MetaApi.Consts;
 using MetaApi.Core.Domain.Hair;
+using MetaApi.Core.OperationResults;
 using MetaApi.Core.OperationResults.Base;
 using MetaApi.Utilities;
 
@@ -22,6 +23,11 @@ namespace MetaApi.Services
                 await _tryOnLimitService.DecrementTryOnLimitAsync(hairTryOnData.AccountId);
 
                 return Result<string>.Success(urlResult ?? string.Empty);
+            }
+            else
+            {
+                _logger.LogInformation($"Prediction error: {predictionResult.Error.Description}");
+                return Result<string>.Failure(VirtualFitError.VirtualFitServiceError("Something went wrong"));
             }
 
             throw new NotImplementedException();

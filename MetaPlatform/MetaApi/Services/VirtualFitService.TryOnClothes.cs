@@ -36,7 +36,7 @@ namespace MetaApi.Services
             }
             else
             {
-                _logger.LogInformation($"Error description: {predictionResult.Error.Description}");
+                _logger.LogInformation($"Prediction error: {predictionResult.Error.Description}");
                 return Result<(string ResultImageUrl, int RemainingUsage)>.Failure(VirtualFitError.VirtualFitServiceError("Something went wrong"));
             }
         }        
