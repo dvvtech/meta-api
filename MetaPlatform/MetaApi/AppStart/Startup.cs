@@ -85,7 +85,17 @@ namespace MetaApi.AppStart
                 var virtualFitConfig = _builder.Configuration.GetSection(VirtualFitConfig.SectionName).Get<VirtualFitConfig>();
 
                 client.BaseAddress = new Uri("https://api.replicate.com/v1/");
-                client.Timeout = TimeSpan.FromSeconds(45); // Таймаут запроса
+                client.Timeout = TimeSpan.FromSeconds(45);
+                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {virtualFitConfig.ApiToken}");
+                client.DefaultRequestHeaders.Add("Prefer", "wait");
+            });
+
+            _builder.Services.AddHttpClient<IReplicateVirtualHairApiClient, ReplicateVirtualHairApiClient>((serviceProvider, client) =>
+            {
+                var virtualFitConfig = _builder.Configuration.GetSection(VirtualFitConfig.SectionName).Get<VirtualFitConfig>();
+
+                client.BaseAddress = new Uri("https://api.replicate.com/v1/");
+                client.Timeout = TimeSpan.FromSeconds(50);
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {virtualFitConfig.ApiToken}");
                 client.DefaultRequestHeaders.Add("Prefer", "wait");
             });
@@ -140,6 +150,7 @@ namespace MetaApi.AppStart
             _builder.Services.AddScoped<ISystemTime, SystemTime>();
             _builder.Services.AddScoped<ITryOnLimitService, TryOnLimitService>();
             _builder.Services.AddScoped<IVirtualFitService, VirtualFitService>();
+            _builder.Services.AddScoped<IVirtualHairStyleService, VirtualHairStyleService>();
             _builder.Services.AddScoped<IProfileService, ProfileService>();
 
             _builder.Services.AddScoped<ImageService>();

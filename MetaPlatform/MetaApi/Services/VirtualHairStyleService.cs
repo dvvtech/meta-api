@@ -13,7 +13,10 @@ namespace MetaApi.Services
         private readonly IFileService _fileService;
         private readonly ILogger<VirtualFitService> _logger;
 
-        public VirtualHairStyleService(IReplicateVirtualHairApiClient replicateClientService)
+        public VirtualHairStyleService(
+            IReplicateVirtualHairApiClient replicateClientService,
+            ITryOnLimitService tryOnLimitService,
+            IFileService fileService)
         {
             _replicateClientService = replicateClientService;
         }
