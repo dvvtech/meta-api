@@ -1,6 +1,7 @@
 ﻿using MetaApi.SqlServer.Configurations;
 using MetaApi.SqlServer.Entities;
 using MetaApi.SqlServer.Entities.VirtualFit;
+using MetaApi.SqlServer.Entities.VirtualHair;
 using Microsoft.EntityFrameworkCore;
 
 namespace MetaApi.SqlServer.Context
@@ -8,6 +9,8 @@ namespace MetaApi.SqlServer.Context
     public class MetaDbContext : DbContext
     {        
         public DbSet<FittingResultEntity> FittingResult { get; set; }
+
+        public DbSet<HairHistoryEntity> HairHistory { get; set; }
 
         public DbSet<AccountEntity> Accounts { get; set; }
 
@@ -20,7 +23,8 @@ namespace MetaApi.SqlServer.Context
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new FittingResultConfiguration());            
+            modelBuilder.ApplyConfiguration(new FittingResultConfiguration());
+            modelBuilder.ApplyConfiguration(new HairHistoryConfiguration());
             modelBuilder.ApplyConfiguration(new AccountConfiguration());
             modelBuilder.ApplyConfiguration(new UserTryOnLimitConfiguration());
 

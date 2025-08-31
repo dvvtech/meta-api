@@ -1,5 +1,6 @@
 ﻿
 using MetaApi.SqlServer.Entities.VirtualFit;
+using MetaApi.SqlServer.Entities.VirtualHair;
 
 namespace MetaApi.SqlServer.Entities
 {
@@ -34,6 +35,11 @@ namespace MetaApi.SqlServer.Entities
         /// Коллекция связанных FittingResultEntity
         /// </summary>
         public ICollection<FittingResultEntity> FittingResults { get; set; }
+
+        /// <summary>
+        /// История примерки причесок
+        /// </summary>
+        public ICollection<HairHistoryEntity> HairHistory { get; set; }
     }
 
     public enum AuthTypeEntity

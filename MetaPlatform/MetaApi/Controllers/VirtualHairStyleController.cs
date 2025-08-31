@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MetaApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/virtual-hair")]
     [ApiController]
     public class VirtualHairStyleController : ControllerBase
     {

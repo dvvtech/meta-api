@@ -1,16 +1,19 @@
 ﻿
-namespace MetaApi.SqlServer.Entities.VirtualFit
+namespace MetaApi.SqlServer.Entities.VirtualHair
 {
-    public class FittingResultEntity
+    public class HairHistoryEntity
     {
         public int Id { get; set; }
 
         /// <summary>
-        /// Фото одежды
+        /// Фото прически
         /// </summary>
-        public string GarmentImgUrl { get; set; }
+        public string HairImgUrl { get; set; }
 
-        public string HumanImgUrl { get; set; }
+        /// <summary>
+        /// Фото на кого примеряем прическу
+        /// </summary>
+        public string FaceImgUrl { get; set; }
 
         public string ResultImgUrl { get; set; }
 
@@ -27,6 +30,6 @@ namespace MetaApi.SqlServer.Entities.VirtualFit
         /// <summary>
         /// Навигационное свойство на AccountEntity
         /// </summary>
-        public AccountEntity Account { get; set; }        
+        public AccountEntity Account { get; set; }
     }
 }
