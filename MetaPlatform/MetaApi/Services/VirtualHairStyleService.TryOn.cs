@@ -18,6 +18,10 @@ namespace MetaApi.Services
                 string urlResult = await _fileService.UploadResultFileAsync(predictionResult.Value, hairTryOnData.Host, hairTryOnData.FaceImg);
 
                 HairHistory fittingHistory = CreateFittingHistory(hairTryOnData, urlResult);
+
+                await _tryOnLimitService.DecrementTryOnLimitAsync(hairTryOnData.AccountId);
+
+                return Result<string>.Success(urlResult ?? string.Empty);
             }
 
             throw new NotImplementedException();

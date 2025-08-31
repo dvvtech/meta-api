@@ -1,5 +1,6 @@
 ﻿using MetaApi.Core.Domain.FittingHistory;
 using MetaApi.Core.Domain.Hair;
+using MetaApi.Core.Interfaces.Services;
 using MetaApi.Core.OperationResults.Base;
 using MetaApi.Services.Interfaces;
 
@@ -8,6 +9,7 @@ namespace MetaApi.Services
     public partial class VirtualHairStyleService : IVirtualHairStyleService
     {
         private readonly IReplicateVirtualHairApiClient _replicateClientService;
+        private readonly ITryOnLimitService _tryOnLimitService;
         private readonly IFileService _fileService;
         private readonly ILogger<VirtualFitService> _logger;
 
