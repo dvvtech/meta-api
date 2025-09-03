@@ -19,7 +19,11 @@
 
         Examples = 7,
 
-        Other = 8
+        Other = 8,
+
+        ManHair = 9,
+
+        WomanHair = 10
     }
 
     public static class FileTypeExtensions
@@ -40,6 +44,8 @@
                 FileType.Result => "result",
                 FileType.Examples => "examples",
                 FileType.Other => "other",
+                FileType.ManHair => "manHair",
+                FileType.WomanHair => "womanHair",
                 _ => "unknown" // По умолчанию, если FileType не определён
             };
         }
