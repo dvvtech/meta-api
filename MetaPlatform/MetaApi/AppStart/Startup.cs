@@ -139,6 +139,8 @@ namespace MetaApi.AppStart
 
             _builder.Services.AddScoped<IEmailBodyGenerator, EmailBodyGenerator>();
 
+            _builder.Services.AddScoped<IHairHistoryRepository, HairHistoryRepository>();
+
             _builder.Services.AddScoped<IFittingHistoryRepository, FittingHistoryRepository>();
             _builder.Services.Decorate<IFittingHistoryRepository, CachedFittingHistoryRepository>();            
 

@@ -11,10 +11,5 @@
         /// Фото прически
         /// </summary>
         public string HairImg { get; set; }
-
-        /// <summary>
-        /// Фото с цветом прически
-        /// </summary>
-        public string ColorImg { get; set; }
     }
 }

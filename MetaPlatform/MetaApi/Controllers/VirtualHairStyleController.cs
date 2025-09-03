@@ -41,8 +41,7 @@ namespace MetaApi.Controllers
             var hairTryOnData = new HairTryOnData
             {
                 HairImg = request.HairImg,
-                FaceImg = request.FaceImg,
-                ColorImg = request.ColorImg,
+                FaceImg = request.FaceImg,                
                 AccountId = userIdResult.Value,
                 Host = Request.Host.Value
             };

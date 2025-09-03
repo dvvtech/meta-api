@@ -23,7 +23,6 @@ namespace MetaApi.Services
                 string urlResult = await _fileService.UploadResultFileAsync(predictionResult.Value, fittingData.Host, fittingData.HumanImg);
                 
                 FittingHistory fittingHistory = CreateFittingHistory(fittingData, urlResult);
-
                 await _fittingHistoryRepository.AddToHistoryAsync(fittingHistory);
 
                 await _tryOnLimitService.DecrementTryOnLimitAsync(fittingData.AccountId);

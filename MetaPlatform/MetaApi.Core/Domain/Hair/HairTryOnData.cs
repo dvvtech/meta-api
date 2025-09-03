@@ -18,11 +18,6 @@ namespace MetaApi.Core.Domain.Hair
         /// </summary>
         public string HairImg { get; set; }
 
-        /// <summary>
-        /// Фото с цветом прически
-        /// </summary>
-        public string ColorImg { get; set; }
-
         public int AccountId { get; set; }
 
         public string Host { get; set; }

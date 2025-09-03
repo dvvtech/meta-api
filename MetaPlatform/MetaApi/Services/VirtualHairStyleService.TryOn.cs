@@ -18,7 +18,8 @@ namespace MetaApi.Services
 
                 string urlResult = await _fileService.UploadResultFileAsync(predictionResult.Value, hairTryOnData.Host, hairTryOnData.FaceImg);
 
-                HairHistory fittingHistory = CreateFittingHistory(hairTryOnData, urlResult);
+                HairHistory hairHistory = CreateFittingHistory(hairTryOnData, urlResult);
+                await _hairHistoryRepository.AddToHistoryAsync(hairHistory);
 
                 await _tryOnLimitService.DecrementTryOnLimitAsync(hairTryOnData.AccountId);
 
