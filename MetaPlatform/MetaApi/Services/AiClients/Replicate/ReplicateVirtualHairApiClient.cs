@@ -53,7 +53,12 @@ namespace MetaApi.Services.AiClients.Replicate
             if (document.RootElement.TryGetProperty("output", out var outputProperty))
             {
                 var resultUrl = outputProperty.GetString();
-                return Result<string>.Success(resultUrl);
+                if (!string.IsNullOrEmpty(resultUrl))
+                {
+                    return Result<string>.Success(resultUrl);
+                }
+
+                _logger.LogError(responseContent);
             }
 
             return Result<string>.Failure(PredictionErrors.PredictionImageEmpty());
