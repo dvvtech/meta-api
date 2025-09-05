@@ -1,4 +1,7 @@
 ﻿добавить эндпоинты 
+преобразование в jpg добавить в параметр вынести возможно по умолчанию не нужно чтобы совместимость осталась
+добавить урл фронта в cors
+подготовить примеры причесок
 
 
 заменить эту строку return Redirect($"https://virtual-fit.one?accessToken={tokenResponse.AccessToken}&refreshToken={tokenResponse.RefreshToken}");

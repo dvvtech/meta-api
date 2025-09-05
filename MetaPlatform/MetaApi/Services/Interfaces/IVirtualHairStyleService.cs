@@ -1,5 +1,4 @@
-﻿using MetaApi.Core.Domain.FittingHistory;
-using MetaApi.Core.Domain.Hair;
+﻿using MetaApi.Core.Domain.Hair;
 using MetaApi.Core.OperationResults.Base;
 
 namespace MetaApi.Services.Interfaces
@@ -12,6 +11,6 @@ namespace MetaApi.Services.Interfaces
 
         Task<Result<HairHistory[]>> GetHistory(int userId);
 
-        //Task<Result<FittingHistory[]>> GetExamples(string host);
+        Task<Result<HairHistory[]>> GetExamples(string host);
     }
 }
