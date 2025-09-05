@@ -10,7 +10,7 @@ namespace MetaApi.Services.Interfaces
 
         Task Delete(int fittingResultId, int userId);
 
-        //Task<Result<FittingHistory[]>> GetHistory(int userId);
+        Task<Result<HairHistory[]>> GetHistory(int userId);
 
         //Task<Result<FittingHistory[]>> GetExamples(string host);
     }

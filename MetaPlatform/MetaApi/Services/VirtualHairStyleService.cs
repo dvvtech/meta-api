@@ -29,12 +29,7 @@ namespace MetaApi.Services
         //public Task<Result<FittingHistory[]>> GetExamples(string host)
         //{
         //    throw new NotImplementedException();
-        //}
-
-        //public Task<Result<FittingHistory[]>> GetHistory(int userId)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        //}        
 
     }
 }
