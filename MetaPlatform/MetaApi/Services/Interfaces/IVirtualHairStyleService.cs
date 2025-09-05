@@ -8,7 +8,7 @@ namespace MetaApi.Services.Interfaces
     {
         Task<Result<string>> TryOnAsync(HairTryOnData hairTryOnData);
 
-        //Task Delete(int fittingResultId, int userId);
+        Task Delete(int fittingResultId, int userId);
 
         //Task<Result<FittingHistory[]>> GetHistory(int userId);
 

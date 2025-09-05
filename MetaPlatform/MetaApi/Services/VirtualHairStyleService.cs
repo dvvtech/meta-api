@@ -26,11 +26,6 @@ namespace MetaApi.Services
             _logger = logger;
         }
 
-        //public Task Delete(int fittingResultId, int userId)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
         //public Task<Result<FittingHistory[]>> GetExamples(string host)
         //{
         //    throw new NotImplementedException();
