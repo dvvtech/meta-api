@@ -30,7 +30,8 @@ namespace MetaApi.Services.AiClients.Replicate
             {
                 input = new
                 {
-                    prompt = "try the hairstyle from the second photo on the first one",
+                    //prompt = "try the hairstyle from the second photo on the first one",
+                    prompt = "In the first photo, there is a person. In the second photo, there is a hairstyle of another person. Transfer the hairstyle from the second photo onto the head of the person in the first photo. Keep the face, pose, and background from the first photo, but make the hair the same as in the second photo (shape, length, color, style). The result should look as realistic and natural as possible.",
                     image_input = new[] { data.FaceImg, data.HairImg }
                 }
             };
@@ -43,6 +44,8 @@ namespace MetaApi.Services.AiClients.Replicate
             var response = await _httpClient.PostAsync("models/google/nano-banana/predictions", content);
             if (!response.IsSuccessStatusCode)
             {
+                var responseContentError = await response.Content.ReadAsStringAsync();
+                _logger.LogError(responseContentError);
                 string httpStatusCode = ((int)response.StatusCode).ToString();
                 return Result<string>.Failure(PredictionErrors.PredictionRequestFail(httpStatusCode));
             }

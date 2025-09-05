@@ -10,18 +10,20 @@ namespace MetaApi.Services
         private readonly IHairHistoryRepository _hairHistoryRepository;
         private readonly ITryOnLimitService _tryOnLimitService;
         private readonly IFileService _fileService;
-        private readonly ILogger<VirtualFitService> _logger;
+        private readonly ILogger<VirtualHairStyleService> _logger;
 
         public VirtualHairStyleService(
             IReplicateVirtualHairApiClient replicateClientService,
             IHairHistoryRepository hairHistoryRepository,
             ITryOnLimitService tryOnLimitService,
-            IFileService fileService)
+            IFileService fileService,
+            ILogger<VirtualHairStyleService> logger)
         {
             _replicateClientService = replicateClientService;
             _hairHistoryRepository = hairHistoryRepository;
             _tryOnLimitService = tryOnLimitService;
             _fileService = fileService;
+            _logger = logger;
         }
 
         //public Task Delete(int fittingResultId, int userId)
