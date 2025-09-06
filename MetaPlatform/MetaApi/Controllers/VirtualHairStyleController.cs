@@ -1,6 +1,7 @@
 ﻿using MetaApi.Core.Domain.Hair;
 using MetaApi.Core.OperationResults.Base;
 using MetaApi.Extensions;
+using MetaApi.Models.VirtualFit;
 using MetaApi.Models.VirtualHair;
 using MetaApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -62,6 +63,81 @@ namespace MetaApi.Controllers
             }
 
             return Ok(new HairResultResponse { Url = resultHairTryOn.Value });
+        }
+
+        [HttpDelete("history"), Authorize]
+        public async Task<ActionResult> Delete(HairDeleteRequest request)
+        {
+            Result<int> userIdResult = this.GetCurrentUserId();
+            if (userIdResult.IsFailure)
+            {
+                return BadRequest(userIdResult.Error);
+            }
+
+            await _virtualHairStyleService.Delete(request.HairResultId, userIdResult.Value);
+            return Ok();
+        }
+
+        [HttpPost("history"), Authorize]
+        public async Task<ActionResult<HairHistoryResponse[]>> GetHistory()
+        {
+            _logger.LogInformation("GetHistory");
+
+            Result<int> userIdResult = this.GetCurrentUserId();
+            if (userIdResult.IsFailure)
+            {
+                return BadRequest(userIdResult.Error);
+            }
+
+            Result<HairHistory[]> fittingResults = await _virtualHairStyleService.GetHistory(userIdResult.Value);
+            if (fittingResults.IsFailure)
+            {
+                return BadRequest(new { description = fittingResults.Error.Description });
+            }
+
+            var fittingHistories = fittingResults.Value.Select(s => new HairHistoryResponse
+            {
+                Id = s.Id,
+                FaceImgUrl = s.FaceImg,
+                HairImgUrl = s.HairImg,
+                ResultImgUrl = s.ResultImgUrl,
+            }).ToArray();
+
+            return Ok(fittingHistories);
+        }
+
+        /// <summary>
+        /// Примеры примерок для незарегестрированных пользователей
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("examples")]
+        public async Task<ActionResult<FittingHistoryResponse[]>> GetExamples()
+        {
+            _logger.LogInformation("GetExamples");
+
+            Result<HairHistory[]> fittingResults = await _virtualHairStyleService.GetExamples(Request.Host.Value);
+            if (fittingResults.IsFailure)
+            {
+                return BadRequest(new { description = fittingResults.Error.Description });
+            }
+
+            var fittingExamples = fittingResults.Value.Select(s => new HairHistoryResponse
+            {
+                Id = s.Id,
+                FaceImgUrl = s.FaceImg,
+                HairImgUrl = s.HairImg,
+                ResultImgUrl = s.ResultImgUrl,
+            }).ToArray();
+
+            return Ok(fittingExamples);
+        }
+
+        [HttpGet("test3")]
+        public IResult Test()
+        {
+            _logger.LogInformation("123count_images1: ");
+            //_virtualFitService.Test();
+            return Results.Ok("777");
         }
     }
 }
