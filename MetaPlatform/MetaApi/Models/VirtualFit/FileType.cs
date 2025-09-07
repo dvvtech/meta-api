@@ -48,6 +48,7 @@
                 FileType.Other => "other",
                 FileType.ManHair => "manHair",
                 FileType.WomanHair => "womanHair",
+                FileType.HairExamples => "hairExamples",
                 _ => "unknown" // По умолчанию, если FileType не определён
             };
         }
