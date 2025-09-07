@@ -25,7 +25,7 @@
 
         WomanHair = 10,
 
-        HairExamples = 10
+        HairExamples = 11
     }
 
     public static class FileTypeExtensions
