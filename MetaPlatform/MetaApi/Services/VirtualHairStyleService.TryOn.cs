@@ -38,7 +38,7 @@ namespace MetaApi.Services
         {
             return HairHistory.Create(
                 accountId: data.AccountId,
-                hairImgImgUrl: ImageUrlHelper.GetUrl(data.HairImg).Replace(FittingConstants.PADDING_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL)
+                hairImgUrl: ImageUrlHelper.GetUrl(data.HairImg).Replace(FittingConstants.PADDING_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL)
                                                                       .Replace(FittingConstants.FULLSIZE_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL),
                 faceImgUrl: ImageUrlHelper.GetUrl(data.FaceImg).Replace(FittingConstants.PADDING_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL)
                                                                      .Replace(FittingConstants.FULLSIZE_SUFFIX_URL, FittingConstants.THUMBNAIL_SUFFIX_URL),

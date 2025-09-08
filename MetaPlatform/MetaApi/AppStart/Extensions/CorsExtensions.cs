@@ -16,7 +16,7 @@
                                            "https://oxford-ap.com",
                                            "https://yashel.center",
                                            "https://pingmetasks.com",
-                                           "https://dvvtech.github.io/virtual-hair")
+                                           "https://dvvtech.github.io")
                               //.AllowCredentials() // Разрешить куки
                               .AllowAnyHeader()
                               .AllowAnyMethod();

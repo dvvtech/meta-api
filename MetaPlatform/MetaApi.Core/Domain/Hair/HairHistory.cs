@@ -22,27 +22,27 @@ namespace MetaApi.Core.Domain.Hair
 
         public int AccountId { get; set; }
 
-        private HairHistory(int accountId, string hairImgImgUrl, string faceImgUrl, string resultImgUrl)
+        private HairHistory(int accountId, string hairImgUrl, string faceImgUrl, string resultImgUrl)
         {
             AccountId = accountId;
-            HairImg = hairImgImgUrl;
+            HairImg = hairImgUrl;
             FaceImg = faceImgUrl;
             ResultImgUrl = resultImgUrl;
         }
 
-        private HairHistory(int id, int accountId, string hairImgImgUrl, string faceImgUrl, string resultImgUrl)
+        private HairHistory(int id, int accountId, string hairImgUrl, string faceImgUrl, string resultImgUrl)
         {
             Id = id;
             AccountId = accountId;
-            HairImg = hairImgImgUrl;
+            HairImg = hairImgUrl;
             FaceImg = faceImgUrl;
             ResultImgUrl = resultImgUrl;
         }
 
 
-        public static HairHistory Create(int accountId, string hairImgImgUrl, string faceImgUrl, string resultImgUrl)
+        public static HairHistory Create(int accountId, string hairImgUrl, string faceImgUrl, string resultImgUrl)
         {
-            return new HairHistory(accountId, hairImgImgUrl, faceImgUrl, resultImgUrl);
+            return new HairHistory(accountId, hairImgUrl, faceImgUrl, resultImgUrl);
         }
 
         public static HairHistory Create(int id, int accountId, string hairImgImgUrl, string faceImgUrl, string resultImgUrl)

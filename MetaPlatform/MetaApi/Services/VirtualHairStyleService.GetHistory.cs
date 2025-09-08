@@ -19,23 +19,21 @@ namespace MetaApi.Services
         /// <returns></returns>
         public async Task<Result<HairHistory[]>> GetExamples(string host)
         {
-
             var fittingExamples = new HairHistory[]
             {
                     HairHistory.Create(accountId: 1,
-                                          hairImgImgUrl: GenerateFileUrl("2e39b1d1-dfc0-4c41-a600-e5b72da6220a_1.435_t.png", FileType.HairExamples, host),
-                                          faceImgUrl: GenerateFileUrl("547babf5-f046-4b73-aa2c-a7d4494298d3_1.481_t.png", FileType.HairExamples, host),
-                                          resultImgUrl: GenerateFileUrl("7abd958d-eb5b-4180-a64f-c988fc536f02_t.jpg", FileType.HairExamples, host)),
+                                       hairImgUrl: GenerateFileUrl("70bb7586-bfdf-4c25-be91-ad16e99b2bb6_0.936_t.png", FileType.HairExamples, host),
+                                       faceImgUrl: GenerateFileUrl("13fc6814-7952-4b17-aa2b-f3944820def1_t.png", FileType.HairExamples, host),
+                                       resultImgUrl: GenerateFileUrl("5428fb07-8a06-4236-8159-dd127e87f36f_t", FileType.HairExamples, host)),
                     HairHistory.Create(accountId: 1,
-                                          hairImgImgUrl: GenerateFileUrl("de419a4d-d232-40a6-b8ca-d065788d1c4c_1.593_t.png", FileType.HairExamples, host),
-                                          faceImgUrl: GenerateFileUrl("3ac9d1c3-4fae-455b-9bef-30e9a2395a7b_2.433_t.png", FileType.HairExamples, host),
-                                          resultImgUrl: GenerateFileUrl("9b9ad00a-47b9-48e8-b960-b73fffc6eabe_t.jpg", FileType.HairExamples, host)),
+                                       hairImgUrl: GenerateFileUrl("fa3f0c40-11ed-401f-b30f-8137d3fd8ded_0.846_t.png", FileType.HairExamples, host),
+                                       faceImgUrl: GenerateFileUrl("48ba878b-cf80-4491-9197-26b52012cb7d_0.605_t.png", FileType.HairExamples, host),
+                                       resultImgUrl: GenerateFileUrl("fbaa162a-9fbb-414e-8e7a-0cbcb29108d1_0.625_t.jpeg", FileType.HairExamples, host)),
                     HairHistory.Create(accountId: 1,
-                                          hairImgImgUrl: GenerateFileUrl("22069f77-18f3-4d3a-8988-4f8ce9ee8726_1.016_t.png", FileType.HairExamples, host),
-                                          faceImgUrl: GenerateFileUrl("7def122e-b614-4f12-b596-9a0b6ccc1a6a_1.497_v.png", FileType.HairExamples, host),
-                                          resultImgUrl: GenerateFileUrl("bbd9ea7b-3bdd-41b6-9992-340ae79ea933_t.jpg", FileType.HairExamples, host))
-            };
-
+                                       hairImgUrl: GenerateFileUrl("0450ed64-7ed4-4d22-8c00-968d1fb44fc6_1.004_t.png", FileType.HairExamples, host),
+                                       faceImgUrl: GenerateFileUrl("554356e7-2239-4c13-8ce1-276b76bf6a72_1.136_t.png", FileType.HairExamples, host),
+                                       resultImgUrl: GenerateFileUrl("7b057d3e-d443-4d0d-8fce-5fc879e81ec2_1.133_v.jpeg", FileType.HairExamples, host))
+            };            
 
             return Result<HairHistory[]>.Success(fittingExamples);
         }
