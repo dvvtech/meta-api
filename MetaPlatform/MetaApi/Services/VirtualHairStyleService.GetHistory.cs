@@ -24,7 +24,7 @@ namespace MetaApi.Services
                     HairHistory.Create(accountId: 1,
                                        hairImgUrl: GenerateFileUrl("70bb7586-bfdf-4c25-be91-ad16e99b2bb6_0.936_t.png", FileType.HairExamples, host),
                                        faceImgUrl: GenerateFileUrl("13fc6814-7952-4b17-aa2b-f3944820def1_t.png", FileType.HairExamples, host),
-                                       resultImgUrl: GenerateFileUrl("5428fb07-8a06-4236-8159-dd127e87f36f_t", FileType.HairExamples, host)),
+                                       resultImgUrl: GenerateFileUrl("5428fb07-8a06-4236-8159-dd127e87f36f_t.jpeg", FileType.HairExamples, host)),
                     HairHistory.Create(accountId: 1,
                                        hairImgUrl: GenerateFileUrl("fa3f0c40-11ed-401f-b30f-8137d3fd8ded_0.846_t.png", FileType.HairExamples, host),
                                        faceImgUrl: GenerateFileUrl("48ba878b-cf80-4491-9197-26b52012cb7d_0.605_t.png", FileType.HairExamples, host),
