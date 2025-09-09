@@ -3,7 +3,7 @@ using MetaApi.Core.OperationResults.Base;
 using MetaApi.Models.VirtualFit;
 
 namespace MetaApi.Services
-{
+{ 
     public partial class VirtualFitService
     {
         public async Task<Result<FittingHistory[]>> GetHistory(int userId)
