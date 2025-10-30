@@ -17,6 +17,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetaApi.UnitTests", "tests\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Meta.Infrastructure", "Meta.Infrastructure\Meta.Infrastructure.csproj", "{445083D0-C1F7-428A-A18A-B93E33CBF543}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{8AC2E90E-89DC-4F13-981F-38D89262BFB3}"
+	ProjectSection(SolutionItems) = preProject
+		..\deploy\docker-compose.yaml = ..\deploy\docker-compose.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

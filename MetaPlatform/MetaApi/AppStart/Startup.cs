@@ -16,6 +16,7 @@ using MetaApi.Services.Cache;
 using MetaApi.Services.Interfaces;
 using MetaApi.SqlServer.Repositories;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using System.Net;
 
 namespace MetaApi.AppStart
 {
@@ -58,6 +59,7 @@ namespace MetaApi.AppStart
             _builder.Services.Configure<MailRuAuthConfig>(_builder.Configuration.GetSection(MailRuAuthConfig.SectionName));
             _builder.Services.Configure<GazpromIdAuthConfig>(_builder.Configuration.GetSection(GazpromIdAuthConfig.SectionName));
             _builder.Services.Configure<AiClientConfig>(_builder.Configuration.GetSection(AiClientConfig.SectionName));
+            _builder.Services.Configure<ProxyConfig>(_builder.Configuration.GetSection(ProxyConfig.SectionName));
 
             _builder.Services.AddOptions<JwtConfig>()
                 .Bind(_builder.Configuration.GetSection(JwtConfig.SectionName))
@@ -102,12 +104,39 @@ namespace MetaApi.AppStart
 
             _builder.Services.AddHttpClient<IAiClient, ChatGptAiClient>((serviceProvider, client) =>
             {
-                var aiClientConfig = _builder.Configuration.GetSection(VirtualFitConfig.SectionName).Get<AiClientConfig>();
+                var aiClientConfig = _builder.Configuration.GetSection(AiClientConfig.SectionName).Get<AiClientConfig>();
 
                 client.BaseAddress = new Uri("https://api.openai.com/v1/chat/completions");
                 client.Timeout = TimeSpan.FromSeconds(35); // Таймаут запроса
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {aiClientConfig.OpenAiApiKey}");
-                //client.DefaultRequestHeaders.Add("Prefer", "wait");
+            })
+            .ConfigurePrimaryHttpMessageHandler(() =>
+            {
+                var handler = new HttpClientHandler();
+
+                // Получаем настройки прокси из конфигурации
+                var proxyConfig = _builder.Configuration.GetSection("ProxySettings").Get<ProxyConfig>();
+
+                if (proxyConfig?.Enabled == true && !string.IsNullOrEmpty(proxyConfig.Ip))
+                {
+                    var proxy = new WebProxy
+                    {
+                        Address = new Uri($"http://{proxyConfig.Ip}:{proxyConfig.Port}"),
+                        BypassProxyOnLocal = false,
+                        UseDefaultCredentials = false
+                    };
+
+                    // Если есть логин и пароль
+                    if (!string.IsNullOrEmpty(proxyConfig.Login) && !string.IsNullOrEmpty(proxyConfig.Password))
+                    {
+                        proxy.Credentials = new NetworkCredential(proxyConfig.Login, proxyConfig.Password);
+                    }
+
+                    handler.Proxy = proxy;
+                    handler.UseProxy = true;
+                }
+
+                return handler;
             });
         }
 

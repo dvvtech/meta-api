@@ -1,6 +1,7 @@
 ﻿using MetaApi.Configuration;
 using MetaApi.Core.Interfaces.Infrastructure;
 using MetaApi.Models.Email;
+using MetaApi.Services.AiClients.Base;
 using MetaApi.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -17,19 +18,22 @@ namespace MetaApi.Controllers
         private readonly IOptions<GoogleRecaptchaConfig> _recaptchaOptions;
         private readonly IEmailBodyGenerator _emailBodyGenerator;
         private readonly ILogger<EmailController> _logger;
+        private readonly IAiClient _aiClient;
 
         public EmailController(IEmailSender emailSender,
                                IHttpClientFactory httpClientFactory,
                                IOptions<GoogleRecaptchaConfig> recaptchaOptions,
                                IEmailBodyGenerator emailBodyGenerator,
-                               ILogger<EmailController> logger)
+                               ILogger<EmailController> logger,
+                               IAiClient aiClient)
         {
             _emailSender = emailSender;
             _httpClientFactory = httpClientFactory;
             _recaptchaOptions = recaptchaOptions;
             _emailBodyGenerator = emailBodyGenerator;
             _logger = logger;
-        }
+            _aiClient = aiClient;
+        }        
 
         [HttpPost("send")]
         public async Task<IActionResult> SendEmail([FromBody] SendEmailRequest request)
@@ -59,6 +63,20 @@ namespace MetaApi.Controllers
 
             var res = await _emailSender.SendEmail("dvv153m@gmail.com", request.Subject, emailBody);            
             return Ok();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Test()
+        {
+            try
+            {
+                var res = await _aiClient.GetTextResponseAsync("напиши короткое стихотворение", "ты профессиональный писатель");
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return Ok("Error" + ex.ToString());
+            }
         }
 
         private async Task<bool> ValidateRecaptcha(string token, string secretKey)
