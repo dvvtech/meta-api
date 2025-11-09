@@ -24,6 +24,6 @@ services:
       - GoogleRecaptcha__SecretKeyForYashelCenter=${SECRET_KEY_FOR_YASHEL_CENTER}
       - GoogleRecaptcha__SecretKeyForPingmetasks=${SECRET_KEY_FOR_PINGMETASKS}
       - AiClientConfig__OpenAiApiKey=${OPEN_AI_API_KEY}
-      - ProxySettings_Login=${PROXY_LOGIN}
-      - ProxySettings_Password=${PROXY_PASSWORD}
+      - ProxySettings__Login=${PROXY_LOGIN}
+      - ProxySettings__Password=${PROXY_PASSWORD}
     restart: unless-stopped
