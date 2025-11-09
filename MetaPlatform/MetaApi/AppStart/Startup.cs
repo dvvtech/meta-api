@@ -57,7 +57,7 @@ namespace MetaApi.AppStart
             _builder.Services.Configure<VkAuthConfig>(_builder.Configuration.GetSection(VkAuthConfig.SectionName));
             _builder.Services.Configure<YandexAuthConfig>(_builder.Configuration.GetSection(YandexAuthConfig.SectionName));
             _builder.Services.Configure<MailRuAuthConfig>(_builder.Configuration.GetSection(MailRuAuthConfig.SectionName));
-            _builder.Services.Configure<GazpromIdAuthConfig>(_builder.Configuration.GetSection(GazpromIdAuthConfig.SectionName));
+            //_builder.Services.Configure<GazpromIdAuthConfig>(_builder.Configuration.GetSection(GazpromIdAuthConfig.SectionName));
             _builder.Services.Configure<AiClientConfig>(_builder.Configuration.GetSection(AiClientConfig.SectionName));
             _builder.Services.Configure<ProxyConfig>(_builder.Configuration.GetSection(ProxyConfig.SectionName));
 

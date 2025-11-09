@@ -11,7 +11,7 @@ namespace MetaApi.Services.Auth
         private readonly IMemoryCache _cache;
         private readonly IJwtProvider _jwtProvider;
         private readonly ILogger<GazpromIdAuthService> _logger;
-        private readonly GazpromIdAuthConfig _authConfig;
+        //private readonly GazpromIdAuthConfig _authConfig;
         private readonly HttpClient _httpClient;
         private readonly IAccountRepository _accountRepository;
 
@@ -19,13 +19,13 @@ namespace MetaApi.Services.Auth
                                     ILogger<GazpromIdAuthService> logger,
                                     IAccountRepository accountRepository,
                                     IJwtProvider jwtProvider,
-                                    HttpClient httpClient,
-                                    IOptions<GazpromIdAuthConfig> authConfig)
+                                    HttpClient httpClient)
+                                    //IOptions<GazpromIdAuthConfig> authConfig)
         {
             _cache = cache;
             _logger = logger;
             _jwtProvider = jwtProvider;
-            _authConfig = authConfig.Value;
+            //_authConfig = authConfig.Value;
             _httpClient = httpClient;
             _accountRepository = accountRepository;
         }
