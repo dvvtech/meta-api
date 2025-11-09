@@ -1,24 +1,29 @@
 version: '3.8'
 
 services:
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2019-latest
-    container_name: mssql-express
-    restart: unless-stopped
+  webapi:
+    build:
+      context: ..
+      dockerfile: MetaApi/Dockerfile
     ports:
-      - "1433:1433"
+      - "6000:8080"
     environment:
-      ACCEPT_EULA: "Y"
-      SA_PASSWORD: "YourStrong!Password123"
-      MSSQL_PID: "Express"
-    volumes:
-      - sqlserver_data:/var/opt/mssql
-    networks:
-      - sqlserver-network
-
-volumes:
-  sqlserver_data:
-
-networks:
-  sqlserver-network:
-    driver: bridge
+      - ASPNETCORE_ENVIRONMENT=Prod
+      - ConnectionStrings__MetaDbMsSqlConnection=${MSSQL_CONNECTION_STRING}
+      - VirtualFit__ApiToken=${API_TOKEN}
+      - Jwt__Key=${JWT_TOKEN}
+      - GoogleAuth__ClientId=${GOOGLE_CLIENT_ID}
+      - GoogleAuth__ClientSecret=${GOOGLE_SECRET}
+      - YandexAuth__ClientId=${YANDEX_CLIENT_ID}
+      - YandexAuth__ClientSecret=${YANDEX_CLIENT_SECRET}
+      - MailRuAuth__ClientId=${MAIL_CLIENT_ID}
+      - MailRuAuth__ClientSecret=${MAIL_CLIENT_SECRET}
+      - SmtpConfig__Username=${SMTP_USERNAME}
+      - SmtpConfig__Password=${SMTP_PASSWORD}
+      - GoogleRecaptcha__SecretKeyForOxfordAp=${SECRET_KEY_FOR_OXFORD_AP}
+      - GoogleRecaptcha__SecretKeyForYashelCenter=${SECRET_KEY_FOR_YASHEL_CENTER}
+      - GoogleRecaptcha__SecretKeyForPingmetasks=${SECRET_KEY_FOR_PINGMETASKS}
+      - AiClientConfig__OpenAiApiKey=${OPEN_AI_API_KEY}
+      - ProxySettings_Login=${PROXY_LOGIN}
+      - ProxySettings_Password=${PROXY_PASSWORD}
+    restart: unless-stopped

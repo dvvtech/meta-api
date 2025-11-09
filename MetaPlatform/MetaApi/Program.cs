@@ -18,8 +18,8 @@ var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 var dbInfo = builder.Configuration.GetConnectionString(DatabaseConfig.MetaDbMsSqlConnection);
 //var rootPath = builder.Environment.ContentRootPath;
 StringBuilder sb = new StringBuilder();
-sb.AppendLine($"Environment1: {environment}");
-sb.AppendLine($"dbInfo1: {dbInfo}");
+sb.AppendLine($"Environment: {environment}");
+sb.AppendLine($"dbInfo: {dbInfo}");
 //sb.AppendLine($"rootPath: {rootPath}");
 app.Logger.LogInformation(sb.ToString());
 
